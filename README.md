@@ -34,9 +34,9 @@ An extremely scalable approach is to generate IDs based on 64 bits and split tho
 
 The first 41 bits store an offset of milliseconds to a customly defined epoch. Using 41 bits offer us about 69 years of milliseconds before we run out of new IDs. This should probably enough for most systems.
 
-The next 13 bits store a unique logical cluster node ID which must be unique for a given point in time. Nodes are not required to retrieve the same cluster node ID over and over again but it must be unique while runtime.
+The next 13 bits store a unique logical cluster node ID which must be unique for a given point in time. Nodes are not required to retrieve the same cluster node ID over and over again but it must be unique while runtime. 13 bits offer us 8,192 (2^13) unique cluster node IDs.
 
-The last 10 bits store the auto-incrementing counter part. This counter is increasing only per millisecond to guarantee the order of generated IDs to *almost* comply to the natural ordering requirement. Using 10 bits enables us to generate up to 1024 (2^10) IDs per millisecond per logical cluster node.
+The last 10 bits store the auto-incrementing counter part. This counter is increasing only per millisecond to guarantee the order of generated IDs to *almost* comply to the natural ordering requirement. Using 10 bits enables us to generate up to 1,024 (2^10) IDs per millisecond per logical cluster node.
 
 The last two parts are able to be changed in the number of bits (e.g. less logical cluster nodes but more IDs per node). In any way this enables us to generate 8,388,608 (2^23) guaranteed unique IDs per millisecond.
 
