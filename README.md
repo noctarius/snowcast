@@ -1,6 +1,6 @@
 # snowcast
 
-**snowcast** is a auto-configuration, distributed, scalable ID generator on top of Hazelcast.
+**snowcast** is an auto-configuration, distributed, scalable ID generator on top of Hazelcast.
 
 ### The Problem
 
