@@ -70,7 +70,7 @@ id |= casInc(counter [0, 1024])
 
 ### Why snowcast?
 
-snowcast is a wordplay based on Snowflake and Hazelcast.
+As you might already have guessed, snowcast is a wordplay based on Snowflake and Hazelcast.
 
 Hazelcast is a distributed cluster environment to offer partitioned in-memory speed. It is the perfect background system to build snowcast on top of. Using Hazelcast, snowcast offers auto-configuration for logical cluster node IDs and fast startup times.
 
