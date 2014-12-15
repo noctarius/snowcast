@@ -20,7 +20,8 @@ public interface SnowcastSequencer {
 
     String getSequencerName();
 
-    long next();
+    long next()
+            throws InterruptedException;
 
     SnowcastSequenceState getSequencerState();
 

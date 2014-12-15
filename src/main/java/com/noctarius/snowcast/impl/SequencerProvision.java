@@ -19,9 +19,9 @@ package com.noctarius.snowcast.impl;
 final class SequencerProvision {
 
     private final SequencerDefinition definition;
-    private final SnowcastSequencerImpl sequencer;
+    private final SequencerImpl sequencer;
 
-    public SequencerProvision(SequencerDefinition definition, SnowcastSequencerImpl sequencer) {
+    public SequencerProvision(SequencerDefinition definition, SequencerImpl sequencer) {
         this.definition = definition;
         this.sequencer = sequencer;
     }
@@ -30,7 +30,7 @@ final class SequencerProvision {
         return definition;
     }
 
-    public SnowcastSequencerImpl getSequencer() {
+    public SequencerImpl getSequencer() {
         return sequencer;
     }
 

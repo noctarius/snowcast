@@ -29,7 +29,7 @@ final class SequencerConstructorFunction
 
     @Override
     public SequencerProvision createNew(SequencerDefinition definition) {
-        SnowcastSequencerImpl sequencer = new SnowcastSequencerImpl(sequencerService, definition);
+        SequencerImpl sequencer = new SequencerImpl(sequencerService, definition);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);
     }

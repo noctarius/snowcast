@@ -125,7 +125,7 @@ Every call to the `Snowcast::createSequencer` method must pass in the same confi
 long nextId = sequencer.next();
 ```
 
-The `SnowcastSequencer::next` operation will return as fast as a ID is available. Depending on how many IDs can be generated per millisecond (to configure generatable IDs, please see [Number of Nodes](#number-of-nodes)) the operation will return immediately with the new ID, if the number of IDs for this millisecond (and node) is exceeded, the method blocks until it can retrieve the next ID. All ID generation is a local only operation, no network interaction is required!
+The `SnowcastSequencer::next` operation will return as fast as a ID is available. Depending on how many IDs can be generated per millisecond (to configure generatable IDs, please see [Number of Nodes](#number-of-nodes)) the operation will return immediately with the new ID, if the number of IDs for this millisecond (and node) is exceeded, the method blocks until it can retrieve the next ID. Therefore the method might throw an `InterruptedException` when the thread becomes interrupted while waiting for a new ID. All ID generation is a local only operation, no network interaction is required!
 
 This is basically it, the last step is to destroy sequencers eventually (or shutdown the cluster ;-)). To destroy a `SnowcastSequencer` the following snippet is enough.
 
