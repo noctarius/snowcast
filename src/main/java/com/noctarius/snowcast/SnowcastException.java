@@ -16,7 +16,8 @@
  */
 package com.noctarius.snowcast;
 
-public class SnowcastException extends RuntimeException {
+public class SnowcastException
+        extends RuntimeException {
     public SnowcastException() {
         super();
     }

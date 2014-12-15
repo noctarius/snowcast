@@ -16,7 +16,8 @@
  */
 package com.noctarius.snowcast;
 
-public class SnowcastStateException extends SnowcastException {
+public class SnowcastStateException
+        extends SnowcastException {
 
     public SnowcastStateException(String message) {
         super(message);

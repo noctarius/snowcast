@@ -16,7 +16,8 @@
  */
 package com.noctarius.snowcast;
 
-public class SnowcastNodeIdsExceededException extends SnowcastException {
+public class SnowcastNodeIdsExceededException
+        extends SnowcastException {
 
     public SnowcastNodeIdsExceededException() {
     }

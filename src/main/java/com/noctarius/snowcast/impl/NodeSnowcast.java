@@ -34,10 +34,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
+
 class NodeSnowcast
         implements Snowcast {
-
-    private static final int DEFAULT_MAX_LOGICAL_NODES_13_BITS = 8192;
 
     private final NodeEngine nodeEngine;
     private final NodeSequencerService sequencerService;

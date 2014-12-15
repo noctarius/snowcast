@@ -19,7 +19,7 @@ package com.noctarius.snowcast;
 public class SnowcastMaxLogicalNodeIdOutOfBoundsException
         extends SnowcastException {
 
-        public SnowcastMaxLogicalNodeIdOutOfBoundsException(String message) {
-                super(message);
-        }
+    public SnowcastMaxLogicalNodeIdOutOfBoundsException(String message) {
+        super(message);
+    }
 }

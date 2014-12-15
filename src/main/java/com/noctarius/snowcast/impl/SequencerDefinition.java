@@ -75,7 +75,7 @@ public final class SequencerDefinition {
 
     @Override
     public String toString() {
-        return "SequencerDefinition{" + "sequencerName='" + sequencerName + '\'' + ", epoch=" + epoch
-                + ", maxLogicalNodeCount=" + maxLogicalNodeCount + '}';
+        return "SequencerDefinition{" + "sequencerName='" + sequencerName + '\'' + ", epoch=" + epoch + ", maxLogicalNodeCount="
+                + maxLogicalNodeCount + '}';
     }
 }

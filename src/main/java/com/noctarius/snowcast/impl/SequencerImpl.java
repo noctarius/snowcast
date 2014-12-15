@@ -25,22 +25,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
+import static com.noctarius.snowcast.impl.SnowcastConstants.BASE_SHIFT_LOGICAL_NODE_ID;
+import static com.noctarius.snowcast.impl.SnowcastConstants.EXP_LOOKUP;
+import static com.noctarius.snowcast.impl.SnowcastConstants.INCREMENT_RETRY_TIMEOUT_NANOS;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_COUNTER;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_TIMESTAMP;
+import static com.noctarius.snowcast.impl.SnowcastConstants.TC_COUNTER_READ_MASK;
+import static com.noctarius.snowcast.impl.SnowcastConstants.TC_TIMESTAMP_READ_MASK;
+
 public class SequencerImpl
         implements SnowcastSequencer {
-
-    private static final int INCREMENT_RETRY_TIMEOUT_NANOS = 100;
-
-    // Shifting values
-    private static final int SHIFT_COUNTER = 41;
-    private static final int SHIFT_TIMESTAMP = 23;
-    private static final int BASE_SHIFT_LOGICAL_NODE_ID = 10;
-
-    // Read masks
-    private static final long TC_TIMESTAMP_READ_MASK = 0x1FFFFFFFFFFL;
-    private static final long TC_COUNTER_READ_MASK = 0x7FFFFE0000000000L;
-
-    // Exponent for power of 2 lookup
-    private static final int[] EXP_LOOKUP = {8192, 4096, 2048, 1024, 512, 256, 128};
 
     private static final AtomicReferenceFieldUpdater<SequencerImpl, SnowcastSequenceState> STATE_FIELD_UPDATER;
 

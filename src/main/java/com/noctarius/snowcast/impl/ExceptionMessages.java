@@ -65,7 +65,12 @@ public enum ExceptionMessages {
     /**
      * Sequencer %s is in wrong state, %s expected but %s found
      */
-    SEQUENCER_IN_WRONG_STATE("Sequencer %s is in wrong state, %s expected but %s found");
+    SEQUENCER_IN_WRONG_STATE("Sequencer %s is in wrong state, %s expected but %s found"),
+
+    /**
+     * Parameter %s is not supported
+     */
+    PARAMETER_IS_NOT_SUPPORTED("Parameter %s is not supported");
 
     private final String template;
 

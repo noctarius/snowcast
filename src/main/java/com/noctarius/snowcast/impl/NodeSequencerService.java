@@ -42,14 +42,13 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_LOWER_BOUND;
+import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_UPPER_BOUND;
+
 public class NodeSequencerService
         implements SequencerService, ManagedService, MigrationAwareService {
 
     public static final String SERVICE_NAME = "noctarius::SequencerService";
-
-    // Logical Node Bounding
-    private static final int NODE_ID_LOWER_BOUND = 128;
-    private static final int NODE_ID_UPPER_BOUND = 8192;
 
     private final SequencerPartitionConstructorFunction partitionConstructor = new SequencerPartitionConstructorFunction();
     private final SequencerConstructorFunction sequencerConstructor = new SequencerConstructorFunction(this);

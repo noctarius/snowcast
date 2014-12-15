@@ -16,12 +16,10 @@
  */
 package com.noctarius.snowcast;
 
-import com.noctarius.snowcast.SnowcastException;
-
 public class SnowcastIllegalStateException
         extends SnowcastException {
 
-        public SnowcastIllegalStateException(String message) {
-                super(message);
-        }
+    public SnowcastIllegalStateException(String message) {
+        super(message);
+    }
 }

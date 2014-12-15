@@ -29,6 +29,8 @@ public final class SnowcastFactory {
         if (hazelcastInstance instanceof HazelcastInstanceProxy) {
             return new NodeSnowcast(hazelcastInstance);
         }
-        return null;
+        String className = hazelcastInstance.getClass().getCanonicalName();
+        String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage(className);
+        throw new IllegalArgumentException(message);
     }
 }

@@ -21,7 +21,6 @@ import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.OperationService;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
-import com.noctarius.snowcast.impl.SequencerDefinition;
 
 public class DestroySequencerDefinitionOperation
         extends AbstractSequencerOperation {
