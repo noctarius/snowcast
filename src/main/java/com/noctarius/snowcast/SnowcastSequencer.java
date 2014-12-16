@@ -28,4 +28,10 @@ public interface SnowcastSequencer {
     SnowcastSequencer attachLogicalNode();
 
     SnowcastSequencer detachLogicalNode();
+
+    long timestampValue(long sequenceId);
+
+    int logicalNodeId(long sequenceId);
+
+    int counterValue(long sequenceId);
 }

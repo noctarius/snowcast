@@ -25,11 +25,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
-import static com.noctarius.snowcast.impl.SnowcastConstants.BASE_SHIFT_LOGICAL_NODE_ID;
-import static com.noctarius.snowcast.impl.SnowcastConstants.EXP_LOOKUP;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounterMask;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeMask;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateMaxMillisCounter;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.generateSequenceId;
 import static com.noctarius.snowcast.impl.SnowcastConstants.INCREMENT_RETRY_TIMEOUT_NANOS;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_COUNTER;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_TIMESTAMP;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_COUNTER_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_TIMESTAMP_READ_MASK;
 
@@ -50,8 +52,11 @@ public class SequencerImpl
     private final String sequencerName;
     private final SnowcastEpoch epoch;
 
-    private final int shiftLogicalNodeId;
+    private final int nodeIdShiftFactor;
     private final int maxMillisCounter;
+
+    private final long logicalNodeIdReadMask;
+    private final long counterReadMask;
 
     private volatile SnowcastSequenceState state = SnowcastSequenceState.Detached;
 
@@ -66,8 +71,12 @@ public class SequencerImpl
         this.definition = definition;
         this.sequencerName = definition.getSequencerName();
         this.epoch = definition.getEpoch();
-        this.shiftLogicalNodeId = calculateLogicalNodeShifting(definition.getMaxLogicalNodeCount());
-        this.maxMillisCounter = calculateMaxMillisCounter(shiftLogicalNodeId);
+
+        int maxLogicalNodeCount = definition.getMaxLogicalNodeCount();
+        this.nodeIdShiftFactor = calculateLogicalNodeShifting(maxLogicalNodeCount);
+        this.logicalNodeIdReadMask = calculateLogicalNodeMask(maxLogicalNodeCount, nodeIdShiftFactor);
+        this.counterReadMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShiftFactor);
+        this.maxMillisCounter = calculateMaxMillisCounter(nodeIdShiftFactor);
 
         // Just to prevent the "never-written" warning
         this.timestampAndCounter = 0;
@@ -98,10 +107,7 @@ public class SequencerImpl
             timestamp = epoch.getEpochTimestamp();
         }
 
-        long id = timestamp << SHIFT_TIMESTAMP;
-        id |= logicalNodeID << shiftLogicalNodeId;
-        id |= nextId;
-        return id;
+        return generateSequenceId(timestamp, logicalNodeID, nextId, nodeIdShiftFactor);
     }
 
     @Override
@@ -132,6 +138,21 @@ public class SequencerImpl
         service.detachSequencer(sequencerName, logicalNodeId);
 
         return this;
+    }
+
+    @Override
+    public long timestampValue(long sequenceId) {
+        return InternalSequencerUtils.timestampValue(sequenceId);
+    }
+
+    @Override
+    public int logicalNodeId(long sequenceId) {
+        return InternalSequencerUtils.logicalNodeId(sequenceId, nodeIdShiftFactor, logicalNodeIdReadMask);
+    }
+
+    @Override
+    public int counterValue(long sequenceId) {
+        return InternalSequencerUtils.counterValue(sequenceId, counterReadMask);
     }
 
     void stateTransition(SnowcastSequenceState newState) {
@@ -219,20 +240,5 @@ public class SequencerImpl
             throw new SnowcastStateException(message);
         }
         return logicalNodeId;
-    }
-
-    private int calculateLogicalNodeShifting(int maxLogicalNodeCount) {
-        int exp = BASE_SHIFT_LOGICAL_NODE_ID;
-        for (int matcher : EXP_LOOKUP) {
-            if (matcher == maxLogicalNodeCount) {
-                break;
-            }
-            exp++;
-        }
-        return exp;
-    }
-
-    private int calculateMaxMillisCounter(int shiftLogicalNodeId) {
-        return (int) Math.pow(2, shiftLogicalNodeId);
     }
 }

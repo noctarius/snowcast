@@ -26,11 +26,9 @@ import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.PartitionMigrationEvent;
 import com.hazelcast.spi.PartitionReplicationEvent;
 import com.hazelcast.util.ConcurrencyUtil;
-import com.hazelcast.util.QuickMath;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastIllegalStateException;
-import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.impl.operations.AttachLogicalNodeOperation;
@@ -42,8 +40,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_LOWER_BOUND;
-import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_UPPER_BOUND;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
 
 public class NodeSequencerService
         implements SequencerService, ManagedService, MigrationAwareService {
@@ -191,18 +188,6 @@ public class NodeSequencerService
 
     public SequencerPartition getSequencerPartition(int partitionId) {
         return ConcurrencyUtil.getOrPutIfAbsent(partitions, partitionId, partitionConstructor);
-    }
-
-    private int calculateBoundedMaxLogicalNodeCount(int maxLogicalNodeCount) {
-        if (maxLogicalNodeCount < NODE_ID_LOWER_BOUND) {
-            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("smaller", NODE_ID_LOWER_BOUND);
-            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
-        }
-        if (maxLogicalNodeCount > NODE_ID_UPPER_BOUND) {
-            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("larger", NODE_ID_UPPER_BOUND);
-            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
-        }
-        return QuickMath.nextPowerOfTwo(maxLogicalNodeCount);
     }
 
     private <T> T invoke(Operation operation, String sequencerName) {

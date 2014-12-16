@@ -27,5 +27,4 @@ public class SequencerImplTestCase {
             sequencer.next();
         }
     }
-
 }
