@@ -29,6 +29,16 @@ public final class SnowcastFactory {
         if (hazelcastInstance instanceof HazelcastInstanceProxy) {
             return new NodeSnowcast(hazelcastInstance);
         }
+        /*try {
+            String className = SnowcastFactory.class.getPackage().getName() + ".ClientSnowcast";
+            Class<? extends Snowcast> clazz = (Class<? extends Snowcast>) ClassLoaderUtil.loadClass(null, className);
+            Constructor<? extends Snowcast> constructor = clazz.getDeclaredConstructor(HazelcastInstance.class);
+            return constructor.newInstance(hazelcastInstance);
+        } catch (Exception e) {
+            throw new SnowcastException(e);
+        }*/
+
+        // Client not yet supported
         String className = hazelcastInstance.getClass().getCanonicalName();
         String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage(className);
         throw new IllegalArgumentException(message);

@@ -41,11 +41,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class NodeSequencerService
         implements SequencerService, ManagedService, MigrationAwareService {
-
-    public static final String SERVICE_NAME = "noctarius::SequencerService";
 
     private final SequencerPartitionConstructorFunction partitionConstructor = new SequencerPartitionConstructorFunction();
     private final SequencerConstructorFunction sequencerConstructor = new SequencerConstructorFunction(this);

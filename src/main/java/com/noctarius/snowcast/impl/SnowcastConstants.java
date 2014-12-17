@@ -25,6 +25,9 @@ public final class SnowcastConstants {
     // Default configuration values
     public static final int DEFAULT_MAX_LOGICAL_NODES_13_BITS = 8192;
 
+    // Defined service name
+    public static final String SERVICE_NAME = "noctarius::SequencerService";
+
     private SnowcastConstants() {
     }
 }

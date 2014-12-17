@@ -43,6 +43,11 @@ public enum ExceptionMessages {
     RETRIEVE_NODE_ENGINE_FAILED("Failed to retrieve NodeEngine from HazelcastInstance, not a proxy?"),
 
     /**
+     * Failed to retrieve NodeEngine from HazelcastInstance, not a proxy?
+     */
+    RETRIEVE_CLIENT_ENGINE_FAILED("Failed to retrieve internal client from HazelcastInstance, not a proxy?"),
+
+    /**
      * Cannot detach the sequencer %s, not in attached state
      */
     SEQUENCER_WRONG_STATE_CANNOT_DETACH("Cannot detach the sequencer %s, not in attached state"),

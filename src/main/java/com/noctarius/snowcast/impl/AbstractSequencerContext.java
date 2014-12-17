@@ -1,24 +1,7 @@
-/*
- * Copyright (c) 2014, Christoph Engelbert (aka noctarius) and
- * contributors. All rights reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.noctarius.snowcast.impl;
 
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastSequenceState;
-import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.SnowcastStateException;
 
 import java.util.concurrent.TimeUnit;
@@ -35,19 +18,18 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_COUNTER;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_COUNTER_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_TIMESTAMP_READ_MASK;
 
-public class SequencerImpl
-        implements SnowcastSequencer {
+abstract class AbstractSequencerContext {
 
-    private static final AtomicReferenceFieldUpdater<SequencerImpl, SnowcastSequenceState> STATE_FIELD_UPDATER;
+    private static final AtomicReferenceFieldUpdater<AbstractSequencerContext, SnowcastSequenceState> STATE_UPDATER;
 
-    private static final AtomicLongFieldUpdater<SequencerImpl> TIMESTAMP_AND_COUNTER_FIELD_UPDATER;
+    private static final AtomicLongFieldUpdater<AbstractSequencerContext> TIMESTAMP_AND_COUNTER_UPDATER;
 
     static {
-        STATE_FIELD_UPDATER = AtomicReferenceFieldUpdater.newUpdater(SequencerImpl.class, SnowcastSequenceState.class, "state");
-        TIMESTAMP_AND_COUNTER_FIELD_UPDATER = AtomicLongFieldUpdater.newUpdater(SequencerImpl.class, "timestampAndCounter");
+        STATE_UPDATER = AtomicReferenceFieldUpdater
+                .newUpdater(AbstractSequencerContext.class, SnowcastSequenceState.class, "state");
+        TIMESTAMP_AND_COUNTER_UPDATER = AtomicLongFieldUpdater.newUpdater(AbstractSequencerContext.class, "timestampAndCounter");
     }
 
-    private final SequencerService service;
     private final SequencerDefinition definition;
     private final String sequencerName;
     private final SnowcastEpoch epoch;
@@ -66,8 +48,7 @@ public class SequencerImpl
     // This field is only accessed or written through the field updater
     private volatile long timestampAndCounter;
 
-    public SequencerImpl(SequencerService service, SequencerDefinition definition) {
-        this.service = service;
+    protected AbstractSequencerContext(SequencerDefinition definition) {
         this.definition = definition;
         this.sequencerName = definition.getSequencerName();
         this.epoch = definition.getEpoch();
@@ -82,13 +63,11 @@ public class SequencerImpl
         this.timestampAndCounter = 0;
     }
 
-    @Override
-    public String getSequencerName() {
+    final String getSequencerName() {
         return sequencerName;
     }
 
-    @Override
-    public long next()
+    final long next()
             throws InterruptedException {
 
         int logicalNodeID = checkStateAndLogicalNodeId();
@@ -110,24 +89,19 @@ public class SequencerImpl
         return generateSequenceId(timestamp, logicalNodeID, nextId, nodeIdShiftFactor);
     }
 
-    @Override
-    public SnowcastSequenceState getSequencerState() {
+    final SnowcastSequenceState getSequencerState() {
         return state;
     }
 
-    @Override
-    public SnowcastSequencer attachLogicalNode() {
+    final void attachLogicalNode() {
         // Will fail if state transition is not allowed
         stateTransition(SnowcastSequenceState.Attached);
 
         // Request sequencer remote assignment
-        logicalNodeId = service.attachSequencer(definition);
-
-        return this;
+        this.logicalNodeId = doAttachLogicalNode(definition);
     }
 
-    @Override
-    public SnowcastSequencer detachLogicalNode() {
+    final void detachLogicalNode() {
         // Will fail if state transition is not allowed
         stateTransition(SnowcastSequenceState.Detached);
 
@@ -135,25 +109,24 @@ public class SequencerImpl
         this.logicalNodeId = -1;
 
         // Remove sequencer remote assignment
-        service.detachSequencer(sequencerName, logicalNodeId);
-
-        return this;
+        doAttachLogicalNode(sequencerName, logicalNodeId);
     }
 
-    @Override
-    public long timestampValue(long sequenceId) {
+    final long timestampValue(long sequenceId) {
         return InternalSequencerUtils.timestampValue(sequenceId);
     }
 
-    @Override
-    public int logicalNodeId(long sequenceId) {
+    final int logicalNodeId(long sequenceId) {
         return InternalSequencerUtils.logicalNodeId(sequenceId, nodeIdShiftFactor, logicalNodeIdReadMask);
     }
 
-    @Override
-    public int counterValue(long sequenceId) {
+    final int counterValue(long sequenceId) {
         return InternalSequencerUtils.counterValue(sequenceId, counterReadMask);
     }
+
+    protected abstract int doAttachLogicalNode(SequencerDefinition definition);
+
+    protected abstract void doAttachLogicalNode(String sequencerName, int logicalNodeId);
 
     void stateTransition(SnowcastSequenceState newState) {
         while (true) {
@@ -179,7 +152,7 @@ public class SequencerImpl
                 }
             }
 
-            if (STATE_FIELD_UPDATER.compareAndSet(this, state, newState)) {
+            if (STATE_UPDATER.compareAndSet(this, state, newState)) {
                 return;
             }
         }
@@ -190,7 +163,7 @@ public class SequencerImpl
             long timestampAndCounter = this.timestampAndCounter;
             long lastTimestamp = timestampAndCounter & TC_TIMESTAMP_READ_MASK;
             if (lastTimestamp < timestamp) {
-                if (TIMESTAMP_AND_COUNTER_FIELD_UPDATER.compareAndSet(this, timestampAndCounter, timestamp)) {
+                if (TIMESTAMP_AND_COUNTER_UPDATER.compareAndSet(this, timestampAndCounter, timestamp)) {
                     break;
                 }
             } else {
@@ -221,7 +194,7 @@ public class SequencerImpl
 
             // Build the new combined timestamp and counter value
             long newTC = timestamp | (counter << SHIFT_COUNTER);
-            if (TIMESTAMP_AND_COUNTER_FIELD_UPDATER.compareAndSet(this, timestampAndCounter, newTC)) {
+            if (TIMESTAMP_AND_COUNTER_UPDATER.compareAndSet(this, timestampAndCounter, newTC)) {
                 return (int) counter;
             }
         }

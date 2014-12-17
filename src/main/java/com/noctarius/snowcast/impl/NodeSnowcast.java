@@ -65,7 +65,7 @@ class NodeSnowcast
     private NodeSequencerService getSequencerService(NodeEngine nodeEngine) {
         // Ugly hacks due to lack in SPI
         NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
-        NodeSequencerService service = nodeEngineImpl.getService(NodeSequencerService.SERVICE_NAME);
+        NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
         if (service != null) {
             return service;
         }
@@ -81,11 +81,11 @@ class NodeSnowcast
                     .getDeclaredMethod("registerUserService", Map.class, Map.class, ServiceConfig.class);
             registerUserService.setAccessible(true);
 
-            ServiceConfig serviceConfig = new ServiceConfig().setEnabled(true).setName(NodeSequencerService.SERVICE_NAME)
+            ServiceConfig serviceConfig = new ServiceConfig().setEnabled(true).setName(SnowcastConstants.SERVICE_NAME)
                                                              .setServiceImpl(new NodeSequencerService());
 
             registerUserService.invoke(serviceManager, new HashMap<String, Properties>(), Collections.emptyMap(), serviceConfig);
-            service = nodeEngineImpl.getService(NodeSequencerService.SERVICE_NAME);
+            service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
             if (service != null) {
                 service.init(nodeEngine, new Properties());
                 return service;

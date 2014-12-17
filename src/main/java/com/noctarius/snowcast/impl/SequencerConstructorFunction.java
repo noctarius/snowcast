@@ -29,7 +29,7 @@ final class SequencerConstructorFunction
 
     @Override
     public SequencerProvision createNew(SequencerDefinition definition) {
-        SequencerImpl sequencer = new SequencerImpl(sequencerService, definition);
+        NodeSequencer sequencer = new NodeSequencer(sequencerService, definition);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);
     }

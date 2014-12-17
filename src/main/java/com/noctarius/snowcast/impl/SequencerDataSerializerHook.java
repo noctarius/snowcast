@@ -38,7 +38,7 @@ public class SequencerDataSerializerHook
     public static final int TYPE_DESTROY_SEQUENCER_DEFINITION = 3;
     public static final int TYPE_DESTROY_SEQUENCER = 4;
 
-    private static final int LEN = 5;
+    private static final int LEN = TYPE_DESTROY_SEQUENCER + 1;
 
     private static final int DEFAULT_FACTORY_ID = 78412;
 
