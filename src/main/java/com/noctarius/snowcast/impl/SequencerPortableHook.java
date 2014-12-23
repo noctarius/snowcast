@@ -5,7 +5,13 @@ import com.hazelcast.nio.serialization.Portable;
 import com.hazelcast.nio.serialization.PortableFactory;
 import com.hazelcast.nio.serialization.PortableHook;
 import com.hazelcast.util.ConstructorFunction;
-import com.noctarius.snowcast.impl.operations.client.ClientCreateSequencerDefinitionOperation;
+import com.noctarius.snowcast.impl.notification.ClientDestroySequencerNotification;
+import com.noctarius.snowcast.impl.operations.client.ClientAttachLogicalNodeRequest;
+import com.noctarius.snowcast.impl.operations.client.ClientCreateSequencerDefinitionRequest;
+import com.noctarius.snowcast.impl.operations.client.ClientDestroySequencerDefinitionRequest;
+import com.noctarius.snowcast.impl.operations.client.ClientDetachLogicalNodeRequest;
+import com.noctarius.snowcast.impl.operations.client.ClientRegisterChannelOperation;
+import com.noctarius.snowcast.impl.operations.client.ClientRemoveChannelOperation;
 
 import java.util.Collection;
 
@@ -17,8 +23,10 @@ public class SequencerPortableHook
     public static final int TYPE_CREATE_SEQUENCER_DEFINITION = 3;
     public static final int TYPE_DESTROY_SEQUENCER_DEFINITION = 4;
     public static final int TYPE_DESTROY_SEQUENCER = 5;
+    public static final int TYPE_REGISTER_CHANNEL = 6;
+    public static final int TYPE_REMOVE_CHANNEL = 7;
 
-    private static final int LEN = TYPE_DESTROY_SEQUENCER + 1;
+    private static final int LEN = TYPE_REMOVE_CHANNEL + 1;
 
     @Override
     public int getFactoryId() {
@@ -31,17 +39,53 @@ public class SequencerPortableHook
             private final ConstructorFunction<Integer, Portable> constructors[] = new ConstructorFunction[LEN];
 
             {
+                constructors[TYPE_ATTACH_LOGICAL_NODE] = new ConstructorFunction<Integer, Portable>() {
+                    @Override
+                    public Portable createNew(Integer arg) {
+                        return new ClientAttachLogicalNodeRequest();
+                    }
+                };
+                constructors[TYPE_DETACH_LOGICAL_NODE] = new ConstructorFunction<Integer, Portable>() {
+                    @Override
+                    public Portable createNew(Integer arg) {
+                        return new ClientDetachLogicalNodeRequest();
+                    }
+                };
                 constructors[TYPE_CREATE_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, Portable>() {
                     @Override
                     public Portable createNew(Integer integer) {
-                        return new ClientCreateSequencerDefinitionOperation();
+                        return new ClientCreateSequencerDefinitionRequest();
+                    }
+                };
+                constructors[TYPE_DESTROY_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, Portable>() {
+                    @Override
+                    public Portable createNew(Integer arg) {
+                        return new ClientDestroySequencerDefinitionRequest();
+                    }
+                };
+                constructors[TYPE_DESTROY_SEQUENCER] = new ConstructorFunction<Integer, Portable>() {
+                    @Override
+                    public Portable createNew(Integer arg) {
+                        return new ClientDestroySequencerNotification();
+                    }
+                };
+                constructors[TYPE_REGISTER_CHANNEL] = new ConstructorFunction<Integer, Portable>() {
+                    @Override
+                    public Portable createNew(Integer arg) {
+                        return new ClientRegisterChannelOperation();
+                    }
+                };
+                constructors[TYPE_REMOVE_CHANNEL] = new ConstructorFunction<Integer, Portable>() {
+                    @Override
+                    public Portable createNew(Integer arg) {
+                        return new ClientRemoveChannelOperation();
                     }
                 };
             }
 
             @Override
-            public Portable create(int i) {
-                return null;
+            public Portable create(int classId) {
+                return (classId > 0 && classId <= constructors.length) ? constructors[classId].createNew(classId) : null;
             }
         };
     }

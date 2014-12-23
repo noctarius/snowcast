@@ -19,9 +19,9 @@ package com.noctarius.snowcast.impl;
 final class SequencerProvision {
 
     private final SequencerDefinition definition;
-    private final NodeSequencer sequencer;
+    private final InternalSequencer sequencer;
 
-    public SequencerProvision(SequencerDefinition definition, NodeSequencer sequencer) {
+    public SequencerProvision(SequencerDefinition definition, InternalSequencer sequencer) {
         this.definition = definition;
         this.sequencer = sequencer;
     }
@@ -30,7 +30,7 @@ final class SequencerProvision {
         return definition;
     }
 
-    public NodeSequencer getSequencer() {
+    public InternalSequencer getSequencer() {
         return sequencer;
     }
 

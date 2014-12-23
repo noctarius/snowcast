@@ -17,10 +17,16 @@
 package com.noctarius.snowcast.impl.operations;
 
 import com.hazelcast.instance.MemberImpl;
+import com.hazelcast.spi.EventRegistration;
 import com.hazelcast.spi.NodeEngine;
 import com.hazelcast.spi.OperationService;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
+import com.noctarius.snowcast.impl.notification.ClientDestroySequencerNotification;
+
+import java.util.Collection;
+
+import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class DestroySequencerDefinitionOperation
         extends AbstractSequencerOperation {
@@ -42,17 +48,23 @@ public class DestroySequencerDefinitionOperation
             throws Exception {
 
         NodeSequencerService sequencerService = getService();
-        sequencerService.destroySequencer(getSequencerName(), true);
+        String sequencerName = getSequencerName();
+
+        sequencerService.destroySequencer(sequencerName, true);
 
         NodeEngine nodeEngine = getNodeEngine();
         OperationService operationService = nodeEngine.getOperationService();
 
-        DestroySequencerOperation operation = new DestroySequencerOperation(getSequencerName());
+        DestroySequencerOperation operation = new DestroySequencerOperation(sequencerName);
         for (MemberImpl member : nodeEngine.getClusterService().getMemberList()) {
             if (!member.localMember() && !member.getAddress().equals(getCallerAddress())) {
-                operationService.invokeOnTarget(getServiceName(), operation, member.getAddress());
+                operationService.invokeOnTarget(SERVICE_NAME, operation, member.getAddress());
             }
         }
+
+        ClientDestroySequencerNotification notification = new ClientDestroySequencerNotification(sequencerName);
+        Collection<EventRegistration> registrations = sequencerService.findClientChannelRegistrations(sequencerName, null);
+        nodeEngine.getEventService().publishEvent(SERVICE_NAME, registrations, notification, 1);
     }
 
     @Override

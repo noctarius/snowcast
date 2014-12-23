@@ -21,15 +21,7 @@ import com.noctarius.snowcast.SnowcastSequencer;
 
 public interface SequencerService {
 
-    SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount);
+    Object createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount);
 
     void destroySequencer(SnowcastSequencer sequencer);
-
-    int attachSequencer(SequencerDefinition definition);
-
-    void detachSequencer(String sequencerName, int logicalNodeId);
-
-    SequencerDefinition registerSequencerDefinition(SequencerDefinition definition);
-
-    SequencerDefinition unregisterSequencerDefinition(String sequencerName);
 }

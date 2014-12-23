@@ -43,7 +43,7 @@ abstract class AbstractSequencerContext {
     private volatile SnowcastSequenceState state = SnowcastSequenceState.Detached;
 
     // Holds the currently assigned logical node id
-    private volatile int logicalNodeId;
+    private volatile int logicalNodeId = -1;
 
     // This field is only accessed or written through the field updater
     private volatile long timestampAndCounter;
@@ -109,7 +109,7 @@ abstract class AbstractSequencerContext {
         this.logicalNodeId = -1;
 
         // Remove sequencer remote assignment
-        doAttachLogicalNode(sequencerName, logicalNodeId);
+        doDetachLogicalNode(sequencerName, logicalNodeId);
     }
 
     final long timestampValue(long sequenceId) {
@@ -126,7 +126,7 @@ abstract class AbstractSequencerContext {
 
     protected abstract int doAttachLogicalNode(SequencerDefinition definition);
 
-    protected abstract void doAttachLogicalNode(String sequencerName, int logicalNodeId);
+    protected abstract void doDetachLogicalNode(String sequencerName, int logicalNodeId);
 
     void stateTransition(SnowcastSequenceState newState) {
         while (true) {

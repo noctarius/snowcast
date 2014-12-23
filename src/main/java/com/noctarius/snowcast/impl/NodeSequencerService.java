@@ -16,7 +16,14 @@
  */
 package com.noctarius.snowcast.impl;
 
+import com.hazelcast.client.ClientEndpoint;
+import com.hazelcast.core.DistributedObject;
+import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.nio.serialization.SerializationService;
 import com.hazelcast.partition.InternalPartitionService;
+import com.hazelcast.spi.EventPublishingService;
+import com.hazelcast.spi.EventRegistration;
+import com.hazelcast.spi.EventService;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.MigrationAwareService;
@@ -25,6 +32,8 @@ import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.PartitionMigrationEvent;
 import com.hazelcast.spi.PartitionReplicationEvent;
+import com.hazelcast.spi.RemoteService;
+import com.hazelcast.spi.impl.EventServiceImpl;
 import com.hazelcast.util.ConcurrencyUtil;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
@@ -36,6 +45,9 @@ import com.noctarius.snowcast.impl.operations.CreateSequencerDefinitionOperation
 import com.noctarius.snowcast.impl.operations.DestroySequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DetachLogicalNodeOperation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -44,15 +56,18 @@ import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBounde
 import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class NodeSequencerService
-        implements SequencerService, ManagedService, MigrationAwareService {
+        implements SequencerService, ManagedService, MigrationAwareService, RemoteService,
+                   EventPublishingService<Object, Object> {
 
     private final SequencerPartitionConstructorFunction partitionConstructor = new SequencerPartitionConstructorFunction();
-    private final SequencerConstructorFunction sequencerConstructor = new SequencerConstructorFunction(this);
+    private final NodeSequencerConstructorFunction sequencerConstructor = new NodeSequencerConstructorFunction(this);
 
     private final ConcurrentMap<Integer, SequencerPartition> partitions;
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
     private NodeEngine nodeEngine;
+    private EventService eventService;
+    private SerializationService serializationService;
 
     public NodeSequencerService() {
         this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
@@ -62,30 +77,8 @@ public class NodeSequencerService
     @Override
     public void init(NodeEngine nodeEngine, Properties properties) {
         this.nodeEngine = nodeEngine;
-    }
-
-    @Override
-    public int attachSequencer(SequencerDefinition definition) {
-        InternalPartitionService partitionService = nodeEngine.getPartitionService();
-        int partitionId = partitionService.getPartitionId(definition.getSequencerName());
-
-        AttachLogicalNodeOperation operation = new AttachLogicalNodeOperation(definition);
-        OperationService operationService = nodeEngine.getOperationService();
-
-        InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
-        return (Integer) invocationBuilder.invoke().getSafely();
-    }
-
-    @Override
-    public void detachSequencer(String sequencerName, int logicalNodeId) {
-        InternalPartitionService partitionService = nodeEngine.getPartitionService();
-        int partitionId = partitionService.getPartitionId(sequencerName);
-
-        DetachLogicalNodeOperation operation = new DetachLogicalNodeOperation(sequencerName, logicalNodeId);
-        OperationService operationService = nodeEngine.getOperationService();
-
-        InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
-        invocationBuilder.invoke().getSafely();
+        this.eventService = nodeEngine.getEventService();
+        this.serializationService = nodeEngine.getSerializationService();
     }
 
     @Override
@@ -120,9 +113,76 @@ public class NodeSequencerService
         // Destroy sequencer definition in partition
         Operation operation = new DestroySequencerDefinitionOperation(provision.getSequencerName());
         invoke(operation, sequencer.getSequencerName());
+
+        // Notify clients to destroy the sequencer
+        // TODO
     }
 
     @Override
+    public void reset() {
+        // TODO kill all sequencers
+    }
+
+    @Override
+    public void shutdown(boolean terminate) {
+        // TODO kill all sequencers
+    }
+
+    @Override
+    public Operation prepareReplicationOperation(PartitionReplicationEvent event) {
+        // TODO
+        return null;
+    }
+
+    @Override
+    public void beforeMigration(PartitionMigrationEvent event) {
+        // TODO
+    }
+
+    @Override
+    public void commitMigration(PartitionMigrationEvent event) {
+        // TODO
+    }
+
+    @Override
+    public void rollbackMigration(PartitionMigrationEvent event) {
+        // TODO
+    }
+
+    @Override
+    public void clearPartitionReplica(int partitionId) {
+        // TODO
+    }
+
+    @Override
+    public void dispatchEvent(Object event, Object listener) {
+        if (listener instanceof ClientChannelHandler) {
+            ((ClientChannelHandler) listener).handleEvent(event);
+        }
+    }
+
+    public int attachSequencer(SequencerDefinition definition) {
+        InternalPartitionService partitionService = nodeEngine.getPartitionService();
+        int partitionId = partitionService.getPartitionId(definition.getSequencerName());
+
+        AttachLogicalNodeOperation operation = new AttachLogicalNodeOperation(definition);
+        OperationService operationService = nodeEngine.getOperationService();
+
+        InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
+        return (Integer) invocationBuilder.invoke().getSafely();
+    }
+
+    public void detachSequencer(String sequencerName, int logicalNodeId) {
+        InternalPartitionService partitionService = nodeEngine.getPartitionService();
+        int partitionId = partitionService.getPartitionId(sequencerName);
+
+        DetachLogicalNodeOperation operation = new DetachLogicalNodeOperation(sequencerName, logicalNodeId);
+        OperationService operationService = nodeEngine.getOperationService();
+
+        InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
+        invocationBuilder.invoke().getSafely();
+    }
+
     public SequencerDefinition registerSequencerDefinition(SequencerDefinition definition) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
@@ -130,41 +190,11 @@ public class NodeSequencerService
         return partition.checkOrRegisterSequencerDefinition(definition);
     }
 
-    @Override
     public SequencerDefinition unregisterSequencerDefinition(String sequencerName) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(sequencerName);
         SequencerPartition partition = getSequencerPartition(partitionId);
         return partition.destroySequencerDefinition(sequencerName);
-    }
-
-    @Override
-    public void reset() {
-    }
-
-    @Override
-    public void shutdown(boolean terminate) {
-    }
-
-    @Override
-    public Operation prepareReplicationOperation(PartitionReplicationEvent event) {
-        return null;
-    }
-
-    @Override
-    public void beforeMigration(PartitionMigrationEvent event) {
-    }
-
-    @Override
-    public void commitMigration(PartitionMigrationEvent event) {
-    }
-
-    @Override
-    public void rollbackMigration(PartitionMigrationEvent event) {
-    }
-
-    @Override
-    public void clearPartitionReplica(int partitionId) {
     }
 
     public SequencerDefinition destroySequencer(String sequencerName, boolean local) {
@@ -187,6 +217,37 @@ public class NodeSequencerService
 
     public SequencerPartition getSequencerPartition(int partitionId) {
         return ConcurrencyUtil.getOrPutIfAbsent(partitions, partitionId, partitionConstructor);
+    }
+
+    public EventRegistration registerClientChannel(String sequencerName, ClientEndpoint endpoint, int callId) {
+        ClientChannelHandler clientChannelHandler = new ClientChannelHandler(endpoint, callId, serializationService);
+        return eventService.registerLocalListener(SnowcastConstants.SERVICE_NAME, sequencerName, clientChannelHandler);
+    }
+
+    public void unregisterClientChannel(String sequencerName, String registrationId) {
+        eventService.deregisterListener(SnowcastConstants.SERVICE_NAME, sequencerName, registrationId);
+    }
+
+    public Collection<EventRegistration> findClientChannelRegistrations(String sequencerName, String clientUuid) {
+        Collection<EventRegistration> registrations = eventService
+                .getRegistrations(SnowcastConstants.SERVICE_NAME, sequencerName);
+
+        if (clientUuid == null) {
+            return registrations;
+        }
+
+        // Copy the registrations since the original one is not modifiable
+        registrations = new ArrayList<EventRegistration>(registrations);
+        Iterator<EventRegistration> iterator = registrations.iterator();
+        while (iterator.hasNext()) {
+            EventServiceImpl.Registration registration = (EventServiceImpl.Registration) iterator.next();
+            ClientChannelHandler channelHandler = (ClientChannelHandler) registration.getListener();
+            if (clientUuid.equals(channelHandler.endpoint.getUuid())) {
+                iterator.remove();
+            }
+        }
+
+        return registrations;
     }
 
     private <T> T invoke(Operation operation, String sequencerName) {
@@ -222,6 +283,31 @@ public class NodeSequencerService
             provision = sequencerConstructor.createNew(definition);
             provisions.put(sequencerName, provision);
             return provision;
+        }
+    }
+
+    @Override
+    public DistributedObject createDistributedObject(String objectName) {
+        return new DummyProxy(objectName);
+    }
+
+    @Override
+    public void destroyDistributedObject(String objectName) {
+    }
+
+    private static class ClientChannelHandler {
+        private final ClientEndpoint endpoint;
+        private final Data clientUuidData;
+        private final int callId;
+
+        public ClientChannelHandler(ClientEndpoint endpoint, int callId, SerializationService serializationService) {
+            this.clientUuidData = serializationService.toData(endpoint.getUuid());
+            this.endpoint = endpoint;
+            this.callId = callId;
+        }
+
+        public void handleEvent(Object event) {
+            endpoint.sendEvent(clientUuidData, event, callId);
         }
     }
 }

@@ -28,6 +28,9 @@ public final class SnowcastConstants {
     // Defined service name
     public static final String SERVICE_NAME = "noctarius::SequencerService";
 
+    // User context lookup name
+    public static final String USER_CONTEXT_LOOKUP_NAME = "noctarius::Snowcast::SequencerService";
+
     private SnowcastConstants() {
     }
 }

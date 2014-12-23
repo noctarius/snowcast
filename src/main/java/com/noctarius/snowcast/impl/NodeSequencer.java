@@ -20,11 +20,11 @@ import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 
 public class NodeSequencer
-        implements SnowcastSequencer {
+        implements InternalSequencer {
 
     private final NodeSequencerContext sequencerContext;
 
-    NodeSequencer(SequencerService service, SequencerDefinition definition) {
+    NodeSequencer(NodeSequencerService service, SequencerDefinition definition) {
         this.sequencerContext = new NodeSequencerContext(service, definition);
     }
 
@@ -72,16 +72,17 @@ public class NodeSequencer
         return sequencerContext.counterValue(sequenceId);
     }
 
-    void stateTransition(SnowcastSequenceState newState) {
+    @Override
+    public void stateTransition(SnowcastSequenceState newState) {
         sequencerContext.stateTransition(newState);
     }
 
     private static class NodeSequencerContext
             extends AbstractSequencerContext {
 
-        private final SequencerService service;
+        private final NodeSequencerService service;
 
-        private NodeSequencerContext(SequencerService service, SequencerDefinition definition) {
+        private NodeSequencerContext(NodeSequencerService service, SequencerDefinition definition) {
             super(definition);
             this.service = service;
         }
@@ -92,7 +93,7 @@ public class NodeSequencer
         }
 
         @Override
-        protected void doAttachLogicalNode(String sequencerName, int logicalNodeId) {
+        protected void doDetachLogicalNode(String sequencerName, int logicalNodeId) {
             service.detachSequencer(sequencerName, logicalNodeId);
         }
     }

@@ -17,7 +17,15 @@
 package com.noctarius.snowcast;
 
 import com.hazelcast.core.HazelcastInstance;
-import com.noctarius.snowcast.impl.SnowcastFactory;
+import com.hazelcast.instance.HazelcastInstanceProxy;
+import com.hazelcast.nio.ClassLoaderUtil;
+import com.noctarius.snowcast.impl.NodeSnowcastFactory;
+import com.noctarius.snowcast.impl.SequencerService;
+
+import java.lang.reflect.Method;
+import java.util.Map;
+
+import static com.noctarius.snowcast.impl.SnowcastConstants.USER_CONTEXT_LOOKUP_NAME;
 
 public final class SnowcastSystem {
 
@@ -25,6 +33,34 @@ public final class SnowcastSystem {
     }
 
     public static Snowcast snowcast(HazelcastInstance hazelcastInstance) {
-        return SnowcastFactory.snowcast(hazelcastInstance);
+        // Test for an already created instance first
+        Map<String, Object> userContext = hazelcastInstance.getUserContext();
+        Snowcast snowcast = (Snowcast) userContext.get(USER_CONTEXT_LOOKUP_NAME);
+        if (snowcast != null) {
+            return snowcast;
+        }
+
+        // Node setup
+        if (hazelcastInstance instanceof HazelcastInstanceProxy) {
+            snowcast = NodeSnowcastFactory.snowcast(hazelcastInstance);
+        }
+
+        if (snowcast == null) {
+            try {
+                String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";
+                Class<?> clazz = ClassLoaderUtil.loadClass(null, className);
+                Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class);
+                snowcast = (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance);
+
+            } catch (Exception e) {
+                if (e instanceof SnowcastException) {
+                    throw (SnowcastException) e;
+                }
+                throw new SnowcastException(e);
+            }
+        }
+
+        userContext.put(USER_CONTEXT_LOOKUP_NAME, snowcast);
+        return snowcast;
     }
 }

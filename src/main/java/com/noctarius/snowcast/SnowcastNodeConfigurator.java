@@ -19,6 +19,7 @@ package com.noctarius.snowcast;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.ServiceConfig;
 import com.hazelcast.config.ServicesConfig;
+import com.hazelcast.config.XmlConfigBuilder;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 
@@ -28,7 +29,7 @@ public final class SnowcastNodeConfigurator {
     }
 
     public static Config buildSnowcastAwareConfig() {
-        return buildSnowcastAwareConfig(new Config());
+        return buildSnowcastAwareConfig(new XmlConfigBuilder().build());
     }
 
     public static Config buildSnowcastAwareConfig(Config config) {

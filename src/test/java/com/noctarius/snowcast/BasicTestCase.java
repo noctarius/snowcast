@@ -86,6 +86,28 @@ public class BasicTestCase
     }
 
     @Test(expected = SnowcastStateException.class)
+    public void test_destroyed_state()
+            throws Exception {
+
+        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            assertNotNull(sequencer);
+            assertNotNull(sequencer.next());
+
+            snowcast.destroySequencer(sequencer);
+            sequencer.next();
+
+        } finally {
+            factory.shutdownAll();
+        }
+    }
+
+    @Test(expected = SnowcastStateException.class)
     public void test_id_generation_in_detached_state()
             throws Exception {
 

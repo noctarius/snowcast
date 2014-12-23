@@ -72,27 +72,36 @@ class NodeSnowcast
 
         // More ugly hacks to come here!
         try {
-            Field serviceManagerField = NodeEngineImpl.class.getDeclaredField("serviceManager");
-            serviceManagerField.setAccessible(true);
-            Object serviceManager = serviceManagerField.get(nodeEngineImpl);
+            synchronized (this) {
+                // Probably initialized under lock contention
+                service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
+                if (service != null) {
+                    return service;
+                }
 
-            Class<?> serviceManagerClass = serviceManager.getClass();
-            Method registerUserService = serviceManagerClass
-                    .getDeclaredMethod("registerUserService", Map.class, Map.class, ServiceConfig.class);
-            registerUserService.setAccessible(true);
+                Field serviceManagerField = NodeEngineImpl.class.getDeclaredField("serviceManager");
+                serviceManagerField.setAccessible(true);
+                Object serviceManager = serviceManagerField.get(nodeEngineImpl);
 
-            ServiceConfig serviceConfig = new ServiceConfig().setEnabled(true).setName(SnowcastConstants.SERVICE_NAME)
-                                                             .setServiceImpl(new NodeSequencerService());
+                Class<?> serviceManagerClass = serviceManager.getClass();
+                Method registerUserService = serviceManagerClass
+                        .getDeclaredMethod("registerUserService", Map.class, Map.class, ServiceConfig.class);
+                registerUserService.setAccessible(true);
 
-            registerUserService.invoke(serviceManager, new HashMap<String, Properties>(), Collections.emptyMap(), serviceConfig);
-            service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
-            if (service != null) {
-                service.init(nodeEngine, new Properties());
-                return service;
+                ServiceConfig serviceConfig = new ServiceConfig().setEnabled(true).setName(SnowcastConstants.SERVICE_NAME)
+                                                                 .setServiceImpl(new NodeSequencerService());
+
+                registerUserService
+                        .invoke(serviceManager, new HashMap<String, Properties>(), Collections.emptyMap(), serviceConfig);
+                service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
+                if (service != null) {
+                    service.init(nodeEngine, new Properties());
+                    return service;
+                }
+
+                String message = ExceptionMessages.SERVICE_REGISTRATION_FAILED.buildMessage();
+                throw new SnowcastException(message);
             }
-
-            String message = ExceptionMessages.SERVICE_REGISTRATION_FAILED.buildMessage();
-            throw new SnowcastException(message);
         } catch (Exception e) {
             String message = ExceptionMessages.SERVICE_REGISTRATION_FAILED.buildMessage();
             throw new SnowcastException(message, e);

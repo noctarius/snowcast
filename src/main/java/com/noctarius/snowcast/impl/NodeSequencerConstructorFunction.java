@@ -18,12 +18,12 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.util.ConstructorFunction;
 
-final class SequencerConstructorFunction
+final class NodeSequencerConstructorFunction
         implements ConstructorFunction<SequencerDefinition, SequencerProvision> {
 
     private final NodeSequencerService sequencerService;
 
-    SequencerConstructorFunction(NodeSequencerService sequencerService) {
+    NodeSequencerConstructorFunction(NodeSequencerService sequencerService) {
         this.sequencerService = sequencerService;
     }
 
