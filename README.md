@@ -179,4 +179,21 @@ In the current state, as of writing, migration and split brain situations are no
 
 ### Hazelcast Clients
 
-Hazelcast clients are also not yet handled. They will be before releasing snowcast. Hazelcast clients are used the same way as Hazelcast nodes and will also get a logical node id assigned. The only difference is the internal remote operation service. The remote calls are not yet implemented.
+Hazelcast Clients are handled quite similar to node sequencers. Therefore all of the above is still true and a short example is shown on how to use snowcast with Hazelcast clients.
+
+```java
+HazelcastInstance hazelcastClient = getHazelcastClient();
+Snowcast snowcast = SnowcastSystem.snowcast( hazelcastClient );
+
+Calendar calendar = GregorianCalendar.getInstance();
+calendar.set( 2014, 1, 1, 0, 0, 0 );
+SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
+
+SnowcastSequencer sequencer = snowcast.createSequencer( "sequencerName", epoch );
+
+long nextId = sequencer.next();
+
+snowcast.destroySequencer( sequencer );
+```
+
+As an important note, clients behave exactly as cluster nodes. Cluster communication is only necessary in case of changes of the sequencer topologies (creation, destroy of sequencers).
