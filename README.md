@@ -1,4 +1,4 @@
-# ![snowcast](snowcast_name.png)
+# ![snowcast](https://raw.githubusercontent.com/noctarius/snowcast/master/snowcast_name.png)
 
 **snowcast** is an auto-configuration, distributed, scalable ID generator on top of [Hazelcast](http://www.hazelcast.org).
 
