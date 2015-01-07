@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="868.90515"
+   height="232.5625"
+   id="svg3798"
+   version="1.1"
+   inkscape:version="0.48.5 r10040"
+   sodipodi:docname="snowcast_name.svg">
+  <defs
+     id="defs3800">
+    <inkscape:path-effect
+       effect="vonkoch"
+       id="path-effect4553"
+       is_visible="true"
+       ref_path="m 513.22956,519.1479 17.11231,0"
+       generator="m 513.22956,581.29076 5.7041,0 m 5.70411,0 5.7041,0"
+       similar_only="false"
+       nbgenerations="1"
+       drawall="true"
+       maxComplexity="1005" />
+    <inkscape:path-effect
+       effect="curvestitching"
+       id="path-effect4551"
+       is_visible="true"
+       count="5"
+       startpoint_edge_variation="0;1"
+       startpoint_spacing_variation="0;1"
+       endpoint_edge_variation="0;1"
+       endpoint_spacing_variation="0;1"
+       strokepath="m 513.22956,519.1479 17.11231,0"
+       prop_scale="1"
+       scale_y_rel="false" />
+    <inkscape:path-effect
+       effect="spiro"
+       id="path-effect4549"
+       is_visible="true" />
+    <inkscape:path-effect
+       effect="sketch"
+       id="path-effect4547"
+       is_visible="true"
+       nbiter_approxstrokes="5"
+       strokelength="100"
+       strokelength_rdm="0.3;1"
+       strokeoverlap="0.3"
+       strokeoverlap_rdm="0.3;1"
+       ends_tolerance="0.1;1"
+       parallel_offset="5;1"
+       tremble_size="5;1"
+       tremble_frequency="1"
+       nbtangents="5"
+       tgt_places_rdmness="1;1"
+       tgtscale="10"
+       tgtlength="100"
+       tgtlength_rdm="0.3;1" />
+    <inkscape:path-effect
+       effect="ruler"
+       id="path-effect4545"
+       is_visible="true"
+       unit="px"
+       mark_distance="20"
+       mark_length="14"
+       minor_mark_length="7"
+       major_mark_steps="5"
+       shift="0"
+       offset="0"
+       mark_dir="left"
+       border_marks="both" />
+    <inkscape:path-effect
+       effect="skeletal"
+       id="path-effect4543"
+       is_visible="true"
+       pattern="M 0,0 1,0"
+       copytype="single_stretched"
+       prop_scale="1"
+       scale_y_rel="false"
+       spacing="0"
+       normal_offset="0"
+       tang_offset="0"
+       prop_units="false"
+       vertical_pattern="false"
+       fuse_tolerance="0" />
+    <inkscape:path-effect
+       effect="knot"
+       id="path-effect4541"
+       is_visible="true"
+       interruption_width="1.4"
+       prop_to_stroke_width="true"
+       add_stroke_width="true"
+       add_other_stroke_width="true"
+       switcher_size="13.1"
+       crossing_points_vector="" />
+    <inkscape:path-effect
+       effect="interpolate"
+       id="path-effect4539"
+       is_visible="true"
+       trajectory="M 0,0 0,0"
+       equidistant_spacing="true"
+       steps="2" />
+    <inkscape:path-effect
+       effect="rough_hatches"
+       id="path-effect4537"
+       is_visible="true"
+       direction="521.78571,514.1479 , 4.2780773,0"
+       dist_rdm="75;1"
+       growth="0"
+       do_bend="true"
+       bender="521.78571,519.1479 , 5,0"
+       bottom_edge_variation="12.428572;1"
+       top_edge_variation="12.428572;1"
+       bottom_tgt_variation="0;1"
+       top_tgt_variation="0;1"
+       scale_bf="1"
+       scale_bb="1"
+       scale_tf="1"
+       scale_tb="1"
+       top_smth_variation="0;1"
+       bottom_smth_variation="0;1"
+       fat_output="true"
+       stroke_width_top="1"
+       stroke_width_bottom="1"
+       front_thickness="1"
+       back_thickness="0.25" />
+    <inkscape:path-effect
+       effect="envelope"
+       id="path-effect4535"
+       is_visible="true"
+       yy="true"
+       xx="true"
+       bendpath1="m 513.22956,457.00504 17.11231,0"
+       bendpath2="m 530.34187,457.00504 0,124.28572"
+       bendpath3="m 513.22956,581.29076 17.11231,0"
+       bendpath4="m 513.22956,457.00504 0,124.28572" />
+    <inkscape:path-effect
+       effect="bend_path"
+       id="path-effect4533"
+       is_visible="true"
+       bendpath="m 513.22956,519.1479 17.11231,0"
+       prop_scale="1"
+       scale_y_rel="false"
+       vertical="false" />
+    <inkscape:path-effect
+       effect="bend_path"
+       id="path-effect4513"
+       is_visible="true"
+       bendpath="m 517.87241,516.64789 12.18073,0"
+       prop_scale="1"
+       scale_y_rel="false"
+       vertical="false" />
+    <inkscape:path-effect
+       effect="bend_path"
+       id="path-effect4511"
+       is_visible="true"
+       bendpath="m 517.87241,516.64789 12.18073,0"
+       prop_scale="1"
+       scale_y_rel="false"
+       vertical="false" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.7"
+     inkscape:cx="156.89953"
+     inkscape:cy="-153.91095"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:object-paths="false"
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <metadata
+     id="metadata3803">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-30.34375,-19.625)">
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 92.065591,189.10625 10.769039,6.49121 0.43545,12.6215 -13.679759,6.92796 4.62804,10.60467 16.302349,-9.04929 0.41565,14.66096 -13.297859,8.50715 5.654499,8.77135 13.52094,-9.41992 12.43011,8.71212 6.07891,-8.75572 -11.51873,-7.42236 -0.0832,-14.4301 14.35096,8.07467 5.55865,-8.95267 -12.3807,-7.36377 0.51122,-12.21063 10.93083,-6.04416"
+       id="path3166"
+       sodipodi:nodetypes="ccccccccccccccccccc"
+       inkscape:transform-center-x="9.349818"
+       inkscape:transform-center-y="56.67138"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:transform-center-y="-56.671378"
+       inkscape:transform-center-x="-9.3498233"
+       sodipodi:nodetypes="ccccccccccccccccccc"
+       id="path3160"
+       d="m 145.07726,129.90384 -10.76904,-6.49122 -0.43545,-12.62149 13.67976,-6.92796 -4.62804,-10.604671 -16.30235,9.049281 -0.41565,-14.660951 13.29786,-8.50715 -5.6545,-8.77135 -13.52094,9.41992 -12.43011,-8.71211 -6.07892,8.75571 11.51875,7.42235 0.0832,14.430121 -14.350969,-8.074681 -5.55865,8.952681 12.380689,7.36377 -0.32343,12.17675 -9.905789,5.27751"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 106.18895,121.74972 -11.006079,6.08066 -11.14826,-5.93365 0.84009,-15.311 -11.49793,-1.29433 -0.31427,18.64289 -12.90458,-6.97052 -0.71849,-15.76985 -10.42345,0.51126 1.39742,16.41944 -13.75997,6.40873 4.54321,9.64235 12.18732,-6.26433 12.53843,7.14303 -14.16836,8.39096 4.97392,9.29027 12.56756,-7.04012 10.64215,6.51574 -0.41608,12.28806"
+       id="path3170"
+       sodipodi:nodetypes="ccccccccccccccccccc"
+       inkscape:transform-center-x="39.943696"
+       inkscape:transform-center-y="-34.481042"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:transform-center-y="34.48104"
+       inkscape:transform-center-x="-39.943697"
+       sodipodi:nodetypes="ccccccccccccccccccc"
+       id="path3164"
+       d="m 130.9539,197.26038 11.00608,-6.08066 11.14826,5.93364 -0.84009,15.311 11.49793,1.29433 0.31427,-18.64289 12.90458,6.97052 0.71848,15.76985 10.42346,-0.51126 -1.39742,-16.41943 13.75997,-6.40874 -4.54321,-9.64236 -12.18733,6.26435 -12.53842,-7.14304 14.16836,-8.39096 -4.97392,-9.29027 -12.56756,7.04011 -10.45437,-6.5496 0.31443,-12.85141"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3172"
+       d="m 78.072951,136.27431 82.230189,49.53515"
+       style="fill:#ffffff;stroke:#000000;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 157.45974,167.65918 0.23703,-12.57188 10.71282,-6.68785 12.83967,8.38304 6.86989,-9.31034 -15.98809,-9.59361 12.48893,-7.69044 14.01634,7.2627 4.76897,-9.28261 -14.91836,-6.99951 1.32986,-15.12085 -10.62214,-0.88665 -0.66858,13.68671 -12.45526,7.28707 -0.1826,-16.46563 -10.53257,-0.3376 -0.18687,14.40388 -11.37502,5.54101 -10.20696,-6.68722"
+       id="path3162"
+       sodipodi:nodetypes="ccccccccccccccccccc"
+       inkscape:transform-center-x="-54.141652"
+       inkscape:transform-center-y="-13.956972"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3158"
+       d="m 119.64738,110.9343 -2.62421,99.35955"
+       style="fill:#ffffff;stroke:#000000;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       inkscape:transform-center-y="13.956972"
+       inkscape:transform-center-x="54.141651"
+       sodipodi:nodetypes="ccccccccccccccccccc"
+       id="path3168"
+       d="m 79.683111,151.35092 -0.23703,12.57187 -10.71282,6.68786 -12.83967,-8.38304 -6.86989,9.31033 15.98809,9.59361 -12.48894,7.69044 -14.01634,-7.2627 -4.76896,9.28261 14.91836,6.99952 -1.32986,15.12084 10.62213,0.88665 0.66859,-13.6867 12.45526,-7.28708 0.1826,16.46563 10.53257,0.3376 0.18686,-14.40388 10.89783,-6.03658 9.985289,6.53333"
+       style="fill:#ffffff;fill-rule:evenodd;stroke:#000000;stroke-width:5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       inkscape:connector-curvature="0"
+       id="path3174"
+       d="M 76.779211,184.9813 161.59688,137.10246"
+       style="fill:#ffffff;stroke:#000000;stroke-width:6;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       transform="matrix(0.984107,-0.177574,0.177574,0.984107,-1.9072086,75.568429)"
+       d="M 127.84452,126.69964 96.463655,136.78434 72.039627,114.65006 78.996458,82.431093 110.37732,72.346401 134.80135,94.480677 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="true"
+       sodipodi:arg2="1.2598562"
+       sodipodi:arg1="0.73625743"
+       sodipodi:r2="28.545481"
+       sodipodi:r1="32.961483"
+       sodipodi:cy="104.56537"
+       sodipodi:cx="103.42049"
+       sodipodi:sides="6"
+       id="path3156"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:6;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       sodipodi:type="star"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       transform="matrix(0.984107,-0.177574,0.177574,0.984107,-2.5024086,74.419129)"
+       d="m 118.30388,117.92226 -18.15729,6.26208 -14.501768,-12.59364 3.655529,-18.855719 18.157299,-6.262077 14.50176,12.593639 z"
+       inkscape:randomized="0"
+       inkscape:rounded="0"
+       inkscape:flatsided="true"
+       sodipodi:arg2="1.2386905"
+       sodipodi:arg1="0.71509174"
+       sodipodi:r2="16.61281"
+       sodipodi:r1="19.206795"
+       sodipodi:cy="105.32862"
+       sodipodi:cx="103.80212"
+       sodipodi:sides="6"
+       id="path2384"
+       style="fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:6;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       sodipodi:type="star"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:5.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 173.82709,52.486649 c 44.33875,19.298 65.84927,53.726181 75.07635,99.058171"
+       id="path3983"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:5.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 175.4999,84.392629 c 26.60327,11.5788 39.50958,32.235711 45.04582,59.434901"
+       id="path3983-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:5.5;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="M 173.6257,22.157599 C 235.7,49.174819 265.81469,97.374259 278.7326,160.83904"
+       id="path3983-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:100%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="145.21428"
+       y="241.79073"
+       id="text4573"
+       sodipodi:linespacing="100%"
+       inkscape:export-filename="C:\Users\noc\snowcast.png"
+       inkscape:export-xdpi="90"
+       inkscape:export-ydpi="90"><tspan
+         sodipodi:role="line"
+         id="tspan4575"
+         x="145.21428"
+         y="241.79073"
+         style="font-size:24px;font-weight:bold;line-height:100%;-inkscape-font-specification:Sans Bold">1... 2 ... 3</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="321.42856"
+       y="245.50505"
+       id="text3053"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3055"
+         x="321.42856"
+         y="245.50505"
+         style="font-size:144px;font-weight:bold;line-height:125%;letter-spacing:-11px;word-spacing:0px;-inkscape-font-specification:Sans Bold"
+         dx="0"
+         dy="0"
+         rotate="0 0 0 0 0 0 0 0 0">snowcast</tspan></text>
+  </g>
+</svg>
