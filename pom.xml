@@ -69,7 +69,7 @@
   </ciManagement>
 
   <properties>
-    <hazelcast.version>3.5-SNAPSHOT</hazelcast.version>
+    <hazelcast.version>3.4</hazelcast.version>
   </properties>
 
   <dependencies>
