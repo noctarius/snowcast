@@ -12,7 +12,7 @@
   - limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
@@ -201,6 +201,26 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.7.2.201409121644</version>
+        <executions>
+          <execution>
+            <id>jacoco-initialize</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>jacoco-site</id>
+            <phase>package</phase>
+            <goals>
+              <goal>report</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <reporting>
@@ -208,16 +228,16 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-              <show>public</show>
-              <sourceFileExcludes>
-                <exclude>com/noctarius/snowcast/impl/*/*.java</exclude>
-              </sourceFileExcludes>
-              <sourceFileIncludes>
-                <include>com/noctarius/snowcast/*.java</include>
-              </sourceFileIncludes>
-              <excludePackageNames>*.impl.*</excludePackageNames>
-            </configuration>
+        <configuration>
+          <show>public</show>
+          <sourceFileExcludes>
+            <exclude>com/noctarius/snowcast/impl/*/*.java</exclude>
+          </sourceFileExcludes>
+          <sourceFileIncludes>
+            <include>com/noctarius/snowcast/*.java</include>
+          </sourceFileIncludes>
+          <excludePackageNames>*.impl.*</excludePackageNames>
+        </configuration>
       </plugin>
     </plugins>
   </reporting>
