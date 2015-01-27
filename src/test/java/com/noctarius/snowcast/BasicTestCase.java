@@ -164,6 +164,25 @@ public class BasicTestCase
         }
     }
 
+    @Test(expected = SnowcastStateException.class)
+    public void test_id_generation_in_attach_wrong_state()
+            throws Exception {
+
+        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            assertNotNull(sequencer);
+
+            sequencer.attachLogicalNode();
+        } finally {
+            factory.shutdownAll();
+        }
+    }
+
     private SnowcastSequencer buildSnowcastSequencer(Snowcast snowcast) {
         String sequencerName = "SimpleSequencer";
         int maxLogicalNodeCount = 128;

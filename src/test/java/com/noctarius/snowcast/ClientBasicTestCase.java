@@ -220,6 +220,26 @@ public class ClientBasicTestCase
         }
     }
 
+    @Test(expected = SnowcastStateException.class)
+    public void test_id_generation_in_attach_wrong_state()
+            throws Exception {
+
+        Hazelcast.newHazelcastInstance(config);
+        HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(client);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            assertNotNull(sequencer);
+
+            sequencer.attachLogicalNode();
+        } finally {
+            HazelcastClient.shutdownAll();
+            Hazelcast.shutdownAll();
+        }
+    }
+
     private SnowcastSequencer buildSnowcastSequencer(Snowcast snowcast) {
         // Build the custom epoch
         SnowcastEpoch epoch = buildEpoch();

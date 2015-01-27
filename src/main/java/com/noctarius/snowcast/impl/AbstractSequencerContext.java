@@ -95,21 +95,21 @@ abstract class AbstractSequencerContext {
 
     final void attachLogicalNode() {
         // Will fail if state transition is not allowed
-        if (stateTransition(SnowcastSequenceState.Attached)) {
-            // Request sequencer remote assignment
-            this.logicalNodeId = doAttachLogicalNode(definition);
-        }
+        stateTransition(SnowcastSequenceState.Attached);
+
+        // Request sequencer remote assignment
+        this.logicalNodeId = doAttachLogicalNode(definition);
     }
 
     final void detachLogicalNode() {
         // Will fail if state transition is not allowed
-        if (stateTransition(SnowcastSequenceState.Detached)) {
-            int logicalNodeId = this.logicalNodeId;
-            this.logicalNodeId = -1;
+        stateTransition(SnowcastSequenceState.Detached);
 
-            // Remove sequencer remote assignment
-            doDetachLogicalNode(definition, logicalNodeId);
-        }
+        int logicalNodeId = this.logicalNodeId;
+        this.logicalNodeId = -1;
+
+        // Remove sequencer remote assignment
+        doDetachLogicalNode(definition, logicalNodeId);
     }
 
     final long timestampValue(long sequenceId) {
@@ -132,7 +132,8 @@ abstract class AbstractSequencerContext {
         while (true) {
             SnowcastSequenceState state = this.state;
             if (state == newState) {
-                return false;
+                String message = ExceptionMessages.SEQUENCER_WRONG_STATE_CANNOT_ATTACH.buildMessage(sequencerName);
+                throw new SnowcastStateException(message);
             }
 
             if (newState == SnowcastSequenceState.Detached) {

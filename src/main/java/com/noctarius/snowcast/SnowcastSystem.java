@@ -61,7 +61,7 @@ public final class SnowcastSystem {
                 String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";
                 Class<?> clazz = ClassLoaderUtil.loadClass(null, className);
                 Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class, short.class);
-                snowcast = (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance, backupCount);
+                snowcast = (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance, (short) backupCount);
 
             } catch (Exception e) {
                 if (e instanceof SnowcastException) {
