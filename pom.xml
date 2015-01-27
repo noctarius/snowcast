@@ -162,6 +162,7 @@
           <excludes>
             <exclude>README.md</exclude>
             <exclude>LICENSE</exclude>
+            <exclude>*.svg</exclude>
           </excludes>
         </configuration>
       </plugin>

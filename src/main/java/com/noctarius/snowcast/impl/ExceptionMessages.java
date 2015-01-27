@@ -80,7 +80,7 @@ public enum ExceptionMessages {
     /**
      * Illegal Sequencer type passed to the Snowcast::destroy method
      */
-    ILLEGAL_SEQUENCER_TYPE("Illegal Sequencer type passed to the Snowcast::destroy method") ;
+    ILLEGAL_SEQUENCER_TYPE("Illegal Sequencer type passed to the Snowcast::destroy method");
 
     private final String template;
 

@@ -18,7 +18,6 @@ package com.noctarius.snowcast;
 
 import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
-import com.hazelcast.instance.TestUtil;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
@@ -261,6 +260,7 @@ public class MultiNodeTestCase
             factory.shutdownAll();
         }
     }
+
     @Test
     public void test_distribute_destroy_node3()
             throws Exception {

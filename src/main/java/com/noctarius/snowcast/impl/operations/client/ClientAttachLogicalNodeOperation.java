@@ -25,7 +25,8 @@ import com.noctarius.snowcast.impl.SequencerPartition;
 import com.noctarius.snowcast.impl.operations.BackupAttachLogicalNodeOperation;
 
 class ClientAttachLogicalNodeOperation
-        extends AbstractClientRequestOperation implements BackupAwareOperation {
+        extends AbstractClientRequestOperation
+        implements BackupAwareOperation {
 
     private final SequencerDefinition definition;
 
