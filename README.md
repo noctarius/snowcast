@@ -13,6 +13,7 @@
 * [Multithreading](#multithreading)
 * [Sequencer States](#sequencer-states)
 * [Number of Nodes](#number-of-nodes)
+* [Backups](#backups)
 * [Migration and Split Brain](#migration-and-split-brain)
 * [Hazelcast Clients](#hazelcast-clients)
 
@@ -173,9 +174,35 @@ SnowcastSequencer sequencer = snowcast.createSequencer( "sequencerName", epoch, 
 
 This way only 7 bits are used for the logical node id and the rest can be used to generate IDs, giving a range of 65,536 possible IDs per millisecond and per node.
 
+### Backups
+
+snowcast by default keeps one backup of the internal logicalNodeId assignment tables to provide graceful failover if the normal partition owner dies. The backup will be activated and possibly migrated to the new owner. Afterwards a new backup will be created.
+
+The number of backups itself might be changed by the user when creating the actual snowcast instance as in the following snippet:
+
+```java
+HazelcastInstance hazelcastInstance = getHazelcastInstance();
+// Configure the snowcast system to use 3 backups instead of 1
+Snowcast snowcast = SnowcastSystem.snowcast( hazelcastInstance, 3 );
+```
+
+Same is possible on clients:
+
+```java
+HazelcastInstance hazelcastInstance = getHazelcastClient();
+// Configure the snowcast system to use 3 backups instead of 1
+Snowcast snowcast = SnowcastSystem.snowcast( hazelcastInstance, 3 );
+```
+
+The number of backups will be part of the internal definition of the sequencers, therefore the number of backups need to stay consistent over all nodes or clients creating the snowcast system. Different number of backups on nodes at creation time will throw an exception explaining that you try to register a different sequencer definition.
+
+The backup count can be any number between 0 and 32767. 0  means to keep no backup at all, in case of node failures, those assignments are lost and the system might assign the same logicalNodeId another time. As long as you won't change the topology as well as attach or detach sequencers you can be sure to stay in a consistent operational state *but* it is highly recommended to gracefully restart the system before making any of the previously mentioned changes.
+
 ### Migration and Split Brain
 
-In the current state, as of writing, migration and split brain situations are not yet handled! At least migration will be added before release since split brain cannot be handled gracefully. In [Split Brain](http://en.wikipedia.org/wiki/Split-brain_%28computing%29) situations you might generate the same IDs multiple times since the splitted clusters do not know about each other anymore. If you don't use attach or detach and do not create new members while split brain, you still will be in a consistent state!
+Migration cases, like topology changes, are handled internally by supporting backup partitions. Those backup partitions reside on other nodes inside the cluster and might be moved along on topology changes. In case of node failures, lost localNodeId assignments are recreated using those backups while migration. As discussed before there is, by default, one backup but the number can be changed depending on the number of nodes inside the cluster and the number of nodes you might be able to lose without data loss.
+
+Split brain, on the other hand, cannot be handled gracefully. In [Split Brain](http://en.wikipedia.org/wiki/Split-brain_%28computing%29) situations you might generate the same IDs multiple times since the splitted clusters do not know about each other anymore. If you don't use attach or detach and do not create new members while split brain, you still will be in a consistent state!
 
 ### Hazelcast Clients
 
