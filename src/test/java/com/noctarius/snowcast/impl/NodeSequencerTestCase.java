@@ -10,7 +10,7 @@ public class NodeSequencerTestCase {
             throws Exception {
 
         // Definition leaves 10 bits for the counter
-        SequencerDefinition definition = new SequencerDefinition("foo", SnowcastEpoch.byTimestamp(0), 8192);
+        SequencerDefinition definition = new SequencerDefinition("foo", SnowcastEpoch.byTimestamp(0), 8192, (short) 1);
 
         NodeSequencer sequencer = new NodeSequencer(new NodeSequencerService() {
             @Override

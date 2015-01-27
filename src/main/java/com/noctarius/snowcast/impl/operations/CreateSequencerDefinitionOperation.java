@@ -18,6 +18,8 @@ package com.noctarius.snowcast.impl.operations;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.spi.BackupAwareOperation;
+import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
@@ -26,7 +28,8 @@ import com.noctarius.snowcast.impl.SequencerDefinition;
 import java.io.IOException;
 
 public class CreateSequencerDefinitionOperation
-        extends AbstractSequencerOperation {
+        extends AbstractSequencerOperation
+        implements BackupAwareOperation {
 
     private transient SequencerDefinition response;
 
@@ -70,6 +73,7 @@ public class CreateSequencerDefinitionOperation
         super.writeInternal(out);
         out.writeLong(definition.getEpoch().getEpochOffset());
         out.writeInt(definition.getMaxLogicalNodeCount());
+        out.writeShort(definition.getBackupCount());
     }
 
     @Override
@@ -80,8 +84,29 @@ public class CreateSequencerDefinitionOperation
 
         long epochOffset = in.readLong();
         int maxLogicalNodeCount = in.readInt();
+        short backupCount = in.readShort();
 
         SnowcastEpoch epoch = SnowcastEpoch.byTimestamp(epochOffset);
-        definition = new SequencerDefinition(getSequencerName(), epoch, maxLogicalNodeCount);
+        definition = new SequencerDefinition(getSequencerName(), epoch, maxLogicalNodeCount, backupCount);
+    }
+
+    @Override
+    public boolean shouldBackup() {
+        return response != null;
+    }
+
+    @Override
+    public int getSyncBackupCount() {
+        return response.getBackupCount();
+    }
+
+    @Override
+    public int getAsyncBackupCount() {
+        return 0;
+    }
+
+    @Override
+    public Operation getBackupOperation() {
+        return new BackupCreateSequencerDefinitionOperation(response);
     }
 }

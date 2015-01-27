@@ -17,11 +17,14 @@
 package com.noctarius.snowcast.impl.operations;
 
 import com.hazelcast.instance.MemberImpl;
+import com.hazelcast.spi.BackupAwareOperation;
 import com.hazelcast.spi.EventRegistration;
 import com.hazelcast.spi.NodeEngine;
+import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.OperationService;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
+import com.noctarius.snowcast.impl.SequencerDefinition;
 import com.noctarius.snowcast.impl.notification.ClientDestroySequencerNotification;
 
 import java.util.Collection;
@@ -29,7 +32,10 @@ import java.util.Collection;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class DestroySequencerDefinitionOperation
-        extends AbstractSequencerOperation {
+        extends AbstractSequencerOperation
+        implements BackupAwareOperation {
+
+    private transient int backupCount;
 
     public DestroySequencerDefinitionOperation() {
     }
@@ -50,7 +56,8 @@ public class DestroySequencerDefinitionOperation
         NodeSequencerService sequencerService = getService();
         String sequencerName = getSequencerName();
 
-        sequencerService.destroySequencer(sequencerName, true);
+        SequencerDefinition definition = sequencerService.destroySequencer(sequencerName, true);
+        backupCount = definition.getBackupCount();
 
         NodeEngine nodeEngine = getNodeEngine();
         OperationService operationService = nodeEngine.getOperationService();
@@ -75,5 +82,25 @@ public class DestroySequencerDefinitionOperation
     @Override
     public Object getResponse() {
         return Boolean.TRUE;
+    }
+
+    @Override
+    public boolean shouldBackup() {
+        return true;
+    }
+
+    @Override
+    public int getSyncBackupCount() {
+        return backupCount;
+    }
+
+    @Override
+    public int getAsyncBackupCount() {
+        return 0;
+    }
+
+    @Override
+    public Operation getBackupOperation() {
+        return new BackupDestroySequencerDefinitionOperation(getSequencerName());
     }
 }

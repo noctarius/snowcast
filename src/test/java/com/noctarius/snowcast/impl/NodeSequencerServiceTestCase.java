@@ -27,7 +27,7 @@ public class NodeSequencerServiceTestCase {
             throws Exception {
 
         NodeSequencerService sequencerService = new NodeSequencerService();
-        sequencerService.createSequencer("test", SnowcastEpoch.byTimestamp(1), 1);
+        sequencerService.createSequencer("test", SnowcastEpoch.byTimestamp(1), 1, (short) 1);
     }
 
     @Test(expected = SnowcastMaxLogicalNodeIdOutOfBoundsException.class)
@@ -35,6 +35,6 @@ public class NodeSequencerServiceTestCase {
             throws Exception {
 
         NodeSequencerService sequencerService = new NodeSequencerService();
-        sequencerService.createSequencer("test", SnowcastEpoch.byTimestamp(1), 8193);
+        sequencerService.createSequencer("test", SnowcastEpoch.byTimestamp(1), 8193, (short) 1);
     }
 }

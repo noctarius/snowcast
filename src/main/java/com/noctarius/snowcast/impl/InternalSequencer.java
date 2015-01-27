@@ -7,4 +7,6 @@ interface InternalSequencer
         extends SnowcastSequencer {
 
     void stateTransition(SnowcastSequenceState newState);
+
+    SequencerService getSequencerService();
 }

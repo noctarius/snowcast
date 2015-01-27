@@ -2,8 +2,8 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.client.PartitionClientRequest;
-import com.hazelcast.client.spi.ClientInvocationService;
 import com.hazelcast.client.spi.ProxyManager;
+import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.Partition;
 import com.hazelcast.core.PartitionService;
@@ -30,24 +30,25 @@ class ClientSequencerService
 
     ClientSequencerService(HazelcastClientInstanceImpl client, ProxyManager proxyManager) {
         this.client = client;
-        this.sequencerConstructor = new ClientSequencerConstructorFunction(client, proxyManager);
+        this.sequencerConstructor = new ClientSequencerConstructorFunction(client, proxyManager, this);
         this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
     }
 
     @Override
-    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount) {
+    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount,
+                                             short backupCount) {
+
         int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
-        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount);
+        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
 
         PartitionService partitionService = client.getPartitionService();
-        ClientInvocationService invocationService = client.getInvocationService();
 
         Partition partition = partitionService.getPartition(sequencerName);
         int partitionId = partition.getPartitionId();
 
         try {
             PartitionClientRequest request = new ClientCreateSequencerDefinitionRequest(sequencerName, partitionId, definition);
-            ICompletableFuture<Object> future = invocationService.invokeOnPartitionOwner(request, partitionId);
+            ICompletableFuture<Object> future = new ClientInvocation(client, request, partitionId).invoke();
 
             Object response = future.get();
             SequencerDefinition realDefinition = client.getSerializationService().toObject(response);
@@ -67,7 +68,6 @@ class ClientSequencerService
         ((InternalSequencer) sequencer).stateTransition(SnowcastSequenceState.Destroyed);
 
         PartitionService partitionService = client.getPartitionService();
-        ClientInvocationService invocationService = client.getInvocationService();
 
         String sequencerName = sequencer.getSequencerName();
 
@@ -76,7 +76,7 @@ class ClientSequencerService
 
         try {
             PartitionClientRequest request = new ClientDestroySequencerDefinitionRequest(sequencerName, partitionId);
-            ICompletableFuture<?> future = invocationService.invokeOnPartitionOwner(request, partitionId);
+            ICompletableFuture<?> future = new ClientInvocation(client, request, partitionId).invoke();
             future.get();
         } catch (Exception e) {
             throw new SnowcastException(e);

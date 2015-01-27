@@ -29,7 +29,7 @@ public class SequencePartitionTestCase {
     public void test_double_registration()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         Address address = new Address("localhost", 1000);
 
         SequencerPartition partition = new SequencerPartition(1);
@@ -43,14 +43,14 @@ public class SequencePartitionTestCase {
     public void test_double_registration_illegal()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         Address address = new Address("localhost", 1000);
 
         SequencerPartition partition = new SequencerPartition(1);
         Integer logicalNodeId = partition.attachLogicalNode(definition, address);
         assertNotNull(logicalNodeId);
 
-        SequencerDefinition otherDefinition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 1000);
+        SequencerDefinition otherDefinition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 1000, (short) 1);
         partition.checkOrRegisterSequencerDefinition(otherDefinition);
     }
 }

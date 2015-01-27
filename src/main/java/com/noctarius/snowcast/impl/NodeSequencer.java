@@ -77,6 +77,11 @@ public class NodeSequencer
         sequencerContext.stateTransition(newState);
     }
 
+    @Override
+    public SequencerService getSequencerService() {
+        return sequencerContext.service;
+    }
+
     private static class NodeSequencerContext
             extends AbstractSequencerContext {
 
@@ -93,8 +98,8 @@ public class NodeSequencer
         }
 
         @Override
-        protected void doDetachLogicalNode(String sequencerName, int logicalNodeId) {
-            service.detachSequencer(sequencerName, logicalNodeId);
+        protected void doDetachLogicalNode(SequencerDefinition definition, int logicalNodeId) {
+            service.detachSequencer(definition, logicalNodeId);
         }
     }
 }

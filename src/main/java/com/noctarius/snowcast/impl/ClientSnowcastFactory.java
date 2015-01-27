@@ -6,9 +6,9 @@ import com.noctarius.snowcast.Snowcast;
 
 public final class ClientSnowcastFactory {
 
-    public static Snowcast snowcast(HazelcastInstance hazelcastInstance) {
+    public static Snowcast snowcast(HazelcastInstance hazelcastInstance, short backupCount) {
         if (hazelcastInstance instanceof HazelcastClientProxy) {
-            return new ClientSnowcast(hazelcastInstance);
+            return new ClientSnowcast(hazelcastInstance, backupCount);
         }
 
         // Client not yet supported

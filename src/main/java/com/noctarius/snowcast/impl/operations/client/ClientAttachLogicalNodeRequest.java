@@ -39,9 +39,9 @@ public class ClientAttachLogicalNodeRequest
             throws IOException {
 
         super.write(writer);
-        ObjectDataOutput out = writer.getRawDataOutput();
-        out.writeLong(definition.getEpoch().getEpochOffset());
-        out.writeInt(definition.getMaxLogicalNodeCount());
+        writer.writeLong("epoch", definition.getEpoch().getEpochOffset());
+        writer.writeInt("mnc", definition.getMaxLogicalNodeCount());
+        writer.writeShort("bc", definition.getBackupCount());
     }
 
     @Override
@@ -50,11 +50,11 @@ public class ClientAttachLogicalNodeRequest
 
         super.read(reader);
 
-        ObjectDataInput in = reader.getRawDataInput();
-        long epochOffset = in.readLong();
-        int maxLogicalNodeCount = in.readInt();
+        long epochOffset = reader.readLong("epoch");
+        int maxLogicalNodeCount = reader.readInt("mnc");
+        short backupCount = reader.readShort("bc");
 
         SnowcastEpoch epoch = SnowcastEpoch.byTimestamp(epochOffset);
-        definition = new SequencerDefinition(getSequencerName(), epoch, maxLogicalNodeCount);
+        definition = new SequencerDefinition(getSequencerName(), epoch, maxLogicalNodeCount, backupCount);
     }
 }

@@ -53,6 +53,7 @@ public class SequencerDefinitionSerializerHook
             out.writeUTF(definition.getSequencerName());
             out.writeLong(definition.getEpoch().getEpochOffset());
             out.writeInt(definition.getMaxLogicalNodeCount());
+            out.writeShort(definition.getBackupCount());
         }
 
         @Override
@@ -62,8 +63,10 @@ public class SequencerDefinitionSerializerHook
             String sequencerName = in.readUTF();
             long epochOffset = in.readLong();
             int maxLogicalNodeCount = in.readInt();
+            short backupCount = in.readShort();
+
             SnowcastEpoch epoch = SnowcastEpoch.byTimestamp(epochOffset);
-            return new SequencerDefinition(sequencerName, epoch, maxLogicalNodeCount);
+            return new SequencerDefinition(sequencerName, epoch, maxLogicalNodeCount, backupCount);
         }
 
         @Override

@@ -22,11 +22,13 @@ public final class SequencerDefinition {
     private final String sequencerName;
     private final SnowcastEpoch epoch;
     private final int maxLogicalNodeCount;
+    private final short backupCount;
 
-    public SequencerDefinition(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount) {
+    public SequencerDefinition(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount, short backupCount) {
         this.sequencerName = sequencerName;
         this.epoch = epoch;
         this.maxLogicalNodeCount = maxLogicalNodeCount;
+        this.backupCount = backupCount;
     }
 
     public String getSequencerName() {
@@ -39,6 +41,10 @@ public final class SequencerDefinition {
 
     public int getMaxLogicalNodeCount() {
         return maxLogicalNodeCount;
+    }
+
+    public short getBackupCount() {
+        return backupCount;
     }
 
     @Override
@@ -61,6 +67,9 @@ public final class SequencerDefinition {
         if (sequencerName != null ? !sequencerName.equals(that.sequencerName) : that.sequencerName != null) {
             return false;
         }
+        if (backupCount != that.backupCount) {
+            return false;
+        }
 
         return true;
     }
@@ -70,12 +79,13 @@ public final class SequencerDefinition {
         int result = sequencerName != null ? sequencerName.hashCode() : 0;
         result = 31 * result + (epoch != null ? epoch.hashCode() : 0);
         result = 31 * result + maxLogicalNodeCount;
+        result = 31 * result + backupCount;
         return result;
     }
 
     @Override
     public String toString() {
         return "SequencerDefinition{" + "sequencerName='" + sequencerName + '\'' + ", epoch=" + epoch + ", maxLogicalNodeCount="
-                + maxLogicalNodeCount + '}';
+                + maxLogicalNodeCount + ", backupCount=" + backupCount + '}';
     }
 }

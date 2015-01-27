@@ -39,10 +39,12 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_
 class NodeSnowcast
         implements Snowcast {
 
+    private final short backupCount;
     private final NodeEngine nodeEngine;
     private final NodeSequencerService sequencerService;
 
-    NodeSnowcast(HazelcastInstance hazelcastInstance) {
+    NodeSnowcast(HazelcastInstance hazelcastInstance, short backupCount) {
+        this.backupCount = backupCount;
         this.nodeEngine = getNodeEngine(hazelcastInstance);
         this.sequencerService = getSequencerService(nodeEngine);
     }
@@ -54,7 +56,7 @@ class NodeSnowcast
 
     @Override
     public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount) {
-        return sequencerService.createSequencer(sequencerName, epoch, maxLogicalNodeCount);
+        return sequencerService.createSequencer(sequencerName, epoch, maxLogicalNodeCount, backupCount);
     }
 
     @Override

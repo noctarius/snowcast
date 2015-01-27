@@ -18,24 +18,30 @@ package com.noctarius.snowcast.impl.operations;
 
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.spi.BackupAwareOperation;
+import com.hazelcast.spi.Operation;
 import com.hazelcast.spi.PartitionAwareOperation;
+import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
+import com.noctarius.snowcast.impl.SequencerDefinition;
 import com.noctarius.snowcast.impl.SequencerPartition;
 
 import java.io.IOException;
 
 public class DetachLogicalNodeOperation
         extends AbstractSequencerOperation
-        implements PartitionAwareOperation {
+        implements PartitionAwareOperation, BackupAwareOperation {
 
     private int logicalNodeId;
+    private SequencerDefinition definition;
 
     public DetachLogicalNodeOperation() {
     }
 
-    public DetachLogicalNodeOperation(String sequencerName, int logicalNodeId) {
-        super(sequencerName);
+    public DetachLogicalNodeOperation(SequencerDefinition definition, int logicalNodeId) {
+        super(definition.getSequencerName());
+        this.definition = definition;
         this.logicalNodeId = logicalNodeId;
     }
 
@@ -69,6 +75,9 @@ public class DetachLogicalNodeOperation
 
         super.writeInternal(out);
         out.writeInt(logicalNodeId);
+        out.writeLong(definition.getEpoch().getEpochOffset());
+        out.writeInt(definition.getMaxLogicalNodeCount());
+        out.writeShort(definition.getBackupCount());
     }
 
     @Override
@@ -77,5 +86,32 @@ public class DetachLogicalNodeOperation
 
         super.readInternal(in);
         logicalNodeId = in.readInt();
+
+        long epochOffset = in.readLong();
+        int maxLogicalNodeCount = in.readInt();
+        short backupCount = in.readShort();
+
+        SnowcastEpoch epoch = SnowcastEpoch.byTimestamp(epochOffset);
+        definition = new SequencerDefinition(getSequencerName(), epoch, maxLogicalNodeCount, backupCount);
+    }
+
+    @Override
+    public boolean shouldBackup() {
+        return true;
+    }
+
+    @Override
+    public int getSyncBackupCount() {
+        return definition.getBackupCount();
+    }
+
+    @Override
+    public int getAsyncBackupCount() {
+        return 0;
+    }
+
+    @Override
+    public Operation getBackupOperation() {
+        return new BackupDetachLogicalNodeOperation(definition, logicalNodeId, getCallerAddress());
     }
 }

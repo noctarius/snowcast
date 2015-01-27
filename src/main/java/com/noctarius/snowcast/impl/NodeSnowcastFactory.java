@@ -5,7 +5,7 @@ import com.noctarius.snowcast.Snowcast;
 
 public final class NodeSnowcastFactory {
 
-    public static Snowcast snowcast(HazelcastInstance hazelcastInstance) {
-        return new NodeSnowcast(hazelcastInstance);
+    public static Snowcast snowcast(HazelcastInstance hazelcastInstance, short backupCount) {
+        return new NodeSnowcast(hazelcastInstance, backupCount);
     }
 }

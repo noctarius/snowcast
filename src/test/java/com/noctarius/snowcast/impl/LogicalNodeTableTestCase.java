@@ -38,7 +38,7 @@ public class LogicalNodeTableTestCase {
     public void test_attach()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
 
         Address address = new Address("localhost", 12345);
@@ -53,7 +53,7 @@ public class LogicalNodeTableTestCase {
     public void test_attach_multiple_nodes()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
 
         Address address1 = new Address("localhost", 12345);
@@ -72,7 +72,7 @@ public class LogicalNodeTableTestCase {
     public void test_attach_exceed_nodes_count()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 1);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 1, (short) 1);
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
 
         Address address1 = new Address("localhost", 12345);
@@ -88,7 +88,7 @@ public class LogicalNodeTableTestCase {
     public void test_illegal_detach()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 2);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 2, (short) 1);
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
 
         Address address1 = new Address("localhost", 12345);
@@ -106,7 +106,7 @@ public class LogicalNodeTableTestCase {
     public void test_attach_concurrently()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         final LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
 
         class Task
@@ -170,7 +170,7 @@ public class LogicalNodeTableTestCase {
     public void test_attach_detach_reattach_concurrently()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         final LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
 
         class Task

@@ -19,18 +19,27 @@ package com.noctarius.snowcast.impl.operations.client;
 import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.spi.BackupAwareOperation;
+import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.impl.NodeSequencerService;
+import com.noctarius.snowcast.impl.SequencerDefinition;
 import com.noctarius.snowcast.impl.SequencerPartition;
+import com.noctarius.snowcast.impl.operations.BackupDetachLogicalNodeOperation;
 
 import java.io.IOException;
 
 class ClientDetachLogicalNodeOperation
-        extends AbstractClientRequestOperation {
+        extends AbstractClientRequestOperation
+        implements BackupAwareOperation {
 
     private int logicalNodeId;
+    private SequencerDefinition definition;
 
-    ClientDetachLogicalNodeOperation(String sequencerName, ClientEndpoint endpoint, int logicalNodeId) {
+    ClientDetachLogicalNodeOperation(String sequencerName, SequencerDefinition definition, ClientEndpoint endpoint,
+                                     int logicalNodeId) {
+
         super(sequencerName, endpoint);
+        this.definition = definition;
         this.logicalNodeId = logicalNodeId;
     }
 
@@ -67,5 +76,25 @@ class ClientDetachLogicalNodeOperation
 
         super.readInternal(in);
         logicalNodeId = in.readInt();
+    }
+
+    @Override
+    public boolean shouldBackup() {
+        return true;
+    }
+
+    @Override
+    public int getSyncBackupCount() {
+        return definition.getBackupCount();
+    }
+
+    @Override
+    public int getAsyncBackupCount() {
+        return 0;
+    }
+
+    @Override
+    public Operation getBackupOperation() {
+        return new BackupDetachLogicalNodeOperation(definition, logicalNodeId, getEndpoint().getConnection().getEndPoint());
     }
 }

@@ -17,12 +17,15 @@
 package com.noctarius.snowcast.impl.operations.client;
 
 import com.hazelcast.client.ClientEndpoint;
+import com.hazelcast.spi.BackupAwareOperation;
+import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDefinition;
 import com.noctarius.snowcast.impl.SequencerPartition;
+import com.noctarius.snowcast.impl.operations.BackupAttachLogicalNodeOperation;
 
 class ClientAttachLogicalNodeOperation
-        extends AbstractClientRequestOperation {
+        extends AbstractClientRequestOperation implements BackupAwareOperation {
 
     private final SequencerDefinition definition;
 
@@ -45,5 +48,25 @@ class ClientAttachLogicalNodeOperation
     @Override
     public Object getResponse() {
         return logicalNodeId;
+    }
+
+    @Override
+    public boolean shouldBackup() {
+        return true;
+    }
+
+    @Override
+    public int getSyncBackupCount() {
+        return definition.getBackupCount();
+    }
+
+    @Override
+    public int getAsyncBackupCount() {
+        return 0;
+    }
+
+    @Override
+    public Operation getBackupOperation() {
+        return new BackupAttachLogicalNodeOperation(definition, logicalNodeId, getEndpoint().getConnection().getEndPoint());
     }
 }

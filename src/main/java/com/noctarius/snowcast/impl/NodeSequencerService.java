@@ -44,6 +44,7 @@ import com.noctarius.snowcast.impl.operations.AttachLogicalNodeOperation;
 import com.noctarius.snowcast.impl.operations.CreateSequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DestroySequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DetachLogicalNodeOperation;
+import com.noctarius.snowcast.impl.operations.SequencerReplicationOperation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,9 +83,11 @@ public class NodeSequencerService
     }
 
     @Override
-    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount) {
+    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount,
+                                             short backupCount) {
+
         int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
-        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount);
+        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
 
         Operation operation = new CreateSequencerDefinitionOperation(definition);
         SequencerDefinition realDefinition = invoke(operation, sequencerName);
@@ -113,14 +116,11 @@ public class NodeSequencerService
         // Destroy sequencer definition in partition
         Operation operation = new DestroySequencerDefinitionOperation(provision.getSequencerName());
         invoke(operation, sequencer.getSequencerName());
-
-        // Notify clients to destroy the sequencer
-        // TODO
     }
 
     @Override
     public void reset() {
-        // TODO kill all sequencers
+        // TODO WUT?
     }
 
     @Override
@@ -130,28 +130,43 @@ public class NodeSequencerService
 
     @Override
     public Operation prepareReplicationOperation(PartitionReplicationEvent event) {
-        // TODO
-        return null;
+        int partitionId = event.getPartitionId();
+        SequencerPartition partition = partitions.get(partitionId);
+        if (partition == null) {
+            return null;
+        }
+
+        PartitionReplication partitionReplication = partition.createPartitionReplication();
+        return new SequencerReplicationOperation(partitionReplication);
     }
 
     @Override
     public void beforeMigration(PartitionMigrationEvent event) {
-        // TODO
+        int partitionId = event.getPartitionId();
+        SequencerPartition partition = partitions.get(partitionId);
+        if (partition != null) {
+            partition.freeze();
+        }
     }
 
     @Override
     public void commitMigration(PartitionMigrationEvent event) {
-        // TODO
+        int partitionId = event.getPartitionId();
+        partitions.remove(partitionId);
     }
 
     @Override
     public void rollbackMigration(PartitionMigrationEvent event) {
-        // TODO
+        int partitionId = event.getPartitionId();
+        SequencerPartition partition = partitions.get(partitionId);
+        if (partition != null) {
+            partition.unfreeze();
+        }
     }
 
     @Override
     public void clearPartitionReplica(int partitionId) {
-        // TODO
+        partitions.remove(partitionId);
     }
 
     @Override
@@ -172,11 +187,11 @@ public class NodeSequencerService
         return (Integer) invocationBuilder.invoke().getSafely();
     }
 
-    public void detachSequencer(String sequencerName, int logicalNodeId) {
+    public void detachSequencer(SequencerDefinition definition, int logicalNodeId) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
-        int partitionId = partitionService.getPartitionId(sequencerName);
+        int partitionId = partitionService.getPartitionId(definition.getSequencerName());
 
-        DetachLogicalNodeOperation operation = new DetachLogicalNodeOperation(sequencerName, logicalNodeId);
+        DetachLogicalNodeOperation operation = new DetachLogicalNodeOperation(definition, logicalNodeId);
         OperationService operationService = nodeEngine.getOperationService();
 
         InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);

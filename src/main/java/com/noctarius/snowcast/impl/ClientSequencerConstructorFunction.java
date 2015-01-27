@@ -29,17 +29,21 @@ final class ClientSequencerConstructorFunction
 
     private final HazelcastClientInstanceImpl client;
     private final ProxyManager proxyManager;
+    private final ClientSequencerService sequencerService;
     private final Method proxyManagerInitialize;
 
-    ClientSequencerConstructorFunction(HazelcastClientInstanceImpl client, ProxyManager proxyManager) {
+    ClientSequencerConstructorFunction(HazelcastClientInstanceImpl client, ProxyManager proxyManager,
+                                       ClientSequencerService sequencerService) {
+
         this.client = client;
         this.proxyManager = proxyManager;
+        this.sequencerService = sequencerService;
         this.proxyManagerInitialize = getInitializeMethod();
     }
 
     @Override
     public SequencerProvision createNew(SequencerDefinition definition) {
-        ClientSequencer sequencer = new ClientSequencer(client, definition);
+        ClientSequencer sequencer = new ClientSequencer(client, sequencerService, definition);
         initializeProxy(sequencer);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);

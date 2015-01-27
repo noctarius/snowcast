@@ -22,10 +22,15 @@ import com.hazelcast.nio.serialization.DataSerializerHook;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.util.ConstructorFunction;
 import com.noctarius.snowcast.impl.operations.AttachLogicalNodeOperation;
+import com.noctarius.snowcast.impl.operations.BackupAttachLogicalNodeOperation;
+import com.noctarius.snowcast.impl.operations.BackupCreateSequencerDefinitionOperation;
+import com.noctarius.snowcast.impl.operations.BackupDestroySequencerDefinitionOperation;
+import com.noctarius.snowcast.impl.operations.BackupDetachLogicalNodeOperation;
 import com.noctarius.snowcast.impl.operations.CreateSequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DestroySequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DestroySequencerOperation;
 import com.noctarius.snowcast.impl.operations.DetachLogicalNodeOperation;
+import com.noctarius.snowcast.impl.operations.SequencerReplicationOperation;
 
 public class SequencerDataSerializerHook
         implements DataSerializerHook {
@@ -37,8 +42,14 @@ public class SequencerDataSerializerHook
     public static final int TYPE_CREATE_SEQUENCER_DEFINITION = 2;
     public static final int TYPE_DESTROY_SEQUENCER_DEFINITION = 3;
     public static final int TYPE_DESTROY_SEQUENCER = 4;
+    public static final int TYPE_REPLICATION_OPERATION = 5;
+    public static final int TYPE_PARTITION_REPLICATION = 6;
+    public static final int TYPE_BACKUP_CREATE_SEQUENCER_DEFINITION = 7;
+    public static final int TYPE_BACKUP_DESTROY_SEQUENCER_DEFINITION = 8;
+    public static final int TYPE_BACKUP_ATTACH_LOGICAL_NODE = 9;
+    public static final int TYPE_BACKUP_DETACH_LOGICAL_NODE = 10;
 
-    private static final int LEN = TYPE_DESTROY_SEQUENCER + 1;
+    private static final int LEN = TYPE_BACKUP_DETACH_LOGICAL_NODE + 1;
 
     private static final int DEFAULT_FACTORY_ID = 78412;
 
@@ -82,6 +93,42 @@ public class SequencerDataSerializerHook
             @Override
             public IdentifiedDataSerializable createNew(Integer arg) {
                 return new DestroySequencerOperation();
+            }
+        };
+        constructors[TYPE_REPLICATION_OPERATION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new SequencerReplicationOperation();
+            }
+        };
+        constructors[TYPE_PARTITION_REPLICATION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new PartitionReplication();
+            }
+        };
+        constructors[TYPE_BACKUP_CREATE_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new BackupCreateSequencerDefinitionOperation();
+            }
+        };
+        constructors[TYPE_BACKUP_DESTROY_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new BackupDestroySequencerDefinitionOperation();
+            }
+        };
+        constructors[TYPE_BACKUP_ATTACH_LOGICAL_NODE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new BackupAttachLogicalNodeOperation();
+            }
+        };
+        constructors[TYPE_BACKUP_DETACH_LOGICAL_NODE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
+            @Override
+            public IdentifiedDataSerializable createNew(Integer arg) {
+                return new BackupDetachLogicalNodeOperation();
             }
         };
         return new ArrayDataSerializableFactory(constructors);

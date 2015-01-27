@@ -95,21 +95,21 @@ abstract class AbstractSequencerContext {
 
     final void attachLogicalNode() {
         // Will fail if state transition is not allowed
-        stateTransition(SnowcastSequenceState.Attached);
-
-        // Request sequencer remote assignment
-        this.logicalNodeId = doAttachLogicalNode(definition);
+        if (stateTransition(SnowcastSequenceState.Attached)) {
+            // Request sequencer remote assignment
+            this.logicalNodeId = doAttachLogicalNode(definition);
+        }
     }
 
     final void detachLogicalNode() {
         // Will fail if state transition is not allowed
-        stateTransition(SnowcastSequenceState.Detached);
+        if (stateTransition(SnowcastSequenceState.Detached)) {
+            int logicalNodeId = this.logicalNodeId;
+            this.logicalNodeId = -1;
 
-        int logicalNodeId = this.logicalNodeId;
-        this.logicalNodeId = -1;
-
-        // Remove sequencer remote assignment
-        doDetachLogicalNode(sequencerName, logicalNodeId);
+            // Remove sequencer remote assignment
+            doDetachLogicalNode(definition, logicalNodeId);
+        }
     }
 
     final long timestampValue(long sequenceId) {
@@ -126,13 +126,13 @@ abstract class AbstractSequencerContext {
 
     protected abstract int doAttachLogicalNode(SequencerDefinition definition);
 
-    protected abstract void doDetachLogicalNode(String sequencerName, int logicalNodeId);
+    protected abstract void doDetachLogicalNode(SequencerDefinition definition, int logicalNodeId);
 
-    void stateTransition(SnowcastSequenceState newState) {
+    boolean stateTransition(SnowcastSequenceState newState) {
         while (true) {
             SnowcastSequenceState state = this.state;
             if (state == newState) {
-                return;
+                return false;
             }
 
             if (newState == SnowcastSequenceState.Detached) {
@@ -148,12 +148,12 @@ abstract class AbstractSequencerContext {
                 }
             } else {
                 if (state == SnowcastSequenceState.Destroyed) {
-                    return;
+                    return true;
                 }
             }
 
             if (STATE_UPDATER.compareAndSet(this, state, newState)) {
-                return;
+                return true;
             }
         }
     }

@@ -17,11 +17,15 @@
 package com.noctarius.snowcast.impl;
 
 import com.hazelcast.nio.Address;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.UnsafeHelper;
 import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastNodeIdsExceededException;
 import sun.misc.Unsafe;
+
+import java.io.IOException;
 
 class LogicalNodeTable {
 
@@ -52,6 +56,11 @@ class LogicalNodeTable {
     LogicalNodeTable(SequencerDefinition definition) {
         this.definition = definition;
         this.assignmentTable = new Object[definition.getMaxLogicalNodeCount()];
+    }
+
+    private LogicalNodeTable(SequencerDefinition definition, Object[] assignmentTable) {
+        this.definition = definition;
+        this.assignmentTable = assignmentTable;
     }
 
     SequencerDefinition getSequencerDefinition() {
@@ -101,6 +110,20 @@ class LogicalNodeTable {
         }
     }
 
+    void assignLogicalNode(int logicalNodeId, Address address) {
+        while (true) {
+            Object[] assignmentTable = this.assignmentTable;
+            if (assignmentTable[logicalNodeId] != null) {
+                throw new IllegalStateException("Backup is out of sync!");
+            }
+
+            long offset = offset(logicalNodeId);
+            if (UNSAFE.compareAndSwapObject(assignmentTable, offset, null, address)) {
+                break;
+            }
+        }
+    }
+
     private int findFreeSlot(Object[] assignmentTable) {
         for (int i = 0; i < assignmentTable.length; i++) {
             if (assignmentTable[i] == null) {
@@ -112,5 +135,46 @@ class LogicalNodeTable {
 
     private long offset(int index) {
         return ((long) index << ARRAY_INDEX_SHIFT) + ARRAY_BASE_OFFSET;
+    }
+
+    public static void writeLogicalNodeTable(LogicalNodeTable logicalNodeTable, ObjectDataOutput out)
+            throws IOException {
+
+        out.writeObject(logicalNodeTable.definition);
+
+        Object[] assignmentTable = logicalNodeTable.assignmentTable;
+        int length = assignmentTable.length;
+
+        int size = 0;
+        for (int i = 0; i < length; i++) {
+            if (assignmentTable[i] != null) {
+                size++;
+            }
+        }
+
+        out.writeShort(size);
+        for (int i = 0; i < length; i++) {
+            Address address = (Address) assignmentTable[i];
+            if (address != null) {
+                out.writeShort(i);
+                address.writeData(out);
+            }
+        }
+    }
+
+    public static LogicalNodeTable readLogicalNodeTable(ObjectDataInput in)
+            throws IOException {
+
+        SequencerDefinition definition = in.readObject();
+        short size = in.readShort();
+
+        Object[] assignmentTable = new Object[definition.getMaxLogicalNodeCount()];
+        for (int i = 0; i < size; i++) {
+            short index = in.readShort();
+            Address address = new Address();
+            address.readData(in);
+            assignmentTable[index] = address;
+        }
+        return new LogicalNodeTable(definition, assignmentTable);
     }
 }

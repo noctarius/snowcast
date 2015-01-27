@@ -3,9 +3,9 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.client.PartitionClientRequest;
 import com.hazelcast.client.spi.ClientContext;
-import com.hazelcast.client.spi.ClientInvocationService;
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.spi.EventHandler;
+import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.core.ICompletableFuture;
 import com.hazelcast.core.Partition;
 import com.hazelcast.core.PartitionService;
@@ -25,9 +25,11 @@ public class ClientSequencer
         implements InternalSequencer {
 
     private final ClientSequencerContext sequencerContext;
+    private final ClientSequencerService sequencerService;
 
-    ClientSequencer(HazelcastClientInstanceImpl client, SequencerDefinition definition) {
+    ClientSequencer(HazelcastClientInstanceImpl client, ClientSequencerService sequencerService, SequencerDefinition definition) {
         super(SnowcastConstants.SERVICE_NAME, definition.getSequencerName());
+        this.sequencerService = sequencerService;
         this.sequencerContext = new ClientSequencerContext(client, definition);
     }
 
@@ -85,6 +87,11 @@ public class ClientSequencer
         sequencerContext.stateTransition(newState);
     }
 
+    @Override
+    public SequencerService getSequencerService() {
+        return sequencerService;
+    }
+
     private static class ClientSequencerContext
             extends AbstractSequencerContext {
 
@@ -100,14 +107,13 @@ public class ClientSequencer
         @Override
         protected int doAttachLogicalNode(SequencerDefinition definition) {
             PartitionService partitionService = client.getPartitionService();
-            ClientInvocationService invocationService = client.getInvocationService();
 
             Partition partition = partitionService.getPartition(getSequencerName());
             int partitionId = partition.getPartitionId();
 
             try {
                 PartitionClientRequest request = new ClientAttachLogicalNodeRequest(getSequencerName(), partitionId, definition);
-                ICompletableFuture<Object> future = invocationService.invokeOnPartitionOwner(request, partitionId);
+                ICompletableFuture<Object> future = new ClientInvocation(client, request, partitionId).invoke();
                 Object response = future.get();
                 return client.getSerializationService().toObject(response);
             } catch (Exception e) {
@@ -116,16 +122,15 @@ public class ClientSequencer
         }
 
         @Override
-        protected void doDetachLogicalNode(String sequencerName, int logicalNodeId) {
+        protected void doDetachLogicalNode(SequencerDefinition definition, int logicalNodeId) {
             PartitionService partitionService = client.getPartitionService();
-            ClientInvocationService invocationService = client.getInvocationService();
 
-            Partition partition = partitionService.getPartition(sequencerName);
+            Partition partition = partitionService.getPartition(getSequencerName());
             int partitionId = partition.getPartitionId();
 
             try {
-                PartitionClientRequest request = new ClientDetachLogicalNodeRequest(sequencerName, partitionId, logicalNodeId);
-                ICompletableFuture<Object> future = invocationService.invokeOnPartitionOwner(request, partitionId);
+                PartitionClientRequest request = new ClientDetachLogicalNodeRequest(definition, partitionId, logicalNodeId);
+                ICompletableFuture<Object> future = new ClientInvocation(client, request, partitionId).invoke();
                 future.get();
             } catch (Exception e) {
                 throw new SnowcastException(e);

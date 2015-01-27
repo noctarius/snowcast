@@ -33,6 +33,10 @@ public final class SnowcastSystem {
     }
 
     public static Snowcast snowcast(HazelcastInstance hazelcastInstance) {
+        return snowcast(hazelcastInstance, 1);
+    }
+
+    public static Snowcast snowcast(HazelcastInstance hazelcastInstance, int backupCount) {
         // Test for an already created instance first
         Map<String, Object> userContext = hazelcastInstance.getUserContext();
         Snowcast snowcast = (Snowcast) userContext.get(USER_CONTEXT_LOOKUP_NAME);
@@ -40,17 +44,24 @@ public final class SnowcastSystem {
             return snowcast;
         }
 
+        if (backupCount < 0) {
+            throw new IllegalArgumentException("backupCount must be equal or greater than 0");
+        }
+        if (backupCount > Short.MAX_VALUE) {
+            throw new IllegalArgumentException("backupCount must be equal or lower than " + Short.MAX_VALUE);
+        }
+
         // Node setup
         if (hazelcastInstance instanceof HazelcastInstanceProxy) {
-            snowcast = NodeSnowcastFactory.snowcast(hazelcastInstance);
+            snowcast = NodeSnowcastFactory.snowcast(hazelcastInstance, (short) backupCount);
         }
 
         if (snowcast == null) {
             try {
                 String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";
                 Class<?> clazz = ClassLoaderUtil.loadClass(null, className);
-                Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class);
-                snowcast = (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance);
+                Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class, short.class);
+                snowcast = (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance, backupCount);
 
             } catch (Exception e) {
                 if (e instanceof SnowcastException) {
