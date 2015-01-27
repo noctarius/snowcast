@@ -10,6 +10,7 @@
 * [Pseudo Implementation](#pseudo-implementation)
 * [Why snowcast?](#why-snowcast)
 * [Usage of snowcast](#usage-of-snowcast)
+* [Maven Coordinates](#maven-coordinates)
 * [Multithreading](#multithreading)
 * [Sequencer States](#sequencer-states)
 * [Number of Nodes](#number-of-nodes)
@@ -135,6 +136,33 @@ snowcast.destroySequencer( sequencer );
 ```
 
 Destroying a sequencer is a cluster operation and will destroy all sequencers referred to by the same name on all nodes. After that point the existing `SnowcastSequencer` instances are in a destroyed state and cannot be used anymore. To find out more about sequencer states, please read [Sequencer States](#sequencer-states).
+
+### Maven Coordinates
+
+snowcast is deployed as Apache Maven artifacts. At the moment there is no final release but snapshots are available. Snapshots are stored in the OSS Nexus environment at Sonatype, therefore you have to set up an external snapshot repository to your pom.xml as shown in the following snippet:
+
+```xml
+<repositories>
+  <repository>
+    <id>sonatype-nexus-snapshots</id>
+    <name>SonaType snapshots repository</name>
+    <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+    <snapshots>
+      <enabled>true</enabled>
+    </snapshots>
+  </repository>
+</repositories>
+```
+
+The Maven coordinates for the snowcast artifacts are:
+
+```plain
+<dependency>
+  <groupId>com.noctarius.snowcast</groupId>
+  <artifactId>snowcast</artifactId>
+  <version>1.0.0-SNAPSHOT</version>
+</dependency>
+```
 
 ### Multithreading
 
