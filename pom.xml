@@ -129,7 +129,10 @@
               com.hazelcast.spi.*,
               com.hazelcast.nio.*,
               com.hazelcast.instance.*,
-              com.hazelcast.partition.*
+              com.hazelcast.partition.*,
+              com.hazelcast.cluster.*,
+              com.hazelcast.config.*,
+              sun.misc.*
             </Import-Package>
           </instructions>
         </configuration>
