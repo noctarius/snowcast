@@ -61,21 +61,48 @@ public final class SequencerPartition {
     }
 
     public Integer attachLogicalNode(SequencerDefinition definition, Address address) {
+        checkPartitionFreezeStatus();
+
         SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
         String sequencerName = safeDefinition.getSequencerName();
 
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
-            logicalNodeTable = new LogicalNodeTable(safeDefinition);
-            LogicalNodeTable temp = logicalNodeTables.putIfAbsent(sequencerName, logicalNodeTable);
-            if (temp != null) {
-                logicalNodeTable = temp;
-            }
+            String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
+            throw new IllegalStateException(message);
         }
         return logicalNodeTable.attachLogicalNode(address);
     }
 
     public void detachLogicalNode(String sequencerName, Address address, int logicalNodeId) {
+        checkPartitionFreezeStatus();
+
+        LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
+        if (logicalNodeTable != null) {
+            logicalNodeTable.detachLogicalNode(address, logicalNodeId);
+        }
+    }
+
+    public void assignLogicalNode(SequencerDefinition definition, int logicalNodeId, Address address) {
+        checkPartitionFreezeStatus();
+
+        SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
+        String sequencerName = safeDefinition.getSequencerName();
+
+        LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
+        if (logicalNodeTable == null) {
+            String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
+            throw new IllegalStateException(message);
+        }
+        logicalNodeTable.assignLogicalNode(logicalNodeId, address);
+    }
+
+    public void unassignLogicalNode(SequencerDefinition definition, int logicalNodeId, Address address) {
+        checkPartitionFreezeStatus();
+
+        SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
+        String sequencerName = safeDefinition.getSequencerName();
+
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable != null) {
             logicalNodeTable.detachLogicalNode(address, logicalNodeId);
@@ -113,22 +140,41 @@ public final class SequencerPartition {
                 return checkSequencerDefinitions(definition, other);
             }
 
-            if (frozen == FROZEN) {
-                throw new SnowcastException("Current partition is frozen!");
-            }
+            checkPartitionFreezeStatus();
 
-            logicalNodeTables.put(sequencerName, new LogicalNodeTable(definition));
+            logicalNodeTables.put(sequencerName, new LogicalNodeTable(partitionId, definition));
             return definition;
         }
     }
 
-    PartitionReplication createPartitionReplication() {
-        return new PartitionReplication(partitionId, logicalNodeTables.values());
-    }
-
     SequencerDefinition destroySequencerDefinition(String sequencerName) {
+        checkPartitionFreezeStatus();
+
         LogicalNodeTable logicalNodeTable = logicalNodeTables.remove(sequencerName);
         return logicalNodeTable != null ? logicalNodeTable.getSequencerDefinition() : null;
+    }
+
+    void mergeLogicalNodeTable(LogicalNodeTable mergeable) {
+        SequencerDefinition definition = mergeable.getSequencerDefinition();
+        String sequencerName = definition.getSequencerName();
+
+        LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
+        if (logicalNodeTable == null) {
+            logicalNodeTables.put(sequencerName, mergeable);
+            return;
+        }
+
+        // Checks the definitions and in the worst case throws an exception
+        SequencerDefinition registered = logicalNodeTable.getSequencerDefinition();
+        checkSequencerDefinitions(definition, registered);
+
+        // Merge existing and replicated LogicalNodeTable if possible, if not
+        // kill the replication process
+        logicalNodeTable.merge(mergeable);
+    }
+
+    PartitionReplication createPartitionReplication() {
+        return new PartitionReplication(partitionId, logicalNodeTables.values());
     }
 
     void freeze() {
@@ -155,41 +201,17 @@ public final class SequencerPartition {
         }
     }
 
+    private void checkPartitionFreezeStatus() {
+        if (frozen == FROZEN) {
+            throw new SnowcastException(ExceptionMessages.PARTITION_IS_FROZEN.buildMessage());
+        }
+    }
+
     private SequencerDefinition checkSequencerDefinitions(SequencerDefinition definition, SequencerDefinition other) {
         if (other != null && !other.equals(definition)) {
             String message = ExceptionMessages.SEQUENCER_ALREADY_REGISTERED.buildMessage();
             throw new SnowcastSequencerAlreadyRegisteredException(message);
         }
         return other != null ? other : definition;
-    }
-
-    public void assignLogicalNode(SequencerDefinition definition, int logicalNodeId, Address address) {
-        SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
-        String sequencerName = safeDefinition.getSequencerName();
-
-        LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
-        if (logicalNodeTable == null) {
-            logicalNodeTable = new LogicalNodeTable(safeDefinition);
-            LogicalNodeTable temp = logicalNodeTables.putIfAbsent(sequencerName, logicalNodeTable);
-            if (temp != null) {
-                logicalNodeTable = temp;
-            }
-        }
-        logicalNodeTable.assignLogicalNode(logicalNodeId, address);
-    }
-
-    public void unassignLogicalNode(SequencerDefinition definition, int logicalNodeId, Address address) {
-        SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
-        String sequencerName = safeDefinition.getSequencerName();
-
-        LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
-        if (logicalNodeTable == null) {
-            logicalNodeTable = new LogicalNodeTable(safeDefinition);
-            LogicalNodeTable temp = logicalNodeTables.putIfAbsent(sequencerName, logicalNodeTable);
-            if (temp != null) {
-                logicalNodeTable = temp;
-            }
-        }
-        logicalNodeTable.detachLogicalNode(address, logicalNodeId);
     }
 }

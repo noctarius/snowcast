@@ -17,6 +17,7 @@
 package com.noctarius.snowcast;
 
 public enum SnowcastSequenceState {
+
     Detached,
     Attached,
     Destroyed

@@ -38,6 +38,21 @@ public class PartitionReplication
         this.logicalNodeTables = logicalNodeTables;
     }
 
+    public void applyReplication(NodeSequencerService sequencerService)
+            throws Exception {
+
+        SequencerPartition partition = sequencerService.getSequencerPartition(partitionId);
+
+        partition.freeze();
+        try {
+            for (LogicalNodeTable logicalNodeTable : logicalNodeTables) {
+                partition.mergeLogicalNodeTable(logicalNodeTable);
+            }
+        } finally {
+            partition.unfreeze();
+        }
+    }
+
     @Override
     public void writeData(ObjectDataOutput out)
             throws IOException {
@@ -57,7 +72,7 @@ public class PartitionReplication
         int size = in.readInt();
         logicalNodeTables = new ArrayList<LogicalNodeTable>(size);
         for (int i = 0; i < size; i++) {
-            LogicalNodeTable logicalNodeTable = LogicalNodeTable.readLogicalNodeTable(in);
+            LogicalNodeTable logicalNodeTable = LogicalNodeTable.readLogicalNodeTable(partitionId, in);
             logicalNodeTables.add(logicalNodeTable);
         }
     }

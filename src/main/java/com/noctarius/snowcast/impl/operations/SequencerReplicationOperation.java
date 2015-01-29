@@ -20,10 +20,12 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.spi.AbstractOperation;
+import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.PartitionReplication;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
 
 import java.io.IOException;
+import java.util.Collection;
 
 public class SequencerReplicationOperation
         extends AbstractOperation
@@ -42,7 +44,8 @@ public class SequencerReplicationOperation
     public void run()
             throws Exception {
 
-        // TODO Apply replication
+        NodeSequencerService sequencerService = getService();
+        partitionReplication.applyReplication(sequencerService);
     }
 
     @Override

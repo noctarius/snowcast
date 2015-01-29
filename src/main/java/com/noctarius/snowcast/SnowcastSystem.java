@@ -19,6 +19,7 @@ package com.noctarius.snowcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.HazelcastInstanceProxy;
 import com.hazelcast.nio.ClassLoaderUtil;
+import com.noctarius.snowcast.impl.ExceptionMessages;
 import com.noctarius.snowcast.impl.NodeSnowcastFactory;
 import com.noctarius.snowcast.impl.SequencerService;
 
@@ -45,10 +46,11 @@ public final class SnowcastSystem {
         }
 
         if (backupCount < 0) {
-            throw new IllegalArgumentException("backupCount must be equal or greater than 0");
+            throw new IllegalArgumentException(ExceptionMessages.BACKUP_COUNT_TOO_LOW.buildMessage());
         }
         if (backupCount > Short.MAX_VALUE) {
-            throw new IllegalArgumentException("backupCount must be equal or lower than " + Short.MAX_VALUE);
+            String message = ExceptionMessages.BACKUP_COUNT_TOO_HIGH.buildMessage(Short.MAX_VALUE);
+            throw new IllegalArgumentException(message);
         }
 
         // Node setup

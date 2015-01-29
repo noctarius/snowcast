@@ -80,7 +80,43 @@ public enum ExceptionMessages {
     /**
      * Illegal Sequencer type passed to the Snowcast::destroy method
      */
-    ILLEGAL_SEQUENCER_TYPE("Illegal Sequencer type passed to the Snowcast::destroy method");
+    ILLEGAL_SEQUENCER_TYPE("Illegal Sequencer type passed to the Snowcast::destroy method"),
+
+    /**
+     * Error on merging LogicalNodeTable on partition %s. Partitions seem to be out of sync - stopping
+     */
+    ERROR_MERGING_LOGICAL_NODE_TABLE(
+            "Error on merging LogicalNodeTable on partition %s. Partitions seem to be out of sync - stopping"),
+
+    /**
+     * Backup on partition %s is out of sync. Backup cannot be applied.
+     */
+    BACKUP_OUT_OF_SYNC("Backup on partition %s is out of sync. Backup cannot be applied."),
+
+    /**
+     * data type scale not a power of two
+     */
+    DATA_NOT_POWER_OF_TWO("data type scale not a power of two"),
+
+    /**
+     * Partition %s is frozen and cannot be changed!
+     */
+    PARTITION_IS_FROZEN("Partition %s is frozen and cannot be changed!"),
+
+    /**
+     * LogicalNodeTable is not registered on partition %s.
+     */
+    UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE("LogicalNodeTable is not registered on partition %s."),
+
+    /**
+     * backupCount must be equal or greater than 0
+     */
+    BACKUP_COUNT_TOO_LOW("backupCount must be equal or greater than 0"),
+
+    /**
+     * backupCount must be equal or lower than %s
+     */
+    BACKUP_COUNT_TOO_HIGH("backupCount must be equal or lower than %s");
 
     private final String template;
 

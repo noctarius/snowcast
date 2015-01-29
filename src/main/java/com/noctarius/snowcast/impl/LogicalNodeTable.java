@@ -41,7 +41,7 @@ class LogicalNodeTable {
             ARRAY_INDEX_SCALE = UNSAFE.arrayIndexScale(Object[].class);
 
             if ((ARRAY_INDEX_SCALE & (ARRAY_INDEX_SCALE - 1)) != 0) {
-                throw new SnowcastException("data type scale not a power of two");
+                throw new SnowcastException(ExceptionMessages.DATA_NOT_POWER_OF_TWO.buildMessage());
             }
             ARRAY_INDEX_SHIFT = 31 - Integer.numberOfLeadingZeros(ARRAY_INDEX_SCALE);
         } catch (Exception e) {
@@ -49,16 +49,17 @@ class LogicalNodeTable {
         }
     }
 
+    private final int partitionId;
     private final SequencerDefinition definition;
 
     private volatile Object[] assignmentTable;
 
-    LogicalNodeTable(SequencerDefinition definition) {
-        this.definition = definition;
-        this.assignmentTable = new Object[definition.getMaxLogicalNodeCount()];
+    LogicalNodeTable(int partitionId, SequencerDefinition definition) {
+        this(partitionId, definition, new Object[definition.getMaxLogicalNodeCount()]);
     }
 
-    private LogicalNodeTable(SequencerDefinition definition, Object[] assignmentTable) {
+    private LogicalNodeTable(int partitionId, SequencerDefinition definition, Object[] assignmentTable) {
+        this.partitionId = partitionId;
         this.definition = definition;
         this.assignmentTable = assignmentTable;
     }
@@ -114,13 +115,33 @@ class LogicalNodeTable {
         while (true) {
             Object[] assignmentTable = this.assignmentTable;
             if (assignmentTable[logicalNodeId] != null) {
-                throw new IllegalStateException("Backup is out of sync!");
+                String message = ExceptionMessages.BACKUP_OUT_OF_SYNC.buildMessage(partitionId);
+                throw new IllegalStateException(message);
             }
 
             long offset = offset(logicalNodeId);
             if (UNSAFE.compareAndSwapObject(assignmentTable, offset, null, address)) {
                 break;
             }
+        }
+    }
+
+    void merge(LogicalNodeTable mergeable) {
+        Object[] mergeableAssignmentTable = mergeable.assignmentTable;
+        Object[] assignmentTable = this.assignmentTable;
+
+        for (int index = 0; index < assignmentTable.length; index++) {
+            Address mergeableAddress = (Address) mergeableAssignmentTable[index];
+            Address currentAddress = (Address) assignmentTable[index];
+            if (currentAddress != null) {
+                if (!currentAddress.equals(mergeableAddress)) {
+                    String message = ExceptionMessages.ERROR_MERGING_LOGICAL_NODE_TABLE.buildMessage(partitionId);
+                    throw new IllegalStateException(message);
+                }
+            }
+
+            long offset = offset(index);
+            UNSAFE.putObjectVolatile(assignmentTable, offset, mergeableAddress);
         }
     }
 
@@ -162,7 +183,7 @@ class LogicalNodeTable {
         }
     }
 
-    public static LogicalNodeTable readLogicalNodeTable(ObjectDataInput in)
+    public static LogicalNodeTable readLogicalNodeTable(int partitionId, ObjectDataInput in)
             throws IOException {
 
         SequencerDefinition definition = in.readObject();
@@ -175,6 +196,6 @@ class LogicalNodeTable {
             address.readData(in);
             assignmentTable[index] = address;
         }
-        return new LogicalNodeTable(definition, assignmentTable);
+        return new LogicalNodeTable(partitionId, definition, assignmentTable);
     }
 }
