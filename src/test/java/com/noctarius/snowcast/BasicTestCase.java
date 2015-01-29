@@ -183,6 +183,25 @@ public class BasicTestCase
         }
     }
 
+    @Test(expected = SnowcastStateException.class)
+    public void test_creation_wrong_definition()
+            throws Exception {
+
+        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            assertNotNull(sequencer);
+
+            buildSnowcastSequencer(snowcast);
+        } finally {
+            factory.shutdownAll();
+        }
+    }
+
     private SnowcastSequencer buildSnowcastSequencer(Snowcast snowcast) {
         String sequencerName = "SimpleSequencer";
         int maxLogicalNodeCount = 128;

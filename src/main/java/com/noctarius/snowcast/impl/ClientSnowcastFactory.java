@@ -27,7 +27,7 @@ public final class ClientSnowcastFactory {
             return new ClientSnowcast(hazelcastInstance, backupCount);
         }
 
-        // Client not yet supported
+        // Client type not yet supported
         String className = hazelcastInstance.getClass().getCanonicalName();
         String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage(className);
         throw new IllegalArgumentException(message);

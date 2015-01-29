@@ -116,7 +116,7 @@ class LogicalNodeTable {
             Object[] assignmentTable = this.assignmentTable;
             if (assignmentTable[logicalNodeId] != null) {
                 String message = ExceptionMessages.BACKUP_OUT_OF_SYNC.buildMessage(partitionId);
-                throw new IllegalStateException(message);
+                throw new SnowcastIllegalStateException(message);
             }
 
             long offset = offset(logicalNodeId);
@@ -134,9 +134,9 @@ class LogicalNodeTable {
             Address mergeableAddress = (Address) mergeableAssignmentTable[index];
             Address currentAddress = (Address) assignmentTable[index];
             if (currentAddress != null) {
-                if (!currentAddress.equals(mergeableAddress)) {
+                if (mergeableAddress != null && !currentAddress.equals(mergeableAddress)) {
                     String message = ExceptionMessages.ERROR_MERGING_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-                    throw new IllegalStateException(message);
+                    throw new SnowcastIllegalStateException(message);
                 }
             }
 

@@ -23,6 +23,7 @@ import com.hazelcast.spi.AbstractOperation;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.PartitionReplication;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
+import com.noctarius.snowcast.impl.SequencerPartition;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -45,7 +46,11 @@ public class SequencerReplicationOperation
             throws Exception {
 
         NodeSequencerService sequencerService = getService();
-        partitionReplication.applyReplication(sequencerService);
+
+        int partitionId = partitionReplication.getPartitionId();
+        SequencerPartition partition = sequencerService.getSequencerPartition(partitionId);
+
+        partitionReplication.applyReplication(partition);
     }
 
     @Override

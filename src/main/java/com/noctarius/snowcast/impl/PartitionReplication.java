@@ -38,18 +38,20 @@ public class PartitionReplication
         this.logicalNodeTables = logicalNodeTables;
     }
 
-    public void applyReplication(NodeSequencerService sequencerService)
+    public int getPartitionId() {
+        return partitionId;
+    }
+
+    public void applyReplication(SequencerPartition targetPartition)
             throws Exception {
 
-        SequencerPartition partition = sequencerService.getSequencerPartition(partitionId);
-
-        partition.freeze();
+        targetPartition.freeze();
         try {
             for (LogicalNodeTable logicalNodeTable : logicalNodeTables) {
-                partition.mergeLogicalNodeTable(logicalNodeTable);
+                targetPartition.mergeLogicalNodeTable(logicalNodeTable);
             }
         } finally {
-            partition.unfreeze();
+            targetPartition.unfreeze();
         }
     }
 

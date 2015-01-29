@@ -39,7 +39,7 @@ public class LogicalNodeTableTestCase {
             throws Exception {
 
         SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
-        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         Address address = new Address("localhost", 12345);
 
@@ -54,7 +54,7 @@ public class LogicalNodeTableTestCase {
             throws Exception {
 
         SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
-        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         Address address1 = new Address("localhost", 12345);
         int logicalNodeId1 = logicalNodeTable.attachLogicalNode(address1);
@@ -73,7 +73,7 @@ public class LogicalNodeTableTestCase {
             throws Exception {
 
         SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 1, (short) 1);
-        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         Address address1 = new Address("localhost", 12345);
         int logicalNodeId1 = logicalNodeTable.attachLogicalNode(address1);
@@ -89,7 +89,7 @@ public class LogicalNodeTableTestCase {
             throws Exception {
 
         SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 2, (short) 1);
-        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         Address address1 = new Address("localhost", 12345);
         int logicalNodeId1 = logicalNodeTable.attachLogicalNode(address1);
@@ -107,7 +107,7 @@ public class LogicalNodeTableTestCase {
             throws Exception {
 
         SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
-        final LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
+        final LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         class Task
                 implements Runnable {
@@ -171,7 +171,7 @@ public class LogicalNodeTableTestCase {
             throws Exception {
 
         SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
-        final LogicalNodeTable logicalNodeTable = new LogicalNodeTable(definition);
+        final LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         class Task
                 implements Runnable {
@@ -248,5 +248,45 @@ public class LogicalNodeTableTestCase {
         }
 
         assertEquals(concurrencyLevel, logicalNodeIds.size());
+    }
+
+    @Test
+    public void test_detach_but_not_attached()
+            throws Exception {
+
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
+
+        Address address = new Address("localhost", 12345);
+
+        logicalNodeTable.detachLogicalNode(address, 1);
+    }
+
+    @Test(expected = SnowcastIllegalStateException.class)
+    public void test_attach_but_already_attached()
+            throws Exception {
+
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
+
+        Address address = new Address("localhost", 12345);
+
+        logicalNodeTable.assignLogicalNode(1, address);
+        logicalNodeTable.assignLogicalNode(1, address);
+    }
+
+    @Test(expected = SnowcastNodeIdsExceededException.class)
+    public void test_exceed_logical_node_ids()
+            throws Exception {
+
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
+        LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
+
+        Address address = new Address("localhost", 12345);
+
+        for (int i = 0; i < 128; i++) {
+            logicalNodeTable.attachLogicalNode(address);
+        }
+        logicalNodeTable.attachLogicalNode(address);
     }
 }

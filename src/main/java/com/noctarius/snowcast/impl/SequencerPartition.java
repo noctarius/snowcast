@@ -19,6 +19,7 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.nio.Address;
 import com.hazelcast.nio.UnsafeHelper;
 import com.noctarius.snowcast.SnowcastException;
+import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastSequencerAlreadyRegisteredException;
 import sun.misc.Unsafe;
 
@@ -69,7 +70,7 @@ public final class SequencerPartition {
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
             String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-            throw new IllegalStateException(message);
+            throw new SnowcastIllegalStateException(message);
         }
         return logicalNodeTable.attachLogicalNode(address);
     }
@@ -92,7 +93,7 @@ public final class SequencerPartition {
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
             String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-            throw new IllegalStateException(message);
+            throw new SnowcastIllegalStateException(message);
         }
         logicalNodeTable.assignLogicalNode(logicalNodeId, address);
     }
@@ -112,7 +113,8 @@ public final class SequencerPartition {
     Address getAttachedLogicalNode(String sequencerName, int logicalNodeId) {
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
-            throw new IllegalStateException();
+            String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
+            throw new SnowcastIllegalStateException(message);
         }
         return logicalNodeTable.getAttachedLogicalNode(logicalNodeId);
     }
@@ -203,7 +205,7 @@ public final class SequencerPartition {
 
     private void checkPartitionFreezeStatus() {
         if (frozen == FROZEN) {
-            throw new SnowcastException(ExceptionMessages.PARTITION_IS_FROZEN.buildMessage());
+            throw new SnowcastIllegalStateException(ExceptionMessages.PARTITION_IS_FROZEN.buildMessage());
         }
     }
 
