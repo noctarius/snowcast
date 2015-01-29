@@ -183,7 +183,7 @@ public class BasicTestCase
         }
     }
 
-    @Test(expected = SnowcastStateException.class)
+    @Test(expected = SnowcastSequencerAlreadyRegisteredException.class)
     public void test_creation_wrong_definition()
             throws Exception {
 
