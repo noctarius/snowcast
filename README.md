@@ -17,6 +17,7 @@
 * [Backups](#backups)
 * [Migration and Split Brain](#migration-and-split-brain)
 * [Hazelcast Clients](#hazelcast-clients)
+* [Build Information](#build-information)
 
 ### The Problem
 
@@ -252,3 +253,9 @@ snowcast.destroySequencer( sequencer );
 ```
 
 As an important note, clients behave exactly as cluster nodes. Cluster communication is only necessary in case of changes of the sequencer topologies (creation, destroy of sequencers).
+
+### Build Information
+
+snowcast is build using Jenkins for Continuous Integration. The project build is publically available for review. It contains Code and Test Coverage reports and many more information.
+
+Please find the Jenkins build here: [Jenkins build](https://noctarius.ci.cloudbees.com/job/snowcast/)
