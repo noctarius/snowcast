@@ -45,7 +45,8 @@ public class InternalSequencerUtilsTestCase {
 
     @Test
     public void test_sequence_extraction_counter() {
-        for (int maxLogicalNodeCount : SnowcastConstants.EXP_LOOKUP) {
+        final int[] expLookup = {8192, 4096, 2048, 1024, 512, 256, 128};
+        for (int maxLogicalNodeCount : expLookup) {
             int nodeCount = InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
 
             int shift = InternalSequencerUtils.calculateLogicalNodeShifting(nodeCount);

@@ -18,17 +18,35 @@ package com.noctarius.snowcast;
 
 import java.util.Comparator;
 
-import static com.noctarius.snowcast.SnowcastSequenceUtils.timestampValue;
-
+/**
+ * <p>This {@link java.util.Comparator} implementation can be used to compare and order two distinct
+ * snowcast sequencer ids.<br/>
+ * This is meant for legacy code or to integrate it with existing frameworks. In general use cases
+ * {@link com.noctarius.snowcast.SnowcastSequenceUtils#compareTimestamp(long, long)} (long, long)}
+ * should be preferred to prevent some unnecessary boxing/unboxing from <tt>long</tt> to <tt>Long</tt>
+ * and back.</p>
+ * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:
+ * <pre>
+ *     List<Long> elements = getSequencerIds();
+ *     Collections.sort( elements );
+ *     System.out.println( elements );
+ * </pre>
+ * </p>
+ */
 public enum SnowcastTimestampComparator
         implements Comparator<Long> {
 
+    /**
+     * The singleton instance for this {@link java.util.Comparator} implementation. Since the
+     * implementation is completely stateless this instance is fine to be used in multi-threading
+     * environments.<br/>
+     * More information on the implementation detail are available here:
+     * {@link com.noctarius.snowcast.SnowcastTimestampComparator}.
+     */
     INSTANCE;
 
     @Override
     public int compare(Long sequenceId1, Long sequenceId2) {
-        long timestampValue1 = timestampValue(sequenceId1);
-        long timestampValue2 = timestampValue(sequenceId2);
-        return timestampValue1 < timestampValue2 ? -1 : timestampValue1 == timestampValue2 ? 0 : 1;
+        return SnowcastSequenceUtils.compareTimestamp(sequenceId1, sequenceId2);
     }
 }

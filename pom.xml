@@ -123,7 +123,6 @@
             </Private-Package>
             <Import-Package>
               com.hazelcast.client.*;resolution=Optional,
-              com.hazelcast.client.spi.*;resolution=Optional,
               com.hazelcast.core.*,
               com.hazelcast.util.*,
               com.hazelcast.spi.*,

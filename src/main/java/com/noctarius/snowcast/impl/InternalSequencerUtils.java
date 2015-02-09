@@ -19,11 +19,23 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.util.QuickMath;
 import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 
-import static com.noctarius.snowcast.impl.SnowcastConstants.BASE_SHIFT_LOGICAL_NODE_ID;
-import static com.noctarius.snowcast.impl.SnowcastConstants.EXP_LOOKUP;
 import static com.noctarius.snowcast.impl.SnowcastConstants.ID_TIMESTAMP_READ_MASK;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_1024;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_128;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_2048;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_256;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_4096;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_512;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_8192;
 import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_LOWER_BOUND;
 import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_UPPER_BOUND;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_1024;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_128;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_2048;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_256;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_4096;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_512;
+import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_8192;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_TIMESTAMP;
 
 public final class InternalSequencerUtils {
@@ -48,14 +60,24 @@ public final class InternalSequencerUtils {
     }
 
     public static int calculateLogicalNodeShifting(int maxLogicalNodeCount) {
-        int exp = BASE_SHIFT_LOGICAL_NODE_ID;
-        for (int matcher : EXP_LOOKUP) {
-            if (matcher == maxLogicalNodeCount + 1) {
-                break;
-            }
-            exp++;
+        switch (maxLogicalNodeCount) {
+            case MAX_LOGICAL_NODE_COUNT_128:
+                return SHIFT_LOGICAL_NODE_ID_128;
+            case MAX_LOGICAL_NODE_COUNT_256:
+                return SHIFT_LOGICAL_NODE_ID_256;
+            case MAX_LOGICAL_NODE_COUNT_512:
+                return SHIFT_LOGICAL_NODE_ID_512;
+            case MAX_LOGICAL_NODE_COUNT_1024:
+                return SHIFT_LOGICAL_NODE_ID_1024;
+            case MAX_LOGICAL_NODE_COUNT_2048:
+                return SHIFT_LOGICAL_NODE_ID_2048;
+            case MAX_LOGICAL_NODE_COUNT_4096:
+                return SHIFT_LOGICAL_NODE_ID_4096;
+            case MAX_LOGICAL_NODE_COUNT_8192:
+                return SHIFT_LOGICAL_NODE_ID_8192;
+            default:
+                throw new IllegalArgumentException(ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_COUNT.buildMessage());
         }
-        return exp;
     }
 
     public static long calculateLogicalNodeMask(long maxLogicalNodeCount, int nodeIdShiftFactor) {

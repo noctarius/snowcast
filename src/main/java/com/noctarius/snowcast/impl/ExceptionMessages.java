@@ -28,6 +28,11 @@ public enum ExceptionMessages {
     ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY("maxLogicalNodeCount cannot be %s than %s"),
 
     /**
+     * maxLogicalNodeCount has an illegal value
+     */
+    ILLEGAL_MAX_LOGICAL_NODE_COUNT("maxLogicalNodeCount has an illegal value"),
+
+    /**
      * Illegal detach attempt, address on slot is wrong
      */
     ILLEGAL_DETACH_ATTEMPT("Illegal detach attempt, address on slot is wrong"),
