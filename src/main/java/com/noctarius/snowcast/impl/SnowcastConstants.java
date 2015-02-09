@@ -32,13 +32,13 @@ public final class SnowcastConstants {
     public static final long ID_TIMESTAMP_READ_MASK = 0xFFFFFFFFFF800000L;
 
     // Exponent for power of 2 lookup
-    public static final int MAX_LOGICAL_NODE_COUNT_8192 = 8192;
-    public static final int MAX_LOGICAL_NODE_COUNT_4096 = 4096;
-    public static final int MAX_LOGICAL_NODE_COUNT_2048 = 2048;
-    public static final int MAX_LOGICAL_NODE_COUNT_1024 = 1024;
-    public static final int MAX_LOGICAL_NODE_COUNT_512 = 512;
-    public static final int MAX_LOGICAL_NODE_COUNT_256 = 256;
-    public static final int MAX_LOGICAL_NODE_COUNT_128 = 128;
+    public static final int MAX_LOGICAL_NODE_COUNT_8192 = 8191;
+    public static final int MAX_LOGICAL_NODE_COUNT_4096 = 4095;
+    public static final int MAX_LOGICAL_NODE_COUNT_2048 = 2047;
+    public static final int MAX_LOGICAL_NODE_COUNT_1024 = 1023;
+    public static final int MAX_LOGICAL_NODE_COUNT_512 = 511;
+    public static final int MAX_LOGICAL_NODE_COUNT_256 = 255;
+    public static final int MAX_LOGICAL_NODE_COUNT_128 = 127;
     public static final int SHIFT_LOGICAL_NODE_ID_8192 = 10;
     public static final int SHIFT_LOGICAL_NODE_ID_4096 = 11;
     public static final int SHIFT_LOGICAL_NODE_ID_2048 = 12;
