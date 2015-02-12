@@ -203,6 +203,10 @@ public final class SequencerPartition {
         }
     }
 
+    boolean isFrozen() {
+        return frozen == FROZEN;
+    }
+
     private void checkPartitionFreezeStatus() {
         if (frozen == FROZEN) {
             throw new SnowcastIllegalStateException(ExceptionMessages.PARTITION_IS_FROZEN.buildMessage());

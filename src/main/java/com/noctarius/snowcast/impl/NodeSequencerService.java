@@ -21,6 +21,7 @@ import com.hazelcast.core.DistributedObject;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.SerializationService;
 import com.hazelcast.partition.InternalPartitionService;
+import com.hazelcast.partition.MigrationEndpoint;
 import com.hazelcast.spi.EventPublishingService;
 import com.hazelcast.spi.EventRegistration;
 import com.hazelcast.spi.EventService;
@@ -152,7 +153,13 @@ public class NodeSequencerService
     @Override
     public void commitMigration(PartitionMigrationEvent event) {
         int partitionId = event.getPartitionId();
-        partitions.remove(partitionId);
+        SequencerPartition partition = partitions.get(partitionId);
+        if (partition != null) {
+            if (event.getMigrationEndpoint() == MigrationEndpoint.SOURCE) {
+                partitions.remove(partitionId);
+            }
+            partition.unfreeze();
+        }
     }
 
     @Override
