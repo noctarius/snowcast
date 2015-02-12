@@ -87,7 +87,7 @@ public final class SnowcastSystem {
      * {@link com.noctarius.snowcast.Snowcast} instance.
      *
      * @param hazelcastInstance the HazelcastInstance with link the Snowcast instance to
-     * @param backupCount
+     * @param backupCount the amount of backups to be stored on other nodes, default is one backup
      * @return a created or cached Snowcast instance, linked to the given HazelcastInstance
      * @throws com.noctarius.snowcast.SnowcastException if creation fails for various reasons
      */

@@ -28,7 +28,7 @@ import java.util.Comparator;
  * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:
  * <pre>
  *     List<Long> elements = getSequencerIds();
- *     Collections.sort( elements );
+ *     Collections.sort( elements, SnowcastTimestampComparator.INSTANCE );
  *     System.out.println( elements );
  * </pre>
  * </p>
