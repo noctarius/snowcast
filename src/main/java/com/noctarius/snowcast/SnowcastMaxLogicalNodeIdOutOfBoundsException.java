@@ -18,9 +18,18 @@ package com.noctarius.snowcast;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The SnowcastMaxLogicalNodeIdOutOfBoundsException is thrown whenever the given
+ * maximal logical node ID is outside the legal bound between 128 and 8192.
+ */
 public class SnowcastMaxLogicalNodeIdOutOfBoundsException
         extends SnowcastException {
 
+    /**
+     * Basic exception constructor
+     *
+     * @param message message to be used
+     */
     public SnowcastMaxLogicalNodeIdOutOfBoundsException(@Nonnull String message) {
         super(message);
     }

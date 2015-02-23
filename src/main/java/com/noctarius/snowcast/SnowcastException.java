@@ -18,21 +18,45 @@ package com.noctarius.snowcast;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The SnowcastException is the base class for all other snowcast exception
+ * classes. It is also often used to throw an exception for general problematic
+ * situations where there is no special subclass provided.
+ */
 public class SnowcastException
         extends RuntimeException {
 
+    /**
+     * Basic exception constructor
+     */
     SnowcastException() {
         super();
     }
 
+    /**
+     * Basic exception constructor with a given message
+     *
+     * @param message message to be used
+     */
     public SnowcastException(@Nonnull String message) {
         super(message);
     }
 
+    /**
+     * Basic exception constructor with a given message and {@link java.lang.Throwable} cause.
+     *
+     * @param message message to be used
+     * @param cause   causing throwable for this exception
+     */
     public SnowcastException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Basic exception constructor with a given {@link java.lang.Throwable} cause.
+     *
+     * @param cause causing throwable for this exception
+     */
     public SnowcastException(@Nonnull Throwable cause) {
         super(cause);
     }

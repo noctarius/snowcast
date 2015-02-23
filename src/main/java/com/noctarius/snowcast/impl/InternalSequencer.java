@@ -30,4 +30,7 @@ interface InternalSequencer
 
     @Nonnull
     SequencerService getSequencerService();
+
+    @Nonnull
+    SequencerDefinition getSequencerDefinition();
 }

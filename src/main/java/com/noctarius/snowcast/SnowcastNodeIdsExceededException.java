@@ -16,9 +16,18 @@
  */
 package com.noctarius.snowcast;
 
+/**
+ * The SnowcastNodeIdsExceededException is thrown whenever no the configured number
+ * of logical node IDs is exceeded.<br/>
+ * If more logical node IDs are required the {@link com.noctarius.snowcast.SnowcastSequencer}
+ * must be destroyed and the configuration can be changed by recreating it.
+ */
 public class SnowcastNodeIdsExceededException
         extends SnowcastException {
 
+    /**
+     * Basic exception constructor
+     */
     public SnowcastNodeIdsExceededException() {
     }
 }

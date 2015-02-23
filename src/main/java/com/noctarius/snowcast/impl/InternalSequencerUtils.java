@@ -18,10 +18,14 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.util.QuickMath;
 import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
+import com.noctarius.snowcast.SnowcastSequenceComparator;
+import com.noctarius.snowcast.SnowcastSequencer;
 
 import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.Comparator;
 
 import static com.noctarius.snowcast.impl.SnowcastConstants.ID_TIMESTAMP_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_1024;
@@ -45,6 +49,12 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_TIMESTAMP;
 public final class InternalSequencerUtils {
 
     private InternalSequencerUtils() {
+    }
+
+    @Nonnull
+    public static Comparator<Long> snowcastSequenceComparator(@Nonnull SnowcastSequencer sequencer) {
+        SequencerDefinition definition = ((InternalSequencer) sequencer).getSequencerDefinition();
+        return new SnowcastSequenceComparator(definition.getMaxLogicalNodeCount());
     }
 
     @Nonnegative

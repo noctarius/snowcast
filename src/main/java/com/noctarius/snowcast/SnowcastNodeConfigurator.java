@@ -25,16 +25,35 @@ import com.noctarius.snowcast.impl.SnowcastConstants;
 
 import javax.annotation.Nonnull;
 
+/**
+ * This class is used as a helper to prepare Hazelcast {@link com.hazelcast.config.Config}
+ * configuration instances for usage / registration of snowcast.
+ */
 public final class SnowcastNodeConfigurator {
 
     private SnowcastNodeConfigurator() {
     }
 
+    /**
+     * Creates a new Hazelcast node {@link com.hazelcast.config.Config} instances and
+     * prepares it for snowcast. This is basically configuring a special internal
+     * snowcast sequencer service.
+     *
+     * @return a new Config instance pre-configured for snowcast
+     */
     @Nonnull
     public static Config buildSnowcastAwareConfig() {
         return buildSnowcastAwareConfig(new XmlConfigBuilder().build());
     }
 
+    /**
+     * Configures a given Hazelcast {@link com.hazelcast.config.Config} instance
+     * for snowcast. This is basically configuring a special internal snowcast
+     * sequencer service.
+     *
+     * @param config the Config instance to configure for snowcast
+     * @return the Config instance pre-configured for snowcast
+     */
     @Nonnull
     public static Config buildSnowcastAwareConfig(@Nonnull Config config) {
         ServicesConfig servicesConfig = config.getServicesConfig();

@@ -90,6 +90,11 @@ abstract class AbstractSequencerContext {
         return sequencerName;
     }
 
+    @Nonnull
+    final SequencerDefinition getSequencerDefinition() {
+        return definition;
+    }
+
     final long next()
             throws InterruptedException {
 

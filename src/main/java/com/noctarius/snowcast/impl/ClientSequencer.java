@@ -77,6 +77,12 @@ public class ClientSequencer
 
     @Nonnull
     @Override
+    public SequencerDefinition getSequencerDefinition() {
+        return sequencerContext.getSequencerDefinition();
+    }
+
+    @Nonnull
+    @Override
     public SnowcastSequencer attachLogicalNode() {
         sequencerContext.attachLogicalNode();
         return this;

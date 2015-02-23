@@ -55,6 +55,12 @@ public class NodeSequencer
 
     @Nonnull
     @Override
+    public SequencerDefinition getSequencerDefinition() {
+        return sequencerContext.getSequencerDefinition();
+    }
+
+    @Nonnull
+    @Override
     public final SnowcastSequencer attachLogicalNode() {
         sequencerContext.attachLogicalNode();
         return this;

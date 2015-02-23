@@ -18,9 +18,13 @@ package com.noctarius.snowcast;
 
 import com.noctarius.snowcast.impl.InternalSequencerUtils;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+
+import java.util.Comparator;
 
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounterMask;
@@ -41,6 +45,19 @@ public final class SnowcastSequenceUtils {
     }
 
     /**
+     * Creates a new {@link com.noctarius.snowcast.SnowcastSequenceComparator} instance based on the
+     * given {@link com.noctarius.snowcast.SnowcastSequencer}'s internal configuration. This is a
+     * convenience method over customly creating the comparator instance.
+     *
+     * @param sequencer the SnowcastSequencer to retrieve the maximum logical node count value from
+     * @return a SnowcastSequenceComparator instance bound to the maximum logical node count
+     */
+    @Nonnull
+    public static Comparator<Long> snowcastSequenceComparator(@Nonnull SnowcastSequencer sequencer) {
+        return InternalSequencerUtils.snowcastSequenceComparator(sequencer);
+    }
+
+    /**
      * This helper method extracts the timestamp value from a given sequence id. This timestamp value can be
      * used to order multiple sequence ids depending on their generation time.<br/>
      * To compare timestamps and order sequence ids accordingly please find {@link #compareTimestamp(long, long)} as
@@ -49,6 +66,7 @@ public final class SnowcastSequenceUtils {
      * @param sequenceId the sequence id to extract the timestamp value from
      * @return the extracted timestamp value based on the generation epoch
      */
+    @Nonnegative
     public static long timestampValue(long sequenceId) {
         return InternalSequencerUtils.timestampValue(sequenceId);
     }
@@ -64,6 +82,7 @@ public final class SnowcastSequenceUtils {
      * @param sequenceId the sequence id to extract the logicalNodeId value from
      * @return the extracted logicalNodeId
      */
+    @Nonnegative
     public static int logicalNodeId(long sequenceId) {
         return logicalNodeId(sequenceId, DEFAULT_MAX_LOGICAL_NODES_13_BITS);
     }
@@ -78,6 +97,7 @@ public final class SnowcastSequenceUtils {
      * @return the extracted logicalNodeId
      * @throws SnowcastMaxLogicalNodeIdOutOfBoundsException when maxLogicalNodeCount is outside of the legal range
      */
+    @Nonnegative
     public static int logicalNodeId(long sequenceId, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShiftFactor = calculateLogicalNodeShifting(nodeCount);
@@ -95,6 +115,7 @@ public final class SnowcastSequenceUtils {
      * @param sequenceId the sequence id to extract the counter value from
      * @return the extracted logicalNodeId
      */
+    @Nonnegative
     public static int counterValue(long sequenceId) {
         return counterValue(sequenceId, DEFAULT_MAX_LOGICAL_NODES_13_BITS);
     }
@@ -108,6 +129,7 @@ public final class SnowcastSequenceUtils {
      * @return the extracted logicalNodeId
      * @throws SnowcastMaxLogicalNodeIdOutOfBoundsException when maxLogicalNodeCount is outside of the legal range
      */
+    @Nonnegative
     public static int counterValue(long sequenceId, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShiftFactor = calculateLogicalNodeShifting(nodeCount);

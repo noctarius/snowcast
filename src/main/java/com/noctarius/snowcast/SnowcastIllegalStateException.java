@@ -18,9 +18,22 @@ package com.noctarius.snowcast;
 
 import javax.annotation.Nonnull;
 
+/**
+ * The SnowcastIllegalStateException is thrown whenever an illegal state change
+ * is tried to execute or when an operation is tried to execute that is not
+ * legal in the current state of the {@link com.noctarius.snowcast.SnowcastSequencer},
+ * for example {@link SnowcastSequencer#next()} in states
+ * {@link com.noctarius.snowcast.SnowcastSequenceState#Detached} or
+ * {@link com.noctarius.snowcast.SnowcastSequenceState#Destroyed}.
+ */
 public class SnowcastIllegalStateException
         extends SnowcastException {
 
+    /**
+     * Basic exception constructor
+     *
+     * @param message message to be used
+     */
     public SnowcastIllegalStateException(@Nonnull String message) {
         super(message);
     }

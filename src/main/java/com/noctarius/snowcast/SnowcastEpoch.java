@@ -21,6 +21,24 @@ import javax.annotation.Nonnull;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * <p>The SnowcastEpoch is used to define a custom epoch for snowcast. A custom epoch
+ * is defined as a offset to the standard Java timestamp and is used to offer more
+ * bits to the internal timestamp value of a snowcast sequence ID.</p>
+ * <p>To build a SnowcastEpoch multiple ways are possible. The most commonly used is
+ * utilizing the Java Calendar API as shown in the following snippet:
+ * <pre>
+ *     Calendar calendar = GregorianCalendar.getInstance();
+ *     calendar.set( 2014, 1, 1, 0, 0, 0 );
+ *     SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
+ * </pre></p>
+ * <p>Another way is by providing a Java long timestamp value. The important note is,
+ * that Java timestamps are based on milliseconds whereas standard Linux timestamps
+ * are based on seconds
+ * <pre>
+ *     SnowcastEpoch epoch = SnowcastEpoch.byTimestamp( 13885308000000 );
+ * </pre></p>
+ */
 public final class SnowcastEpoch {
 
     private static final long INITIALIZATION_TIMESTAMP = System.currentTimeMillis();
@@ -32,18 +50,40 @@ public final class SnowcastEpoch {
         this.offset = offset;
     }
 
+    /**
+     * Returns the current point in time as a timestamp based on this custom epoch.
+     *
+     * @return a current timestamp based on this custom epoch
+     */
     public long getEpochTimestamp() {
         return getEpochTimestamp(getNow());
     }
 
+    /**
+     * Returns the timestamp value between this custom epoch and the standard Linux
+     * timestamp epoch (in milliseconds) for the given timestamp.
+     *
+     * @param timestamp a timestamp based on the standard Linux timestamp epoch
+     * @return a timestamp based on this custom epoch
+     */
     long getEpochTimestamp(@Nonnegative long timestamp) {
         return timestamp - offset;
     }
 
+    /**
+     * Returns the configured offset of this custom epoch. This value is the number
+     * of milliseconds between the standard Linux timestamp (in milliseconds) and the
+     * configured date / time of this epoch.
+     *
+     * @return the number of milliseconds (offset) from the standard Linux timestamp
+     */
     public long getEpochOffset() {
         return offset;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -57,21 +97,40 @@ public final class SnowcastEpoch {
         return offset == epoch.offset;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
         return (int) (offset ^ (offset >>> 32));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
         return "SnowcastEpoch{" + "offset=" + offset + '}';
     }
 
+    /**
+     * Creates a custom epoch based on the given {@link java.util.Calendar} instance.
+     *
+     * @param calendar the calendar instance to base the epoch on
+     * @return a SnowcastEpoch instance based on the given calendars value
+     */
     public static SnowcastEpoch byCalendar(@Nonnull Calendar calendar) {
         long offset = calendar.getTimeInMillis();
         return new SnowcastEpoch(offset);
     }
 
+    /**
+     * Creates a custom epoch based on the given milliseconds based timestamp. This given
+     * timestamp must be based on the standard Linux timestamp epoch (in milliseconds).
+     *
+     * @param timestamp the timestamp value to base the epoch on
+     * @return a SnowcastEpoch instance based on the given timestamp value
+     */
     @Nonnull
     public static SnowcastEpoch byTimestamp(@Nonnegative long timestamp) {
         return new SnowcastEpoch(timestamp);

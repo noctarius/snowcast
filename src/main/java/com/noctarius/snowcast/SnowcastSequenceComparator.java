@@ -28,18 +28,56 @@ import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounte
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.counterValue;
 
+/**
+ * <p>This {@link java.util.Comparator} implementation can be used to compare and order two distinct
+ * snowcast sequencer ids by their corresponding timestamps and counter values.<br/>
+ * This is meant for legacy code or to integrate it with existing frameworks. In general use cases
+ * {@link com.noctarius.snowcast.SnowcastSequenceUtils#compareSequence(long, long)} or
+ * {@link com.noctarius.snowcast.SnowcastSequenceUtils#compareSequence(long, long, int)}
+ * should be preferred to prevent some unnecessary boxing/unboxing from <tt>long</tt> to <tt>Long</tt>
+ * and back.</p>
+ * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:
+ * <pre>
+ *     List<Long> elements = getSequencerIds();
+ *     Collections.sort( elements, new SnowcastSequenceComparator( 128 ) );
+ *     System.out.println( elements );
+ * </pre>
+ * Alternatively an instance can be retrieved using a convenience method and a already existing
+ * {@link com.noctarius.snowcast.SnowcastSequencer} instance:
+ * <pre>
+ *     SnowcastSequencer sequencer = getSnowcastSequencer();
+ *     Comparator<Long> comparator = SnowcastSequenceUtils.snowcastSequenceComparator( sequencer );
+ * </pre>
+ * </p>
+ */
 @ThreadSafe
 public final class SnowcastSequenceComparator
         implements Comparator<Long> {
 
     private final long counterMask;
 
+    /**
+     * This constructor creates a new SnowcastSequenceComparator instance bound to the given
+     * maximal logical node count.<br/>
+     * There is also a convenience method in {@link com.noctarius.snowcast.SnowcastSequenceUtils}
+     * to easy the creation process when a {@link com.noctarius.snowcast.SnowcastSequencer} is
+     * available:
+     * <pre>
+     *     SnowcastSequencer sequencer = getSnowcastSequencer();
+     *     Comparator<Long> comparator = SnowcastSequenceUtils.snowcastSequenceComparator( sequencer );
+     * </pre>
+     *
+     * @param maxLogicalNodeCount the maximal logical node count
+     */
     public SnowcastSequenceComparator(@Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShifting = calculateLogicalNodeShifting(nodeCount);
         this.counterMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShifting);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int compare(@Nonnull Long sequenceId1, @Nonnull Long sequenceId2) {
         long timestampValue1 = timestampValue(sequenceId1);
