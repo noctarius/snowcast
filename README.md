@@ -10,7 +10,7 @@
 * [Pseudo Implementation](#pseudo-implementation)
 * [Why snowcast?](#why-snowcast)
 * [Usage of snowcast](#usage-of-snowcast)
-* [Hazelcast configuration](#hazelcast-configuration)
+* [Hazelcast Configuration](#hazelcast-configuration)
 * [Maven Coordinates](#maven-coordinates)
 * [Multithreading](#multithreading)
 * [Sequencer States](#sequencer-states)
