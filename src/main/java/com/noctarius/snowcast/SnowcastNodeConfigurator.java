@@ -23,6 +23,8 @@ import com.hazelcast.config.XmlConfigBuilder;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 
+import javax.annotation.Nonnull;
+
 public final class SnowcastNodeConfigurator {
 
     private SnowcastNodeConfigurator() {
@@ -32,7 +34,7 @@ public final class SnowcastNodeConfigurator {
         return buildSnowcastAwareConfig(new XmlConfigBuilder().build());
     }
 
-    public static Config buildSnowcastAwareConfig(Config config) {
+    public static Config buildSnowcastAwareConfig(@Nonnull Config config) {
         ServicesConfig servicesConfig = config.getServicesConfig();
         servicesConfig.addServiceConfig(new ServiceConfig().setEnabled(true).setName(SnowcastConstants.SERVICE_NAME)
                                                            .setServiceImpl(new NodeSequencerService()));

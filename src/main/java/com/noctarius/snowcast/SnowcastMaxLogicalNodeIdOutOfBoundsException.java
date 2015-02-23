@@ -16,10 +16,12 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+
 public class SnowcastMaxLogicalNodeIdOutOfBoundsException
         extends SnowcastException {
 
-    public SnowcastMaxLogicalNodeIdOutOfBoundsException(String message) {
+    public SnowcastMaxLogicalNodeIdOutOfBoundsException(@Nonnull String message) {
         super(message);
     }
 }

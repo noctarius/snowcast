@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+
 /**
  * The SnowcastStateException is used whenever there is an exception in the internal
  * state machine of a {@link com.noctarius.snowcast.SnowcastSequencer}. This can happen
@@ -30,7 +32,7 @@ public class SnowcastStateException
      *
      * @param message message to be used
      */
-    public SnowcastStateException(String message) {
+    public SnowcastStateException(@Nonnull String message) {
         super(message);
     }
 }

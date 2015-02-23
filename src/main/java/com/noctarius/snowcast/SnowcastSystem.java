@@ -23,6 +23,10 @@ import com.noctarius.snowcast.impl.ExceptionMessages;
 import com.noctarius.snowcast.impl.NodeSnowcastFactory;
 import com.noctarius.snowcast.impl.SequencerService;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.validation.constraints.Max;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -59,6 +63,7 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.USER_CONTEXT_LOOKUP_
  * </pre>
  * </p>
  */
+@ThreadSafe
 public final class SnowcastSystem {
 
     private static final Object CREATION_LOCK = new Object();
@@ -76,7 +81,8 @@ public final class SnowcastSystem {
      * @return a created or cached Snowcast instance, linked to the given HazelcastInstance
      * @throws com.noctarius.snowcast.SnowcastException if creation fails for various reasons
      */
-    public static Snowcast snowcast(HazelcastInstance hazelcastInstance) {
+    @Nonnull
+    public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance) {
         return snowcast(hazelcastInstance, 1);
     }
 
@@ -87,11 +93,13 @@ public final class SnowcastSystem {
      * {@link com.noctarius.snowcast.Snowcast} instance.
      *
      * @param hazelcastInstance the HazelcastInstance with link the Snowcast instance to
-     * @param backupCount the amount of backups to be stored on other nodes, default is one backup
+     * @param backupCount       the amount of backups to be stored on other nodes, default is one backup
      * @return a created or cached Snowcast instance, linked to the given HazelcastInstance
      * @throws com.noctarius.snowcast.SnowcastException if creation fails for various reasons
      */
-    public static Snowcast snowcast(HazelcastInstance hazelcastInstance, int backupCount) {
+    @Nonnull
+    public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
+                                    @Nonnegative @Max(Short.MAX_VALUE) int backupCount) {
         // Test for an already created instance first
         Map<String, Object> userContext = hazelcastInstance.getUserContext();
         Snowcast snowcast = (Snowcast) userContext.get(USER_CONTEXT_LOOKUP_NAME);

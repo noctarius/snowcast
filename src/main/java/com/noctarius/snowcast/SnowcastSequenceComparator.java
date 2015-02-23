@@ -16,6 +16,10 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.Comparator;
 
 import static com.noctarius.snowcast.SnowcastSequenceUtils.timestampValue;
@@ -24,19 +28,20 @@ import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounte
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.counterValue;
 
+@ThreadSafe
 public final class SnowcastSequenceComparator
         implements Comparator<Long> {
 
     private final long counterMask;
 
-    public SnowcastSequenceComparator(int maxLogicalNodeCount) {
+    public SnowcastSequenceComparator(@Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShifting = calculateLogicalNodeShifting(nodeCount);
         this.counterMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShifting);
     }
 
     @Override
-    public int compare(Long sequenceId1, Long sequenceId2) {
+    public int compare(@Nonnull Long sequenceId1, @Nonnull Long sequenceId2) {
         long timestampValue1 = timestampValue(sequenceId1);
         long timestampValue2 = timestampValue(sequenceId2);
 

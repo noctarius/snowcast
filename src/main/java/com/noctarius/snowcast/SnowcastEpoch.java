@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
@@ -26,7 +28,7 @@ public final class SnowcastEpoch {
 
     private final long offset;
 
-    private SnowcastEpoch(long offset) {
+    private SnowcastEpoch(@Nonnegative long offset) {
         this.offset = offset;
     }
 
@@ -34,7 +36,7 @@ public final class SnowcastEpoch {
         return getEpochTimestamp(getNow());
     }
 
-    public long getEpochTimestamp(long timestamp) {
+    public long getEpochTimestamp(@Nonnegative long timestamp) {
         return timestamp - offset;
     }
 
@@ -70,12 +72,12 @@ public final class SnowcastEpoch {
         return "SnowcastEpoch{" + "offset=" + offset + '}';
     }
 
-    public static SnowcastEpoch byCalendar(Calendar calendar) {
+    public static SnowcastEpoch byCalendar(@Nonnull Calendar calendar) {
         long offset = calendar.getTimeInMillis();
         return new SnowcastEpoch(offset);
     }
 
-    public static SnowcastEpoch byTimestamp(long timestamp) {
+    public static SnowcastEpoch byTimestamp(@Nonnegative long timestamp) {
         return new SnowcastEpoch(timestamp);
     }
 

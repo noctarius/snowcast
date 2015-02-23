@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
 import java.util.Comparator;
 
 /**
@@ -33,6 +35,7 @@ import java.util.Comparator;
  * </pre>
  * </p>
  */
+@ThreadSafe
 public enum SnowcastTimestampComparator
         implements Comparator<Long> {
 
@@ -46,7 +49,7 @@ public enum SnowcastTimestampComparator
     INSTANCE;
 
     @Override
-    public int compare(Long sequenceId1, Long sequenceId2) {
+    public int compare(@Nonnull Long sequenceId1, @Nonnull Long sequenceId2) {
         return SnowcastSequenceUtils.compareTimestamp(sequenceId1, sequenceId2);
     }
 }

@@ -18,6 +18,10 @@ package com.noctarius.snowcast;
 
 import com.noctarius.snowcast.impl.InternalSequencerUtils;
 
+import javax.annotation.concurrent.ThreadSafe;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounterMask;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeMask;
@@ -30,6 +34,7 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_
  * sequence id and to compare sequence ids without the need for boxing/unboxing as the
  * {@link com.noctarius.snowcast.SnowcastTimestampComparator} would have to.
  */
+@ThreadSafe
 public final class SnowcastSequenceUtils {
 
     private SnowcastSequenceUtils() {
@@ -73,7 +78,7 @@ public final class SnowcastSequenceUtils {
      * @return the extracted logicalNodeId
      * @throws SnowcastMaxLogicalNodeIdOutOfBoundsException when maxLogicalNodeCount is outside of the legal range
      */
-    public static int logicalNodeId(long sequenceId, int maxLogicalNodeCount) {
+    public static int logicalNodeId(long sequenceId, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShiftFactor = calculateLogicalNodeShifting(nodeCount);
         long mask = calculateLogicalNodeMask(maxLogicalNodeCount, nodeIdShiftFactor);
@@ -103,7 +108,7 @@ public final class SnowcastSequenceUtils {
      * @return the extracted logicalNodeId
      * @throws SnowcastMaxLogicalNodeIdOutOfBoundsException when maxLogicalNodeCount is outside of the legal range
      */
-    public static int counterValue(long sequenceId, int maxLogicalNodeCount) {
+    public static int counterValue(long sequenceId, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShiftFactor = calculateLogicalNodeShifting(nodeCount);
         long mask = calculateCounterMask(maxLogicalNodeCount, nodeIdShiftFactor);
@@ -154,7 +159,7 @@ public final class SnowcastSequenceUtils {
      * equal to, or greater than the second.
      * @throws SnowcastMaxLogicalNodeIdOutOfBoundsException when maxLogicalNodeCount is outside of the legal range
      */
-    public static int compareSequence(long sequenceId1, long sequenceId2, int maxLogicalNodeCount) {
+    public static int compareSequence(long sequenceId1, long sequenceId2, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShifting = calculateLogicalNodeShifting(nodeCount);
         long counterMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShifting);

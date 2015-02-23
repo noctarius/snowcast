@@ -111,6 +111,12 @@
           <version>2.0.2</version>
           <scope>provided</scope>
       </dependency>
+      <dependency>
+          <groupId>javax.validation</groupId>
+          <artifactId>validation-api</artifactId>
+          <version>1.0.0.GA</version>
+          <scope>provided</scope>
+      </dependency>
   </dependencies>
 
   <build>
@@ -130,6 +136,7 @@
             </Private-Package>
             <Import-Package>
               com.hazelcast.client.*;resolution=Optional,
+              javax.validation.*;resolution=Optional,
               com.hazelcast.core.*,
               com.hazelcast.util.*,
               com.hazelcast.spi.*,

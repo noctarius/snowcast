@@ -16,11 +16,16 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 public interface Snowcast {
 
-    SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch);
+    SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch);
 
-    SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount);
+    SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
+                                      @Min(128) @Max(8192) int maxLogicalNodeCount);
 
     void destroySequencer(SnowcastSequencer sequencer);
 }

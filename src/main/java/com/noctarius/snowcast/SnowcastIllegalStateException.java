@@ -16,10 +16,12 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+
 public class SnowcastIllegalStateException
         extends SnowcastException {
 
-    public SnowcastIllegalStateException(String message) {
+    public SnowcastIllegalStateException(@Nonnull String message) {
         super(message);
     }
 }

@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+
 /**
  * The SnowcastSequencerAlreadyRegisteredException is thrown whenever there is requested
  * sequencer is already registered with the snowcast system in the cluster but the
@@ -30,7 +32,7 @@ public class SnowcastSequencerAlreadyRegisteredException
      *
      * @param message message to be used
      */
-    public SnowcastSequencerAlreadyRegisteredException(String message) {
+    public SnowcastSequencerAlreadyRegisteredException(@Nonnull String message) {
         super(message);
     }
 }

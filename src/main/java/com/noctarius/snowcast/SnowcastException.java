@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnull;
+
 public class SnowcastException
         extends RuntimeException {
 
@@ -23,15 +25,15 @@ public class SnowcastException
         super();
     }
 
-    public SnowcastException(String message) {
+    public SnowcastException(@Nonnull String message) {
         super(message);
     }
 
-    public SnowcastException(String message, Throwable cause) {
+    public SnowcastException(@Nonnull String message, @Nonnull Throwable cause) {
         super(message, cause);
     }
 
-    public SnowcastException(Throwable cause) {
+    public SnowcastException(@Nonnull Throwable cause) {
         super(cause);
     }
 }
