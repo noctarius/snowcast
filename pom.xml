@@ -246,7 +246,7 @@
         <configuration>
           <checkoutDirectory>${project.build.directory}/scmpublish</checkoutDirectory>
           <checkinComment>Publishing javadoc for ${project.artifactId}:${project.version}</checkinComment>
-          <content>${project.reporting.outputDirectory}/apidocs</content>
+          <content>${project.build.directory}/apidocs</content>
           <skipDeletedFiles>true</skipDeletedFiles>
           <pubScmUrl>scm:git:git@github.com:noctarius/snowcast.git</pubScmUrl>
           <scmBranch>gh-pages</scmBranch>
