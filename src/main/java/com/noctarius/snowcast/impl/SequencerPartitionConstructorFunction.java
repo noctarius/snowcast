@@ -18,11 +18,15 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.util.ConstructorFunction;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+
 final class SequencerPartitionConstructorFunction
         implements ConstructorFunction<Integer, SequencerPartition> {
 
+    @Nonnull
     @Override
-    public SequencerPartition createNew(Integer partitionId) {
+    public SequencerPartition createNew(@Nonnull @Nonnegative Integer partitionId) {
         return new SequencerPartition(partitionId);
     }
 }

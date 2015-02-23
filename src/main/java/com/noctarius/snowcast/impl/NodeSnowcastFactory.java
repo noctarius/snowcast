@@ -19,9 +19,16 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.core.HazelcastInstance;
 import com.noctarius.snowcast.Snowcast;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
+
 public final class NodeSnowcastFactory {
 
-    public static Snowcast snowcast(HazelcastInstance hazelcastInstance, short backupCount) {
+    @Nonnull
+    public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
+                                    @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
+
         return new NodeSnowcast(hazelcastInstance, backupCount);
     }
 }

@@ -57,6 +57,12 @@ public class DestroySequencerDefinitionOperation
         String sequencerName = getSequencerName();
 
         SequencerDefinition definition = sequencerService.destroySequencer(sequencerName, true);
+
+        // Definition might be already destroyed concurrently
+        if (definition == null) {
+            return;
+        }
+
         backupCount = definition.getBackupCount();
 
         NodeEngine nodeEngine = getNodeEngine();

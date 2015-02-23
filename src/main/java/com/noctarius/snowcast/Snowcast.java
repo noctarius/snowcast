@@ -22,8 +22,10 @@ import javax.validation.constraints.Min;
 
 public interface Snowcast {
 
+    @Nonnull
     SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch);
 
+    @Nonnull
     SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
                                       @Min(128) @Max(8192) int maxLogicalNodeCount);
 

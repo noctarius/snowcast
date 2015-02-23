@@ -47,6 +47,11 @@ import com.noctarius.snowcast.impl.operations.DestroySequencerDefinitionOperatio
 import com.noctarius.snowcast.impl.operations.DetachLogicalNodeOperation;
 import com.noctarius.snowcast.impl.operations.SequencerReplicationOperation;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -77,15 +82,16 @@ public class NodeSequencerService
     }
 
     @Override
-    public void init(NodeEngine nodeEngine, Properties properties) {
+    public void init(@Nonnull NodeEngine nodeEngine, @Nullable Properties properties) {
         this.nodeEngine = nodeEngine;
         this.eventService = nodeEngine.getEventService();
         this.serializationService = nodeEngine.getSerializationService();
     }
 
+    @Nonnull
     @Override
-    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount,
-                                             short backupCount) {
+    public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
+                                             @Min(128) @Max(8192) int maxLogicalNodeCount, short backupCount) {
 
         int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
@@ -102,7 +108,7 @@ public class NodeSequencerService
     }
 
     @Override
-    public void destroySequencer(SnowcastSequencer sequencer) {
+    public void destroySequencer(@Nonnull SnowcastSequencer sequencer) {
         // Remove the current provision
         SequencerProvision provision = provisions.remove(sequencer.getSequencerName());
 
@@ -129,8 +135,9 @@ public class NodeSequencerService
         // TODO kill all sequencers
     }
 
+    @Nullable
     @Override
-    public Operation prepareReplicationOperation(PartitionReplicationEvent event) {
+    public Operation prepareReplicationOperation(@Nonnull PartitionReplicationEvent event) {
         int partitionId = event.getPartitionId();
         SequencerPartition partition = partitions.get(partitionId);
         if (partition == null) {
@@ -142,7 +149,7 @@ public class NodeSequencerService
     }
 
     @Override
-    public void beforeMigration(PartitionMigrationEvent event) {
+    public void beforeMigration(@Nonnull PartitionMigrationEvent event) {
         int partitionId = event.getPartitionId();
         SequencerPartition partition = partitions.get(partitionId);
         if (partition != null) {
@@ -151,7 +158,7 @@ public class NodeSequencerService
     }
 
     @Override
-    public void commitMigration(PartitionMigrationEvent event) {
+    public void commitMigration(@Nonnull PartitionMigrationEvent event) {
         int partitionId = event.getPartitionId();
         SequencerPartition partition = partitions.get(partitionId);
         if (partition != null) {
@@ -163,7 +170,7 @@ public class NodeSequencerService
     }
 
     @Override
-    public void rollbackMigration(PartitionMigrationEvent event) {
+    public void rollbackMigration(@Nonnull PartitionMigrationEvent event) {
         int partitionId = event.getPartitionId();
         SequencerPartition partition = partitions.get(partitionId);
         if (partition != null) {
@@ -172,18 +179,18 @@ public class NodeSequencerService
     }
 
     @Override
-    public void clearPartitionReplica(int partitionId) {
+    public void clearPartitionReplica(@Nonnegative int partitionId) {
         partitions.remove(partitionId);
     }
 
     @Override
-    public void dispatchEvent(Object event, Object listener) {
+    public void dispatchEvent(@Nonnull Object event, @Nonnull Object listener) {
         if (listener instanceof ClientChannelHandler) {
             ((ClientChannelHandler) listener).handleEvent(event);
         }
     }
 
-    public int attachSequencer(SequencerDefinition definition) {
+    public int attachSequencer(@Nonnull SequencerDefinition definition) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
 
@@ -194,7 +201,7 @@ public class NodeSequencerService
         return (Integer) invocationBuilder.invoke().getSafely();
     }
 
-    public void detachSequencer(SequencerDefinition definition, int logicalNodeId) {
+    public void detachSequencer(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
 
@@ -205,21 +212,24 @@ public class NodeSequencerService
         invocationBuilder.invoke().getSafely();
     }
 
-    public SequencerDefinition registerSequencerDefinition(SequencerDefinition definition) {
+    @Nonnull
+    public SequencerDefinition registerSequencerDefinition(@Nonnull SequencerDefinition definition) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
         SequencerPartition partition = getSequencerPartition(partitionId);
         return partition.checkOrRegisterSequencerDefinition(definition);
     }
 
-    public SequencerDefinition unregisterSequencerDefinition(String sequencerName) {
+    @Nullable
+    public SequencerDefinition unregisterSequencerDefinition(@Nonnull String sequencerName) {
         InternalPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(sequencerName);
         SequencerPartition partition = getSequencerPartition(partitionId);
         return partition.destroySequencerDefinition(sequencerName);
     }
 
-    public SequencerDefinition destroySequencer(String sequencerName, boolean local) {
+    @Nullable
+    public SequencerDefinition destroySequencer(@Nonnull String sequencerName, boolean local) {
         // Remove the current provision
         SequencerProvision provision = provisions.remove(sequencerName);
 
@@ -237,20 +247,25 @@ public class NodeSequencerService
         return definition;
     }
 
-    public SequencerPartition getSequencerPartition(int partitionId) {
+    @Nonnull
+    public SequencerPartition getSequencerPartition(@Nonnegative int partitionId) {
         return ConcurrencyUtil.getOrPutIfAbsent(partitions, partitionId, partitionConstructor);
     }
 
-    public EventRegistration registerClientChannel(String sequencerName, ClientEndpoint endpoint, int callId) {
+    @Nonnull
+    public EventRegistration registerClientChannel(@Nonnull String sequencerName, @Nonnull ClientEndpoint endpoint, int callId) {
         ClientChannelHandler clientChannelHandler = new ClientChannelHandler(endpoint, callId, serializationService);
         return eventService.registerLocalListener(SnowcastConstants.SERVICE_NAME, sequencerName, clientChannelHandler);
     }
 
-    public void unregisterClientChannel(String sequencerName, String registrationId) {
+    public void unregisterClientChannel(@Nonnull String sequencerName, @Nonnull String registrationId) {
         eventService.deregisterListener(SnowcastConstants.SERVICE_NAME, sequencerName, registrationId);
     }
 
-    public Collection<EventRegistration> findClientChannelRegistrations(String sequencerName, String clientUuid) {
+    @Nonnull
+    public Collection<EventRegistration> findClientChannelRegistrations(@Nonnull String sequencerName,
+                                                                        @Nullable String clientUuid) {
+
         Collection<EventRegistration> registrations = eventService
                 .getRegistrations(SnowcastConstants.SERVICE_NAME, sequencerName);
 
@@ -272,7 +287,8 @@ public class NodeSequencerService
         return registrations;
     }
 
-    private <T> T invoke(Operation operation, String sequencerName) {
+    @Nullable
+    private <T> T invoke(@Nonnull Operation operation, @Nonnull String sequencerName) {
         try {
             InternalPartitionService partitionService = nodeEngine.getPartitionService();
             int partitionId = partitionService.getPartitionId(sequencerName);
@@ -288,7 +304,8 @@ public class NodeSequencerService
         }
     }
 
-    private SequencerProvision getOrCreateSequencerProvision(SequencerDefinition definition) {
+    @Nonnull
+    private SequencerProvision getOrCreateSequencerProvision(@Nonnull SequencerDefinition definition) {
         String sequencerName = definition.getSequencerName();
 
         SequencerProvision provision = provisions.get(sequencerName);
@@ -308,13 +325,14 @@ public class NodeSequencerService
         }
     }
 
+    @Nonnull
     @Override
-    public DistributedObject createDistributedObject(String objectName) {
+    public DistributedObject createDistributedObject(@Nonnull String objectName) {
         return new DummyProxy(objectName);
     }
 
     @Override
-    public void destroyDistributedObject(String objectName) {
+    public void destroyDistributedObject(@Nonnull String objectName) {
     }
 
     private static class ClientChannelHandler {
@@ -322,13 +340,15 @@ public class NodeSequencerService
         private final Data clientUuidData;
         private final int callId;
 
-        public ClientChannelHandler(ClientEndpoint endpoint, int callId, SerializationService serializationService) {
+        public ClientChannelHandler(@Nonnull ClientEndpoint endpoint, int callId,
+                                    @Nonnull SerializationService serializationService) {
+
             this.clientUuidData = serializationService.toData(endpoint.getUuid());
             this.endpoint = endpoint;
             this.callId = callId;
         }
 
-        public void handleEvent(Object event) {
+        public void handleEvent(@Nonnull Object event) {
             endpoint.sendEvent(clientUuidData, event, callId);
         }
     }

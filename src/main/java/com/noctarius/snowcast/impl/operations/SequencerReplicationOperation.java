@@ -26,7 +26,6 @@ import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
 import com.noctarius.snowcast.impl.SequencerPartition;
 
 import java.io.IOException;
-import java.util.Collection;
 
 public class SequencerReplicationOperation
         extends AbstractOperation

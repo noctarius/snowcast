@@ -32,6 +32,9 @@ import com.noctarius.snowcast.impl.operations.DestroySequencerOperation;
 import com.noctarius.snowcast.impl.operations.DetachLogicalNodeOperation;
 import com.noctarius.snowcast.impl.operations.SequencerReplicationOperation;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+
 public class SequencerDataSerializerHook
         implements DataSerializerHook {
 
@@ -58,10 +61,12 @@ public class SequencerDataSerializerHook
     }
 
     @Override
+    @Nonnegative
     public int getFactoryId() {
         return FACTORY_ID;
     }
 
+    @Nonnull
     @Override
     public DataSerializableFactory createFactory() {
         ConstructorFunction<Integer, IdentifiedDataSerializable>[] constructors = new ConstructorFunction[LEN];

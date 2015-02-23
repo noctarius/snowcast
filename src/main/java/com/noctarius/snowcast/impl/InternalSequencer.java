@@ -19,10 +19,15 @@ package com.noctarius.snowcast.impl;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+
+@ThreadSafe
 interface InternalSequencer
         extends SnowcastSequencer {
 
-    void stateTransition(SnowcastSequenceState newState);
+    void stateTransition(@Nonnull SnowcastSequenceState newState);
 
+    @Nonnull
     SequencerService getSequencerService();
 }

@@ -24,7 +24,7 @@ import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
 
 import java.io.IOException;
 
-public abstract class AbstractSequencerOperation
+abstract class AbstractSequencerOperation
         extends AbstractOperation
         implements IdentifiedDataSerializable {
 
@@ -33,11 +33,11 @@ public abstract class AbstractSequencerOperation
     AbstractSequencerOperation() {
     }
 
-    public AbstractSequencerOperation(String sequencerName) {
+    AbstractSequencerOperation(String sequencerName) {
         this.sequencerName = sequencerName;
     }
 
-    public String getSequencerName() {
+    String getSequencerName() {
         return sequencerName;
     }
 

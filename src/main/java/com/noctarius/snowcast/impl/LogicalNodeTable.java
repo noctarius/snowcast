@@ -25,6 +25,11 @@ import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastNodeIdsExceededException;
 import sun.misc.Unsafe;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.io.IOException;
 
 class LogicalNodeTable {
@@ -54,30 +59,37 @@ class LogicalNodeTable {
 
     private volatile Object[] assignmentTable;
 
-    LogicalNodeTable(int partitionId, SequencerDefinition definition) {
+    LogicalNodeTable(@Nonnegative int partitionId, @Nonnull SequencerDefinition definition) {
         this(partitionId, definition, new Object[definition.getMaxLogicalNodeCount()]);
     }
 
-    private LogicalNodeTable(int partitionId, SequencerDefinition definition, Object[] assignmentTable) {
+    private LogicalNodeTable(@Nonnegative int partitionId, @Nonnull SequencerDefinition definition,
+                             @Nonnull Object[] assignmentTable) {
+
         this.partitionId = partitionId;
         this.definition = definition;
         this.assignmentTable = assignmentTable;
     }
 
+    @Nonnull
     SequencerDefinition getSequencerDefinition() {
         return definition;
     }
 
+    @Nonnull
     String getSequencerName() {
         return definition.getSequencerName();
     }
 
-    Address getAttachedLogicalNode(int logicalNodeId) {
+    @Nullable
+    Address getAttachedLogicalNode(@Min(128) @Max(8192) int logicalNodeId) {
         long offset = offset(logicalNodeId);
         return (Address) UNSAFE.getObjectVolatile(assignmentTable, offset);
     }
 
-    int attachLogicalNode(Address address) {
+    @Min(128)
+    @Max(8192)
+    int attachLogicalNode(@Nonnull Address address) {
         while (true) {
             Object[] assignmentTable = this.assignmentTable;
             int freeSlot = findFreeSlot(assignmentTable);
@@ -91,7 +103,7 @@ class LogicalNodeTable {
         }
     }
 
-    void detachLogicalNode(Address address, int logicalNodeId) {
+    void detachLogicalNode(@Nonnull Address address, @Min(128) @Max(8192) int logicalNodeId) {
         while (true) {
             Object[] assignmentTable = this.assignmentTable;
             Address addressOnSlot = (Address) assignmentTable[logicalNodeId];
@@ -111,7 +123,7 @@ class LogicalNodeTable {
         }
     }
 
-    void assignLogicalNode(int logicalNodeId, Address address) {
+    void assignLogicalNode(@Min(128) @Max(8192) int logicalNodeId, @Nonnull Address address) {
         while (true) {
             Object[] assignmentTable = this.assignmentTable;
             if (assignmentTable[logicalNodeId] != null) {
@@ -126,7 +138,7 @@ class LogicalNodeTable {
         }
     }
 
-    void merge(LogicalNodeTable mergeable) {
+    void merge(@Nonnull LogicalNodeTable mergeable) {
         Object[] mergeableAssignmentTable = mergeable.assignmentTable;
         Object[] assignmentTable = this.assignmentTable;
 
@@ -145,7 +157,7 @@ class LogicalNodeTable {
         }
     }
 
-    private int findFreeSlot(Object[] assignmentTable) {
+    private int findFreeSlot(@Nonnull Object[] assignmentTable) {
         for (int i = 0; i < assignmentTable.length; i++) {
             if (assignmentTable[i] == null) {
                 return i;
@@ -154,11 +166,12 @@ class LogicalNodeTable {
         return -1;
     }
 
-    private long offset(int index) {
+    @Nonnegative
+    private long offset(@Nonnegative int index) {
         return ((long) index << ARRAY_INDEX_SHIFT) + ARRAY_BASE_OFFSET;
     }
 
-    public static void writeLogicalNodeTable(LogicalNodeTable logicalNodeTable, ObjectDataOutput out)
+    public static void writeLogicalNodeTable(@Nonnull LogicalNodeTable logicalNodeTable, @Nonnull ObjectDataOutput out)
             throws IOException {
 
         out.writeObject(logicalNodeTable.definition);
@@ -183,7 +196,8 @@ class LogicalNodeTable {
         }
     }
 
-    public static LogicalNodeTable readLogicalNodeTable(int partitionId, ObjectDataInput in)
+    @Nonnull
+    public static LogicalNodeTable readLogicalNodeTable(@Nonnegative int partitionId, @Nonnull ObjectDataInput in)
             throws IOException {
 
         SequencerDefinition definition = in.readObject();

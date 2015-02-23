@@ -52,6 +52,12 @@ class ClientDestroySequencerDefinitionOperation
 
         NodeSequencerService sequencerService = getService();
         SequencerDefinition definition = sequencerService.destroySequencer(sequencerName, true);
+
+        // Definition might be already destroyed concurrently
+        if (definition == null) {
+            return;
+        }
+
         backupCount = definition.getBackupCount();
 
         NodeEngine nodeEngine = getNodeEngine();

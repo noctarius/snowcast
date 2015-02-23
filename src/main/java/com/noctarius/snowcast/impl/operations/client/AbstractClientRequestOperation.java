@@ -24,14 +24,14 @@ import com.hazelcast.spi.PartitionAwareOperation;
 
 import java.io.IOException;
 
-public abstract class AbstractClientRequestOperation
+abstract class AbstractClientRequestOperation
         extends Operation
         implements PartitionAwareOperation {
 
     private final String sequencerName;
     private final ClientEndpoint endpoint;
 
-    protected AbstractClientRequestOperation(String sequencerName, ClientEndpoint endpoint) {
+    AbstractClientRequestOperation(String sequencerName, ClientEndpoint endpoint) {
         this.sequencerName = sequencerName;
         this.endpoint = endpoint;
     }
@@ -61,11 +61,11 @@ public abstract class AbstractClientRequestOperation
             throws IOException {
     }
 
-    public String getSequencerName() {
+    String getSequencerName() {
         return sequencerName;
     }
 
-    public ClientEndpoint getEndpoint() {
+    ClientEndpoint getEndpoint() {
         return endpoint;
     }
 }

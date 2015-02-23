@@ -20,9 +20,15 @@ import com.hazelcast.client.impl.HazelcastClientProxy;
 import com.hazelcast.core.HazelcastInstance;
 import com.noctarius.snowcast.Snowcast;
 
-public final class ClientSnowcastFactory {
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
 
-    public static Snowcast snowcast(HazelcastInstance hazelcastInstance, short backupCount) {
+final class ClientSnowcastFactory {
+
+    public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
+                                    @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
+
         if (hazelcastInstance instanceof HazelcastClientProxy) {
             return new ClientSnowcast(hazelcastInstance, backupCount);
         }

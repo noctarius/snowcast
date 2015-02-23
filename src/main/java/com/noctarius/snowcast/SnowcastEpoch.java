@@ -36,7 +36,7 @@ public final class SnowcastEpoch {
         return getEpochTimestamp(getNow());
     }
 
-    public long getEpochTimestamp(@Nonnegative long timestamp) {
+    long getEpochTimestamp(@Nonnegative long timestamp) {
         return timestamp - offset;
     }
 
@@ -54,12 +54,7 @@ public final class SnowcastEpoch {
         }
 
         SnowcastEpoch epoch = (SnowcastEpoch) o;
-
-        if (offset != epoch.offset) {
-            return false;
-        }
-
-        return true;
+        return offset == epoch.offset;
     }
 
     @Override
@@ -77,6 +72,7 @@ public final class SnowcastEpoch {
         return new SnowcastEpoch(offset);
     }
 
+    @Nonnull
     public static SnowcastEpoch byTimestamp(@Nonnegative long timestamp) {
         return new SnowcastEpoch(timestamp);
     }

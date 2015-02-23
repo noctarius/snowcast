@@ -23,6 +23,9 @@ import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastSequencerAlreadyRegisteredException;
 import sun.misc.Unsafe;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,7 +55,7 @@ public final class SequencerPartition {
 
     private volatile int frozen = UNFROZEN;
 
-    public SequencerPartition(int partitionId) {
+    public SequencerPartition(@Nonnegative int partitionId) {
         this.partitionId = partitionId;
         this.logicalNodeTables = new ConcurrentHashMap<String, LogicalNodeTable>();
     }
@@ -61,7 +64,9 @@ public final class SequencerPartition {
         return partitionId;
     }
 
-    public Integer attachLogicalNode(SequencerDefinition definition, Address address) {
+    @Nonnull
+    @Nonnegative
+    public Integer attachLogicalNode(@Nonnull SequencerDefinition definition, @Nonnull Address address) {
         checkPartitionFreezeStatus();
 
         SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
@@ -75,7 +80,7 @@ public final class SequencerPartition {
         return logicalNodeTable.attachLogicalNode(address);
     }
 
-    public void detachLogicalNode(String sequencerName, Address address, int logicalNodeId) {
+    public void detachLogicalNode(@Nonnull String sequencerName, @Nonnull Address address, @Nonnegative int logicalNodeId) {
         checkPartitionFreezeStatus();
 
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
@@ -98,7 +103,9 @@ public final class SequencerPartition {
         logicalNodeTable.assignLogicalNode(logicalNodeId, address);
     }
 
-    public void unassignLogicalNode(SequencerDefinition definition, int logicalNodeId, Address address) {
+    public void unassignLogicalNode(@Nonnull SequencerDefinition definition, @Nonnegative int logicalNodeId,
+                                    @Nonnull Address address) {
+
         checkPartitionFreezeStatus();
 
         SequencerDefinition safeDefinition = checkOrRegisterSequencerDefinition(definition);
@@ -110,7 +117,8 @@ public final class SequencerPartition {
         }
     }
 
-    Address getAttachedLogicalNode(String sequencerName, int logicalNodeId) {
+    @Nullable
+    Address getAttachedLogicalNode(@Nonnull String sequencerName, @Nonnegative int logicalNodeId) {
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
             String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
@@ -119,7 +127,8 @@ public final class SequencerPartition {
         return logicalNodeTable.getAttachedLogicalNode(logicalNodeId);
     }
 
-    SequencerDefinition getSequencerDefinition(String sequencerName) {
+    @Nullable
+    SequencerDefinition getSequencerDefinition(@Nonnull String sequencerName) {
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
             return null;
@@ -127,7 +136,8 @@ public final class SequencerPartition {
         return logicalNodeTable.getSequencerDefinition();
     }
 
-    SequencerDefinition checkOrRegisterSequencerDefinition(SequencerDefinition definition) {
+    @Nonnull
+    SequencerDefinition checkOrRegisterSequencerDefinition(@Nonnull SequencerDefinition definition) {
         String sequencerName = definition.getSequencerName();
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable != null) {
@@ -149,14 +159,15 @@ public final class SequencerPartition {
         }
     }
 
-    SequencerDefinition destroySequencerDefinition(String sequencerName) {
+    @Nullable
+    SequencerDefinition destroySequencerDefinition(@Nonnull String sequencerName) {
         checkPartitionFreezeStatus();
 
         LogicalNodeTable logicalNodeTable = logicalNodeTables.remove(sequencerName);
         return logicalNodeTable != null ? logicalNodeTable.getSequencerDefinition() : null;
     }
 
-    void mergeLogicalNodeTable(LogicalNodeTable mergeable) {
+    void mergeLogicalNodeTable(@Nonnull LogicalNodeTable mergeable) {
         SequencerDefinition definition = mergeable.getSequencerDefinition();
         String sequencerName = definition.getSequencerName();
 
@@ -175,6 +186,7 @@ public final class SequencerPartition {
         logicalNodeTable.merge(mergeable);
     }
 
+    @Nonnull
     PartitionReplication createPartitionReplication() {
         return new PartitionReplication(partitionId, logicalNodeTables.values());
     }
@@ -213,7 +225,10 @@ public final class SequencerPartition {
         }
     }
 
-    private SequencerDefinition checkSequencerDefinitions(SequencerDefinition definition, SequencerDefinition other) {
+    @Nonnull
+    private SequencerDefinition checkSequencerDefinitions(@Nonnull SequencerDefinition definition,
+                                                          @Nullable SequencerDefinition other) {
+
         if (other != null && !other.equals(definition)) {
             String message = ExceptionMessages.SEQUENCER_ALREADY_REGISTERED.buildMessage();
             throw new SnowcastSequencerAlreadyRegisteredException(message);

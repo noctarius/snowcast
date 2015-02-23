@@ -20,6 +20,11 @@ import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastStateException;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.concurrent.ThreadSafe;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -34,6 +39,7 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_COUNTER;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_COUNTER_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_TIMESTAMP_READ_MASK;
 
+@ThreadSafe
 abstract class AbstractSequencerContext {
 
     private static final AtomicReferenceFieldUpdater<AbstractSequencerContext, SnowcastSequenceState> STATE_UPDATER;
@@ -64,7 +70,7 @@ abstract class AbstractSequencerContext {
     // This field is only accessed or written through the field updater
     private volatile long timestampAndCounter;
 
-    protected AbstractSequencerContext(SequencerDefinition definition) {
+    AbstractSequencerContext(@Nonnull SequencerDefinition definition) {
         this.definition = definition;
         this.sequencerName = definition.getSequencerName();
         this.epoch = definition.getEpoch();
@@ -79,6 +85,7 @@ abstract class AbstractSequencerContext {
         this.timestampAndCounter = 0;
     }
 
+    @Nonnull
     final String getSequencerName() {
         return sequencerName;
     }
@@ -105,6 +112,7 @@ abstract class AbstractSequencerContext {
         return generateSequenceId(timestamp, logicalNodeID, nextId, nodeIdShiftFactor);
     }
 
+    @Nonnull
     final SnowcastSequenceState getSequencerState() {
         return state;
     }
@@ -128,23 +136,28 @@ abstract class AbstractSequencerContext {
         doDetachLogicalNode(definition, logicalNodeId);
     }
 
+    @Nonnegative
     final long timestampValue(long sequenceId) {
         return InternalSequencerUtils.timestampValue(sequenceId);
     }
 
+    @Nonnegative
     final int logicalNodeId(long sequenceId) {
         return InternalSequencerUtils.logicalNodeId(sequenceId, nodeIdShiftFactor, logicalNodeIdReadMask);
     }
 
+    @Nonnegative
     final int counterValue(long sequenceId) {
         return InternalSequencerUtils.counterValue(sequenceId, counterReadMask);
     }
 
-    protected abstract int doAttachLogicalNode(SequencerDefinition definition);
+    @Min(128)
+    @Max(8192)
+    protected abstract int doAttachLogicalNode(@Nonnull SequencerDefinition definition);
 
-    protected abstract void doDetachLogicalNode(SequencerDefinition definition, int logicalNodeId);
+    protected abstract void doDetachLogicalNode(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId);
 
-    boolean stateTransition(SnowcastSequenceState newState) {
+    boolean stateTransition(@Nonnull SnowcastSequenceState newState) {
         while (true) {
             SnowcastSequenceState state = this.state;
             if (state == newState) {
@@ -175,7 +188,7 @@ abstract class AbstractSequencerContext {
         }
     }
 
-    private void checkAndUpdateTimestamp(long timestamp) {
+    private void checkAndUpdateTimestamp(@Nonnegative long timestamp) {
         while (true) {
             long timestampAndCounter = this.timestampAndCounter;
             long lastTimestamp = timestampAndCounter & TC_TIMESTAMP_READ_MASK;
@@ -189,7 +202,8 @@ abstract class AbstractSequencerContext {
         }
     }
 
-    private int increment(long expectedTimestamp) {
+    @Nonnegative
+    private int increment(@Nonnegative long expectedTimestamp) {
         while (true) {
             long timestampAndCounter = this.timestampAndCounter;
 
@@ -217,6 +231,8 @@ abstract class AbstractSequencerContext {
         }
     }
 
+    @Min(128)
+    @Max(8192)
     private int checkStateAndLogicalNodeId() {
         int logicalNodeId = this.logicalNodeId;
         if (logicalNodeId == -1) {

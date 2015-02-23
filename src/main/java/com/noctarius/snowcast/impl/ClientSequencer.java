@@ -36,6 +36,11 @@ import com.noctarius.snowcast.impl.operations.client.ClientDetachLogicalNodeRequ
 import com.noctarius.snowcast.impl.operations.client.ClientRegisterChannelOperation;
 import com.noctarius.snowcast.impl.operations.client.ClientRemoveChannelOperation;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 public class ClientSequencer
         extends ClientProxy
         implements InternalSequencer {
@@ -43,12 +48,15 @@ public class ClientSequencer
     private final ClientSequencerContext sequencerContext;
     private final ClientSequencerService sequencerService;
 
-    ClientSequencer(HazelcastClientInstanceImpl client, ClientSequencerService sequencerService, SequencerDefinition definition) {
+    ClientSequencer(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ClientSequencerService sequencerService,
+                    @Nonnull SequencerDefinition definition) {
+
         super(SnowcastConstants.SERVICE_NAME, definition.getSequencerName());
         this.sequencerService = sequencerService;
         this.sequencerContext = new ClientSequencerContext(client, definition);
     }
 
+    @Nonnull
     @Override
     public String getSequencerName() {
         return sequencerContext.getSequencerName();
@@ -61,17 +69,20 @@ public class ClientSequencer
         return sequencerContext.next();
     }
 
+    @Nonnull
     @Override
     public SnowcastSequenceState getSequencerState() {
         return sequencerContext.getSequencerState();
     }
 
+    @Nonnull
     @Override
     public SnowcastSequencer attachLogicalNode() {
         sequencerContext.attachLogicalNode();
         return this;
     }
 
+    @Nonnull
     @Override
     public SnowcastSequencer detachLogicalNode() {
         sequencerContext.detachLogicalNode();
@@ -79,16 +90,19 @@ public class ClientSequencer
     }
 
     @Override
+    @Nonnegative
     public long timestampValue(long sequenceId) {
         return sequencerContext.timestampValue(sequenceId);
     }
 
     @Override
+    @Nonnegative
     public int logicalNodeId(long sequenceId) {
         return sequencerContext.logicalNodeId(sequenceId);
     }
 
     @Override
+    @Nonnegative
     public int counterValue(long sequenceId) {
         return sequencerContext.counterValue(sequenceId);
     }
@@ -99,10 +113,11 @@ public class ClientSequencer
     }
 
     @Override
-    public void stateTransition(SnowcastSequenceState newState) {
+    public void stateTransition(@Nonnull SnowcastSequenceState newState) {
         sequencerContext.stateTransition(newState);
     }
 
+    @Nonnull
     @Override
     public SequencerService getSequencerService() {
         return sequencerService;
@@ -115,13 +130,15 @@ public class ClientSequencer
 
         private volatile String channelRegistration;
 
-        private ClientSequencerContext(HazelcastClientInstanceImpl client, SequencerDefinition definition) {
+        private ClientSequencerContext(@Nonnull HazelcastClientInstanceImpl client, @Nonnull SequencerDefinition definition) {
             super(definition);
             this.client = client;
         }
 
+        @Min(128)
         @Override
-        protected int doAttachLogicalNode(SequencerDefinition definition) {
+        @Max(8192)
+        protected int doAttachLogicalNode(@Nonnull SequencerDefinition definition) {
             PartitionService partitionService = client.getPartitionService();
             ClientInvocationService invocationService = client.getInvocationService();
 
@@ -140,7 +157,7 @@ public class ClientSequencer
         }
 
         @Override
-        protected void doDetachLogicalNode(SequencerDefinition definition, int logicalNodeId) {
+        protected void doDetachLogicalNode(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
             PartitionService partitionService = client.getPartitionService();
             ClientInvocationService invocationService = client.getInvocationService();
 
@@ -157,12 +174,12 @@ public class ClientSequencer
             }
         }
 
-        private void unregisterClientChannel(ClientSequencer clientSequencer) {
+        private void unregisterClientChannel(@Nonnull ClientSequencer clientSequencer) {
             ClientRemoveChannelOperation operation = new ClientRemoveChannelOperation(getSequencerName(), channelRegistration);
             clientSequencer.stopListening(operation, channelRegistration);
         }
 
-        public void initialize(ClientSequencer clientSequencer) {
+        public void initialize(@Nonnull ClientSequencer clientSequencer) {
             ClientRegisterChannelOperation operation = new ClientRegisterChannelOperation(getSequencerName());
             ClientChannelHandler handler = new ClientChannelHandler(this, clientSequencer);
             channelRegistration = clientSequencer.listen(operation, getSequencerName(), handler);
@@ -175,13 +192,13 @@ public class ClientSequencer
         private final ClientSequencerContext sequencerContext;
         private final ClientSequencer clientSequencer;
 
-        private ClientChannelHandler(ClientSequencerContext sequencerContext, ClientSequencer clientSequencer) {
+        private ClientChannelHandler(@Nonnull ClientSequencerContext sequencerContext, @Nonnull ClientSequencer clientSequencer) {
             this.sequencerContext = sequencerContext;
             this.clientSequencer = clientSequencer;
         }
 
         @Override
-        public void handle(Portable event) {
+        public void handle(@Nonnull Portable event) {
             ClientContext context = clientSequencer.getContext();
             SerializationService serializationService = context.getSerializationService();
 

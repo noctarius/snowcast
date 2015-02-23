@@ -23,16 +23,20 @@ import com.hazelcast.nio.serialization.SerializerHook;
 import com.hazelcast.nio.serialization.StreamSerializer;
 import com.noctarius.snowcast.SnowcastEpoch;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 public class SequencerDefinitionSerializerHook
         implements SerializerHook<SequencerDefinition> {
 
+    @Nonnull
     @Override
     public Class<SequencerDefinition> getSerializationType() {
         return SequencerDefinition.class;
     }
 
+    @Nonnull
     @Override
     public Serializer createSerializer() {
         return new SequencerDefinitionSerializer();
@@ -47,7 +51,7 @@ public class SequencerDefinitionSerializerHook
             implements StreamSerializer<SequencerDefinition> {
 
         @Override
-        public void write(ObjectDataOutput out, SequencerDefinition definition)
+        public void write(@Nonnull ObjectDataOutput out, @Nonnull SequencerDefinition definition)
                 throws IOException {
 
             out.writeUTF(definition.getSequencerName());
@@ -57,7 +61,7 @@ public class SequencerDefinitionSerializerHook
         }
 
         @Override
-        public SequencerDefinition read(ObjectDataInput in)
+        public SequencerDefinition read(@Nonnull ObjectDataInput in)
                 throws IOException {
 
             String sequencerName = in.readUTF();
@@ -70,6 +74,7 @@ public class SequencerDefinitionSerializerHook
         }
 
         @Override
+        @Nonnegative
         public int getTypeId() {
             return SequencerDataSerializerHook.FACTORY_ID;
         }

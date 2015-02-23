@@ -19,6 +19,8 @@ package com.noctarius.snowcast.impl;
 import com.noctarius.snowcast.SnowcastEpoch;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
+
 public class NodeSequencerTestCase {
 
     @Test(timeout = 60000)
@@ -30,7 +32,7 @@ public class NodeSequencerTestCase {
 
         NodeSequencer sequencer = new NodeSequencer(new NodeSequencerService() {
             @Override
-            public int attachSequencer(final SequencerDefinition definition) {
+            public int attachSequencer(@Nonnull final SequencerDefinition definition) {
                 // Faking we're in node 0
                 return 0;
             }

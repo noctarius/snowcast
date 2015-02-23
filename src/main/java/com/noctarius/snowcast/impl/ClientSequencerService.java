@@ -30,6 +30,10 @@ import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.impl.operations.client.ClientCreateSequencerDefinitionRequest;
 import com.noctarius.snowcast.impl.operations.client.ClientDestroySequencerDefinitionRequest;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -44,15 +48,17 @@ class ClientSequencerService
 
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
-    ClientSequencerService(HazelcastClientInstanceImpl client, ProxyManager proxyManager) {
+    ClientSequencerService(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ProxyManager proxyManager) {
         this.client = client;
         this.sequencerConstructor = new ClientSequencerConstructorFunction(client, proxyManager, this);
         this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
     }
 
+    @Nonnull
     @Override
-    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount,
-                                             short backupCount) {
+    public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
+                                             @Min(128) @Max(8192) int maxLogicalNodeCount,
+                                             @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
 
         int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
@@ -76,7 +82,7 @@ class ClientSequencerService
     }
 
     @Override
-    public void destroySequencer(SnowcastSequencer sequencer) {
+    public void destroySequencer(@Nonnull SnowcastSequencer sequencer) {
         if (!(sequencer instanceof ClientSequencer)) {
             String message = ExceptionMessages.ILLEGAL_SEQUENCER_TYPE.buildMessage();
             throw new SnowcastException(message);
@@ -102,7 +108,8 @@ class ClientSequencerService
         }
     }
 
-    private SequencerProvision getOrCreateSequencerProvision(SequencerDefinition definition) {
+    @Nonnull
+    private SequencerProvision getOrCreateSequencerProvision(@Nonnull SequencerDefinition definition) {
         String sequencerName = definition.getSequencerName();
 
         SequencerProvision provision = provisions.get(sequencerName);

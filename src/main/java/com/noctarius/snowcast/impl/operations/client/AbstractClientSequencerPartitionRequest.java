@@ -25,16 +25,16 @@ import com.noctarius.snowcast.impl.SnowcastConstants;
 import java.io.IOException;
 import java.security.Permission;
 
-public abstract class AbstractClientSequencerPartitionRequest
+abstract class AbstractClientSequencerPartitionRequest
         extends PartitionClientRequest {
 
     private String sequencerName;
     private int partitionId;
 
-    public AbstractClientSequencerPartitionRequest() {
+    AbstractClientSequencerPartitionRequest() {
     }
 
-    public AbstractClientSequencerPartitionRequest(String sequencerName, int partitionId) {
+    AbstractClientSequencerPartitionRequest(String sequencerName, int partitionId) {
         this.sequencerName = sequencerName;
         this.partitionId = partitionId;
     }
@@ -59,7 +59,7 @@ public abstract class AbstractClientSequencerPartitionRequest
         return null;
     }
 
-    public String getSequencerName() {
+    String getSequencerName() {
         return sequencerName;
     }
 

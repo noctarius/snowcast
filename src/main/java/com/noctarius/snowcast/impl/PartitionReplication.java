@@ -20,6 +20,8 @@ import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,16 +35,17 @@ public class PartitionReplication
     public PartitionReplication() {
     }
 
-    public PartitionReplication(int partitionId, Collection<LogicalNodeTable> logicalNodeTables) {
+    public PartitionReplication(@Nonnegative int partitionId, @Nonnull Collection<LogicalNodeTable> logicalNodeTables) {
         this.partitionId = partitionId;
         this.logicalNodeTables = logicalNodeTables;
     }
 
+    @Nonnegative
     public int getPartitionId() {
         return partitionId;
     }
 
-    public void applyReplication(SequencerPartition targetPartition)
+    public void applyReplication(@Nonnull SequencerPartition targetPartition)
             throws Exception {
 
         targetPartition.freeze();
@@ -56,7 +59,7 @@ public class PartitionReplication
     }
 
     @Override
-    public void writeData(ObjectDataOutput out)
+    public void writeData(@Nonnull ObjectDataOutput out)
             throws IOException {
 
         out.writeInt(partitionId);
@@ -67,7 +70,7 @@ public class PartitionReplication
     }
 
     @Override
-    public void readData(ObjectDataInput in)
+    public void readData(@Nonnull ObjectDataInput in)
             throws IOException {
 
         partitionId = in.readInt();
@@ -80,11 +83,13 @@ public class PartitionReplication
     }
 
     @Override
+    @Nonnegative
     public int getFactoryId() {
         return SequencerDataSerializerHook.FACTORY_ID;
     }
 
     @Override
+    @Nonnegative
     public int getId() {
         return SequencerDataSerializerHook.TYPE_PARTITION_REPLICATION;
     }

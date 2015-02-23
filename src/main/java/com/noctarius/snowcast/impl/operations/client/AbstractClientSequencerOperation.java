@@ -25,19 +25,19 @@ import com.noctarius.snowcast.impl.SnowcastConstants;
 import java.io.IOException;
 import java.security.Permission;
 
-public abstract class AbstractClientSequencerOperation
+abstract class AbstractClientSequencerOperation
         extends InvocationClientRequest {
 
     private String sequencerName;
 
-    public AbstractClientSequencerOperation() {
+    AbstractClientSequencerOperation() {
     }
 
-    public AbstractClientSequencerOperation(String sequencerName) {
+    AbstractClientSequencerOperation(String sequencerName) {
         this.sequencerName = sequencerName;
     }
 
-    public String getSequencerName() {
+    String getSequencerName() {
         return sequencerName;
     }
 

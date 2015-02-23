@@ -18,17 +18,20 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.util.ConstructorFunction;
 
+import javax.annotation.Nonnull;
+
 final class NodeSequencerConstructorFunction
         implements ConstructorFunction<SequencerDefinition, SequencerProvision> {
 
     private final NodeSequencerService sequencerService;
 
-    NodeSequencerConstructorFunction(NodeSequencerService sequencerService) {
+    NodeSequencerConstructorFunction(@Nonnull NodeSequencerService sequencerService) {
         this.sequencerService = sequencerService;
     }
 
+    @Nonnull
     @Override
-    public SequencerProvision createNew(SequencerDefinition definition) {
+    public SequencerProvision createNew(@Nonnull SequencerDefinition definition) {
         NodeSequencer sequencer = new NodeSequencer(sequencerService, definition);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);

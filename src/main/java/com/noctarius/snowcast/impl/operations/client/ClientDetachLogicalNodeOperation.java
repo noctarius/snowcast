@@ -33,7 +33,7 @@ class ClientDetachLogicalNodeOperation
         implements BackupAwareOperation {
 
     private int logicalNodeId;
-    private SequencerDefinition definition;
+    private final SequencerDefinition definition;
 
     ClientDetachLogicalNodeOperation(String sequencerName, SequencerDefinition definition, ClientEndpoint endpoint,
                                      int logicalNodeId) {

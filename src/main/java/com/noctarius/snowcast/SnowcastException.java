@@ -21,7 +21,7 @@ import javax.annotation.Nonnull;
 public class SnowcastException
         extends RuntimeException {
 
-    public SnowcastException() {
+    SnowcastException() {
         super();
     }
 

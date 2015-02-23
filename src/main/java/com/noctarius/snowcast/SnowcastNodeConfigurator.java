@@ -30,10 +30,12 @@ public final class SnowcastNodeConfigurator {
     private SnowcastNodeConfigurator() {
     }
 
+    @Nonnull
     public static Config buildSnowcastAwareConfig() {
         return buildSnowcastAwareConfig(new XmlConfigBuilder().build());
     }
 
+    @Nonnull
     public static Config buildSnowcastAwareConfig(@Nonnull Config config) {
         ServicesConfig servicesConfig = config.getServicesConfig();
         servicesConfig.addServiceConfig(new ServiceConfig().setEnabled(true).setName(SnowcastConstants.SERVICE_NAME)

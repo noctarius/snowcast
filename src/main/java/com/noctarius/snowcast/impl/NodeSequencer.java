@@ -19,38 +19,48 @@ package com.noctarius.snowcast.impl;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 public class NodeSequencer
         implements InternalSequencer {
 
     private final NodeSequencerContext sequencerContext;
 
-    NodeSequencer(NodeSequencerService service, SequencerDefinition definition) {
+    NodeSequencer(@Nonnull NodeSequencerService service, @Nonnull SequencerDefinition definition) {
         this.sequencerContext = new NodeSequencerContext(service, definition);
     }
 
+    @Nonnull
     @Override
     public String getSequencerName() {
         return sequencerContext.getSequencerName();
     }
 
     @Override
+    @Nonnegative
     public long next()
             throws InterruptedException {
 
         return sequencerContext.next();
     }
 
+    @Nonnull
     @Override
     public SnowcastSequenceState getSequencerState() {
         return sequencerContext.getSequencerState();
     }
 
+    @Nonnull
     @Override
     public final SnowcastSequencer attachLogicalNode() {
         sequencerContext.attachLogicalNode();
         return this;
     }
 
+    @Nonnull
     @Override
     public final SnowcastSequencer detachLogicalNode() {
         sequencerContext.detachLogicalNode();
@@ -58,25 +68,29 @@ public class NodeSequencer
     }
 
     @Override
+    @Nonnegative
     public long timestampValue(long sequenceId) {
         return sequencerContext.timestampValue(sequenceId);
     }
 
     @Override
+    @Nonnegative
     public int logicalNodeId(long sequenceId) {
         return sequencerContext.logicalNodeId(sequenceId);
     }
 
     @Override
+    @Nonnegative
     public int counterValue(long sequenceId) {
         return sequencerContext.counterValue(sequenceId);
     }
 
     @Override
-    public void stateTransition(SnowcastSequenceState newState) {
+    public void stateTransition(@Nonnull SnowcastSequenceState newState) {
         sequencerContext.stateTransition(newState);
     }
 
+    @Nonnull
     @Override
     public SequencerService getSequencerService() {
         return sequencerContext.service;
@@ -87,18 +101,20 @@ public class NodeSequencer
 
         private final NodeSequencerService service;
 
-        private NodeSequencerContext(NodeSequencerService service, SequencerDefinition definition) {
+        private NodeSequencerContext(@Nonnull NodeSequencerService service, @Nonnull SequencerDefinition definition) {
             super(definition);
             this.service = service;
         }
 
+        @Min(128)
         @Override
-        protected int doAttachLogicalNode(SequencerDefinition definition) {
+        @Max(8192)
+        protected int doAttachLogicalNode(@Nonnull SequencerDefinition definition) {
             return service.attachSequencer(definition);
         }
 
         @Override
-        protected void doDetachLogicalNode(SequencerDefinition definition, int logicalNodeId) {
+        protected void doDetachLogicalNode(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
             service.detachSequencer(definition, logicalNodeId);
         }
     }

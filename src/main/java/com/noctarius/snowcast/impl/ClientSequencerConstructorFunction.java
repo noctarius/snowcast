@@ -22,6 +22,7 @@ import com.hazelcast.client.spi.ProxyManager;
 import com.hazelcast.util.ConstructorFunction;
 import com.noctarius.snowcast.SnowcastException;
 
+import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
 
 final class ClientSequencerConstructorFunction
@@ -32,8 +33,8 @@ final class ClientSequencerConstructorFunction
     private final ClientSequencerService sequencerService;
     private final Method proxyManagerInitialize;
 
-    ClientSequencerConstructorFunction(HazelcastClientInstanceImpl client, ProxyManager proxyManager,
-                                       ClientSequencerService sequencerService) {
+    ClientSequencerConstructorFunction(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ProxyManager proxyManager,
+                                       @Nonnull ClientSequencerService sequencerService) {
 
         this.client = client;
         this.proxyManager = proxyManager;
@@ -41,15 +42,16 @@ final class ClientSequencerConstructorFunction
         this.proxyManagerInitialize = getInitializeMethod();
     }
 
+    @Nonnull
     @Override
-    public SequencerProvision createNew(SequencerDefinition definition) {
+    public SequencerProvision createNew(@Nonnull SequencerDefinition definition) {
         ClientSequencer sequencer = new ClientSequencer(client, sequencerService, definition);
         initializeProxy(sequencer);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);
     }
 
-    private void initializeProxy(ClientSequencer sequencer) {
+    private void initializeProxy(@Nonnull ClientSequencer sequencer) {
         try {
             proxyManagerInitialize.invoke(proxyManager, sequencer);
         } catch (Exception e) {
@@ -57,6 +59,7 @@ final class ClientSequencerConstructorFunction
         }
     }
 
+    @Nonnull
     private Method getInitializeMethod() {
         try {
             Method method = ProxyManager.class.getDeclaredMethod("initialize", ClientProxy.class);

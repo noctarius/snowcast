@@ -18,7 +18,7 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.core.DistributedObject;
 
-public class DummyProxy
+class DummyProxy
         implements DistributedObject {
 
     private final String sequencerName;

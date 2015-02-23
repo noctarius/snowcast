@@ -18,37 +18,51 @@ package com.noctarius.snowcast.impl;
 
 import com.noctarius.snowcast.SnowcastEpoch;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 public final class SequencerDefinition {
     private final String sequencerName;
     private final SnowcastEpoch epoch;
     private final int maxLogicalNodeCount;
     private final short backupCount;
 
-    public SequencerDefinition(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount, short backupCount) {
+    public SequencerDefinition(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
+                               @Min(128) @Max(8192) int maxLogicalNodeCount,
+                               @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
+
         this.sequencerName = sequencerName;
         this.epoch = epoch;
         this.maxLogicalNodeCount = maxLogicalNodeCount;
         this.backupCount = backupCount;
     }
 
+    @Nonnull
     public String getSequencerName() {
         return sequencerName;
     }
 
+    @Nonnull
     public SnowcastEpoch getEpoch() {
         return epoch;
     }
 
+    @Nonnegative
     public int getMaxLogicalNodeCount() {
         return maxLogicalNodeCount;
     }
 
+    @Min(128)
+    @Max(8192)
     public short getBackupCount() {
         return backupCount;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) {
             return true;
         }
@@ -61,23 +75,19 @@ public final class SequencerDefinition {
         if (maxLogicalNodeCount != that.maxLogicalNodeCount) {
             return false;
         }
-        if (epoch != null ? !epoch.equals(that.epoch) : that.epoch != null) {
+        if (!epoch.equals(that.epoch)) {
             return false;
         }
-        if (sequencerName != null ? !sequencerName.equals(that.sequencerName) : that.sequencerName != null) {
+        if (!sequencerName.equals(that.sequencerName)) {
             return false;
         }
-        if (backupCount != that.backupCount) {
-            return false;
-        }
-
-        return true;
+        return backupCount == that.backupCount;
     }
 
     @Override
     public int hashCode() {
-        int result = sequencerName != null ? sequencerName.hashCode() : 0;
-        result = 31 * result + (epoch != null ? epoch.hashCode() : 0);
+        int result = sequencerName.hashCode();
+        result = 31 * result + (epoch.hashCode());
         result = 31 * result + maxLogicalNodeCount;
         result = 31 * result + backupCount;
         return result;

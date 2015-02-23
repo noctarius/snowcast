@@ -27,6 +27,10 @@ import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastSequencer;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -44,28 +48,33 @@ class NodeSnowcast
     private final NodeEngine nodeEngine;
     private final NodeSequencerService sequencerService;
 
-    NodeSnowcast(HazelcastInstance hazelcastInstance, short backupCount) {
+    NodeSnowcast(@Nonnull HazelcastInstance hazelcastInstance, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
         this.backupCount = backupCount;
         this.nodeEngine = getNodeEngine(hazelcastInstance);
         this.sequencerService = getSequencerService(nodeEngine);
     }
 
+    @Nonnull
     @Override
-    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch) {
+    public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch) {
         return createSequencer(sequencerName, epoch, DEFAULT_MAX_LOGICAL_NODES_13_BITS);
     }
 
+    @Nonnull
     @Override
-    public SnowcastSequencer createSequencer(String sequencerName, SnowcastEpoch epoch, int maxLogicalNodeCount) {
+    public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
+                                             @Min(128) @Max(8192) int maxLogicalNodeCount) {
+
         return sequencerService.createSequencer(sequencerName, epoch, maxLogicalNodeCount, backupCount);
     }
 
     @Override
-    public void destroySequencer(SnowcastSequencer sequencer) {
+    public void destroySequencer(@Nonnull SnowcastSequencer sequencer) {
         sequencerService.destroySequencer(sequencer);
     }
 
-    private NodeSequencerService getSequencerService(NodeEngine nodeEngine) {
+    @Nonnull
+    private NodeSequencerService getSequencerService(@Nonnull NodeEngine nodeEngine) {
         // Ugly hacks due to lack in SPI
         NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
         NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
@@ -118,7 +127,8 @@ class NodeSnowcast
         }
     }
 
-    private NodeEngine getNodeEngine(HazelcastInstance hazelcastInstance) {
+    @Nonnull
+    private NodeEngine getNodeEngine(@Nonnull HazelcastInstance hazelcastInstance) {
         try {
             // Ugly hack due to lack in SPI
             Field originalField = HazelcastInstanceProxy.class.getDeclaredField("original");

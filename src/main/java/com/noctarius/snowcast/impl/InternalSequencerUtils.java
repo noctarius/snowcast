@@ -19,6 +19,10 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.util.QuickMath;
 import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 
+import javax.annotation.Nonnegative;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
 import static com.noctarius.snowcast.impl.SnowcastConstants.ID_TIMESTAMP_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_1024;
 import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_128;
@@ -43,6 +47,7 @@ public final class InternalSequencerUtils {
     private InternalSequencerUtils() {
     }
 
+    @Nonnegative
     public static int calculateBoundedMaxLogicalNodeCount(int maxLogicalNodeCount) {
         if (maxLogicalNodeCount < NODE_ID_LOWER_BOUND) {
             String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("smaller", NODE_ID_LOWER_BOUND);
@@ -55,11 +60,13 @@ public final class InternalSequencerUtils {
         return QuickMath.nextPowerOfTwo(maxLogicalNodeCount) - 1;
     }
 
-    public static int calculateMaxMillisCounter(int shiftLogicalNodeId) {
+    @Nonnegative
+    public static int calculateMaxMillisCounter(@Nonnegative int shiftLogicalNodeId) {
         return (int) Math.pow(2, shiftLogicalNodeId);
     }
 
-    public static int calculateLogicalNodeShifting(int maxLogicalNodeCount) {
+    @Nonnegative
+    public static int calculateLogicalNodeShifting(@Min(128) @Max(8192) int maxLogicalNodeCount) {
         switch (maxLogicalNodeCount) {
             case MAX_LOGICAL_NODE_COUNT_128:
                 return SHIFT_LOGICAL_NODE_ID_128;
@@ -80,31 +87,39 @@ public final class InternalSequencerUtils {
         }
     }
 
-    public static long calculateLogicalNodeMask(long maxLogicalNodeCount, int nodeIdShiftFactor) {
+    @Nonnegative
+    public static long calculateLogicalNodeMask(@Min(128) @Max(8192) long maxLogicalNodeCount,
+                                                @Nonnegative int nodeIdShiftFactor) {
+
         return (maxLogicalNodeCount) << nodeIdShiftFactor;
     }
 
-    public static long calculateCounterMask(long maxLogicalNodeCount, int nodeIdShiftFactor) {
+    public static long calculateCounterMask(@Min(128) @Max(8192) long maxLogicalNodeCount, @Nonnegative int nodeIdShiftFactor) {
         long logicalNodeMask = maxLogicalNodeCount << nodeIdShiftFactor;
         long invMask = ID_TIMESTAMP_READ_MASK | logicalNodeMask;
         return ~invMask;
     }
 
-    public static long generateSequenceId(long timestamp, int logicalNodeID, int nextId, int nodeIdShiftFactor) {
+    public static long generateSequenceId(@Nonnegative long timestamp, @Min(128) @Max(8192) int logicalNodeID,
+                                          @Nonnegative int nextId, @Nonnegative int nodeIdShiftFactor) {
+
         long id = timestamp << SHIFT_TIMESTAMP;
         id |= logicalNodeID << nodeIdShiftFactor;
         id |= nextId;
         return id;
     }
 
+    @Nonnegative
     public static long timestampValue(long sequenceId) {
         return (sequenceId & ID_TIMESTAMP_READ_MASK) >>> SHIFT_TIMESTAMP;
     }
 
-    public static int logicalNodeId(long sequenceId, int nodeIdShiftFactor, long mask) {
+    @Nonnegative
+    public static int logicalNodeId(long sequenceId, @Nonnegative int nodeIdShiftFactor, long mask) {
         return (int) ((sequenceId & mask) >>> nodeIdShiftFactor);
     }
 
+    @Nonnegative
     public static int counterValue(long sequenceId, long mask) {
         return (int) (sequenceId & mask);
     }

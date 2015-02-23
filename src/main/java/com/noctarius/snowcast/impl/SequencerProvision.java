@@ -16,24 +16,29 @@
  */
 package com.noctarius.snowcast.impl;
 
+import javax.annotation.Nonnull;
+
 final class SequencerProvision {
 
     private final SequencerDefinition definition;
     private final InternalSequencer sequencer;
 
-    public SequencerProvision(SequencerDefinition definition, InternalSequencer sequencer) {
+    public SequencerProvision(@Nonnull SequencerDefinition definition, @Nonnull InternalSequencer sequencer) {
         this.definition = definition;
         this.sequencer = sequencer;
     }
 
+    @Nonnull
     public SequencerDefinition getDefinition() {
         return definition;
     }
 
+    @Nonnull
     public InternalSequencer getSequencer() {
         return sequencer;
     }
 
+    @Nonnull
     public String getSequencerName() {
         return definition.getSequencerName();
     }

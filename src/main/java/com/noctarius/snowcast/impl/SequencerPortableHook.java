@@ -29,6 +29,9 @@ import com.noctarius.snowcast.impl.operations.client.ClientDetachLogicalNodeRequ
 import com.noctarius.snowcast.impl.operations.client.ClientRegisterChannelOperation;
 import com.noctarius.snowcast.impl.operations.client.ClientRemoveChannelOperation;
 
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collection;
 
 public class SequencerPortableHook
@@ -45,10 +48,12 @@ public class SequencerPortableHook
     private static final int LEN = TYPE_REMOVE_CHANNEL + 1;
 
     @Override
+    @Nonnegative
     public int getFactoryId() {
         return SequencerDataSerializerHook.FACTORY_ID;
     }
 
+    @Nonnull
     @Override
     public PortableFactory createFactory() {
         return new PortableFactory() {
@@ -99,6 +104,7 @@ public class SequencerPortableHook
                 };
             }
 
+            @Nullable
             @Override
             public Portable create(int classId) {
                 return (classId > 0 && classId <= constructors.length) ? constructors[classId].createNew(classId) : null;
@@ -106,6 +112,7 @@ public class SequencerPortableHook
         };
     }
 
+    @Nullable
     @Override
     public Collection<ClassDefinition> getBuiltinDefinitions() {
         return null;
