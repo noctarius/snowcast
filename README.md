@@ -197,7 +197,7 @@ No further configuration or user interaction is necessary to use lazy configurat
  (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_
 /____/_/ /_/\____/|__/|__/\___/\__,_/____/\__/
 
-snowcast Version: 1.0.0-SNAPSHOT    Build-Date: Unknown build-date
+snowcast node mode - version: 1.0.0-SNAPSHOT    build-date: Unknown build-date
 WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!
 ```
 

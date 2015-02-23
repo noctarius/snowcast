@@ -16,6 +16,7 @@
  */
 package com.noctarius.snowcast;
 
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -100,6 +101,7 @@ public interface SnowcastSequencer {
      * @param sequenceId the sequence ID to extract the timestamp from
      * @return the extracted timestamp based on the configured epoch
      */
+    @Nonnegative
     long timestampValue(long sequenceId);
 
     /**
@@ -110,6 +112,7 @@ public interface SnowcastSequencer {
      * @param sequenceId the sequence ID to extract the logical node ID from
      * @return the extracted logical node ID based on the configured maximal logical node ID
      */
+    @Nonnegative
     int logicalNodeId(long sequenceId);
 
     /**
@@ -120,5 +123,6 @@ public interface SnowcastSequencer {
      * @param sequenceId the sequence ID to extract the counter value from
      * @return the extracted counter value based on the configured maximal logical node ID
      */
+    @Nonnegative
     int counterValue(long sequenceId);
 }

@@ -42,7 +42,8 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.USER_CONTEXT_LOOKUP_
  * A basic example on how to use the snowcast API to generate IDs will show the following snippet:
  * <pre>
  * // Create a HazelcastInstance
- * HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance();
+ * Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
+ * HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance( config );
  *
  * // Create or retrieve the snowcast instance
  * Snowcast snowcast = SnowcastSystem.snowcast( hazelcastInstance );
