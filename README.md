@@ -12,6 +12,7 @@
 * [Usage of snowcast](#usage-of-snowcast)
 * [Hazelcast Configuration](#hazelcast-configuration)
 * [Maven Coordinates](#maven-coordinates)
+* [Javadoc](#javadoc)
 * [Multithreading](#multithreading)
 * [Sequencer States](#sequencer-states)
 * [Number of Nodes](#number-of-nodes)
@@ -235,6 +236,12 @@ The Maven coordinates for the snowcast artifacts are:
   <version>1.0.0-SNAPSHOT</version>
 </dependency>
 ```
+
+### Javadoc
+
+snowcast build process offers an automatically generated Javadoc. This is, at the time of writing, always a snapshow of the latest build.
+
+The Javadoc snapshot is available here: [Javadoc](http://noctarius.github.io/snowcast/)
 
 ### Multithreading
 
