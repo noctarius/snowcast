@@ -24,7 +24,7 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 
-final class ClientSnowcastFactory {
+public final class ClientSnowcastFactory {
 
     public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
                                     @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
