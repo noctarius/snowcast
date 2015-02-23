@@ -108,4 +108,14 @@ public final class InternalSequencerUtils {
     public static int counterValue(long sequenceId, long mask) {
         return (int) (sequenceId & mask);
     }
+
+    public static void printStartupMessage(boolean lazyConfiguration) {
+        StringBuilder sb = new StringBuilder(SnowcastConstants.SNOWCAST_ASCII_LOGO).append('\n');
+        sb.append("snowcast Version: ").append(SnowcastConstants.VERSION).append("    ");
+        sb.append("Build-Date: ").append(SnowcastConstants.BUILD_DATE).append('\n');
+        if (lazyConfiguration) {
+            sb.append("WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!\n");
+        }
+        System.out.println(sb.toString());
+    }
 }

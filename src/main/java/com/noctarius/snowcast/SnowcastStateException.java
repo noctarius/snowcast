@@ -16,9 +16,20 @@
  */
 package com.noctarius.snowcast;
 
+/**
+ * The SnowcastStateException is used whenever there is an exception in the internal
+ * state machine of a {@link com.noctarius.snowcast.SnowcastSequencer}. This can happen
+ * for example if {@link SnowcastSequencer#next()} is called on a <tt>detached</tt>
+ * sequencer instance.
+ */
 public class SnowcastStateException
         extends SnowcastException {
 
+    /**
+     * Basic exception constructor
+     *
+     * @param message message to be used
+     */
     public SnowcastStateException(String message) {
         super(message);
     }

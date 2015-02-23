@@ -10,6 +10,7 @@
 * [Pseudo Implementation](#pseudo-implementation)
 * [Why snowcast?](#why-snowcast)
 * [Usage of snowcast](#usage-of-snowcast)
+* [Hazelcast configuration](#hazelcast-configuration)
 * [Maven Coordinates](#maven-coordinates)
 * [Multithreading](#multithreading)
 * [Sequencer States](#sequencer-states)
@@ -114,7 +115,7 @@ calendar.set( 2014, 1, 1, 0, 0, 0 );
 SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
 ```
 
-Preparations are done by now. Creating a `Sequencer` using the `Snowcast` factory instance and the epoch, together with a reference name, is now as easy as the following snippet:
+Preparations are done by now. Creating a `SnowcastSequencer` using the `Snowcast` factory instance and the epoch, together with a reference name, is now as easy as the following snippet:
 
 ```java
 SnowcastSequencer sequencer = snowcast.createSequencer( "sequencerName", epoch );
@@ -137,6 +138,76 @@ snowcast.destroySequencer( sequencer );
 ```
 
 Destroying a sequencer is a cluster operation and will destroy all sequencers referred to by the same name on all nodes. After that point the existing `SnowcastSequencer` instances are in a destroyed state and cannot be used anymore. To find out more about sequencer states, please read [Sequencer States](#sequencer-states).
+
+### Hazelcast Configuration
+
+Hazelcast requires custom services to be configured upfront using either the Configuration API or by utilizing the, XML based, declarative configuration.
+
+snowcast offers three different ways to register the snowcast service with Hazelcast by providing support for the two already named ones and additionally is equipped with a hack to lazily registers itself as a Hazelcast service on first acquisition. This way is not meant to be used in production, the reason will be shown in a bit.
+
+#### Using the Configuration API
+
+The simplest way to configure snowcast is using the Hazelcast Configuration API. snowcast provides the user with a helper class to configure all necessary options.
+
+If no other configuration is necessary let the snowcast helper create the `com.hazelcast.config.Config` instance for you, using the same way as Hazelcast itself would do it, and retrieve a pre-configured `Config` ready to be used to create a Hazelcast instance.
+
+```java
+Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
+HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance( config );
+```
+
+If there is already a `Config` instance this can be passed in and configured to use snowcast.
+
+```java
+Config config = new Config();
+config = SnowcastNodeConfigurator.buildSnowcastAwareConfig( config );
+HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance( config );
+```
+
+#### Using the Declarative Configuration
+
+For people configuring Hazelcast using the XML based configuration only, snowcast also supports a configuration based on declarative configuration. As a disadvantage using the declarative configuration the internal classname of the service is bound to the configuration. Whenever the classname might change for any reason instantiating Hazelcast might fail for an non-obvious reason. Using the [Configuration API](#using-the-configuration-api) is recommended.
+
+```xml
+<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.4.xsd"
+           xmlns="http://www.hazelcast.com/schema/config"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+
+  <services enable-defaults="true">
+    <service enabled="true">
+      <name>noctarius::SequencerService</name>
+      <class-name>com.noctarius.snowcast.impl.NodeSequencerService</class-name>
+    </service>
+  </services>
+</hazelcast>
+```
+
+That way the snowcast service is registered into Hazelcast.
+
+#### Lazy Configuration Hack
+
+This lazy initialization is meant to be used for convenience and the out-of-the-box experience, as the heading suggests this is not meant to be used in production. The reason is simple. All Hazelcast nodes need to have the service registered before the sequencer is retrieved. That said it is hard to achieve this state with more than one cluster node.
+
+No further configuration or user interaction is necessary to use lazy configuration as it happens automatically when no Hazelcast service is yet created. A warning is printed whenever this way of configuration is used. Please do not use it in production.
+
+```plain
+                                             __
+   _________  ____ _      ___________ ______/ /_
+  / ___/ __ \/ __ \ | /| / / ___/ __ `/ ___/ __/
+ (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_
+/____/_/ /_/\____/|__/|__/\___/\__,_/____/\__/
+
+snowcast Version: null    Build-Date: Unknown build-date
+WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!
+```
+
+For Technical Operations: To prevent lazy configuration from happening and to provide a fast-fail behavior please set the Java system property:
+
+```plain
+-Dcom.noctarius.snowcast.prevent.lazy.configuration
+```
+
+The property does not have to have a value, the simple existence of that property is enough to prevent lazy initialization from happening.
 
 ### Maven Coordinates
 

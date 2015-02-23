@@ -16,6 +16,14 @@
  */
 package com.noctarius.snowcast.impl;
 
+import java.io.InputStream;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.jar.Manifest;
+
 public final class SnowcastConstants {
 
     // Retry timeout for increment function of the counter
@@ -24,7 +32,6 @@ public final class SnowcastConstants {
     // Shifting values
     public static final int SHIFT_COUNTER = 41;
     public static final int SHIFT_TIMESTAMP = 23;
-    public static final int BASE_SHIFT_LOGICAL_NODE_ID = 10;
 
     // Read masks
     public static final long TC_TIMESTAMP_READ_MASK = 0x1FFFFFFFFFFL;
@@ -60,6 +67,49 @@ public final class SnowcastConstants {
     // User context lookup name
     public static final String USER_CONTEXT_LOOKUP_NAME = "noctarius::Snowcast::SequencerService";
 
+    // snowcast ascii logo
+    public static final String SNOWCAST_ASCII_LOGO = "                                             __ \n" +
+            "   _________  ____ _      ___________ ______/ /_\n" +
+            "  / ___/ __ \\/ __ \\ | /| / / ___/ __ `/ ___/ __/\n" +
+            " (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_  \n" +
+            "/____/_/ /_/\\____/|__/|__/\\___/\\__,_/____/\\__/  \n";
+
+    // snowcast version
+    public static final String VERSION;
+
+    // snowcast build date
+    public static final String BUILD_DATE;
+
+    // System Property to prevent lazy configuration
+    public static final String PROPERTY_PREVENT_LAZY_CONFIGURATION = "com.noctarius.snowcast.prevent.lazy.configuration";
+
+    static {
+        String version = "Unknown version";
+        String buildDate = "Unknown build-date";
+        try {
+            ClassLoader classLoader = SnowcastConstants.class.getClassLoader();
+            InputStream manifestStream = classLoader.getResourceAsStream(JarFile.MANIFEST_NAME);
+            Manifest manifest = new Manifest(manifestStream);
+
+            Attributes attributes = manifest.getMainAttributes();
+            version = attributes.getValue("Bundle-Version");
+
+            long lastModified = Long.parseLong(attributes.getValue("Bnd-LastModified"));
+            Date date = new Date(lastModified);
+            buildDate = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.ENGLISH).format(date);
+        } catch (Exception e) {
+            // We really want to ignore this, should never fail but if it does
+            // there is no reason to prevent startup!
+        }
+        VERSION = version;
+        BUILD_DATE = buildDate;
+    }
+
     private SnowcastConstants() {
+    }
+
+    public static boolean preventLazyConfiguration() {
+        String property = System.getProperty(PROPERTY_PREVENT_LAZY_CONFIGURATION);
+        return property != null;
     }
 }

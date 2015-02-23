@@ -27,6 +27,7 @@ import com.noctarius.snowcast.SnowcastSequencer;
 
 import java.lang.reflect.Field;
 
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.printStartupMessage;
 import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
 
 class ClientSnowcast
@@ -41,6 +42,7 @@ class ClientSnowcast
         this.client = getHazelcastClient(hazelcastInstance);
         ProxyManager proxyManager = getProxyManager(client);
         this.sequencerService = new ClientSequencerService(client, proxyManager);
+        printStartupMessage(false);
     }
 
     @Override

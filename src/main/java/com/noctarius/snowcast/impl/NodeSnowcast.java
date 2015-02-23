@@ -34,6 +34,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.printStartupMessage;
 import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
 
 class NodeSnowcast
@@ -69,7 +70,13 @@ class NodeSnowcast
         NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
         NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
         if (service != null) {
+            printStartupMessage(false);
             return service;
+        }
+
+        if (SnowcastConstants.preventLazyConfiguration()) {
+            String message = ExceptionMessages.SERVICE_NOT_REGISTERED.buildMessage();
+            throw new SnowcastException(message);
         }
 
         // More ugly hacks to come here!
@@ -98,6 +105,7 @@ class NodeSnowcast
                 service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
                 if (service != null) {
                     service.init(nodeEngine, new Properties());
+                    printStartupMessage(true);
                     return service;
                 }
 

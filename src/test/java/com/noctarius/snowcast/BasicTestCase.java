@@ -17,11 +17,14 @@
 package com.noctarius.snowcast;
 
 import com.hazelcast.config.Config;
+import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
+import com.noctarius.snowcast.impl.SnowcastConstants;
 import org.junit.Test;
 
+import java.io.InputStream;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -47,6 +50,47 @@ public class BasicTestCase
             assertNotNull(sequencer);
         } finally {
             factory.shutdownAll();
+        }
+    }
+
+    @Test
+    public void test_simple_sequencer_initialization_declarative()
+            throws Exception {
+
+        ClassLoader classLoader = BasicTestCase.class.getClassLoader();
+        InputStream stream = classLoader.getResourceAsStream("hazelcast-node-configuration.xml");
+        Config config = new XmlConfigBuilder(stream).build();
+
+        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            assertNotNull(sequencer);
+        } finally {
+            factory.shutdownAll();
+        }
+    }
+
+    @Test(expected = SnowcastException.class)
+    public void test_simple_sequencer_initialization_fails_prevent_lazy_configuration()
+            throws Exception {
+
+        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
+
+        try {
+            System.setProperty(SnowcastConstants.PROPERTY_PREVENT_LAZY_CONFIGURATION, "");
+
+            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            assertNotNull(sequencer);
+        } finally {
+            factory.shutdownAll();
+            System.getProperties().remove(SnowcastConstants.PROPERTY_PREVENT_LAZY_CONFIGURATION);
         }
     }
 

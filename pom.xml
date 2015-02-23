@@ -45,7 +45,7 @@
   <developers>
     <developer>
       <id>cengelbert</id>
-      <name>Christoph Engelbert (noctarius)</name>
+      <name>Christoph Engelbert (@noctarius2k)</name>
       <email>noctarius@apache.org</email>
       <timezone>+1</timezone>
     </developer>
@@ -104,6 +104,13 @@
       <version>${hazelcast.version}</version>
       <classifier>tests</classifier>
     </dependency>
+
+      <dependency>
+          <groupId>com.google.code.findbugs</groupId>
+          <artifactId>annotations</artifactId>
+          <version>2.0.2</version>
+          <scope>provided</scope>
+      </dependency>
   </dependencies>
 
   <build>
@@ -196,6 +203,10 @@
                 <include>com/noctarius/snowcast/*.java</include>
               </sourceFileIncludes>
               <excludePackageNames>*.impl.*</excludePackageNames>
+              <detectJavaApiLink>true</detectJavaApiLink>
+              <links>
+                <link>http://docs.hazelcast.org/docs/3.4/javadoc/</link>
+              </links>
             </configuration>
           </execution>
         </executions>

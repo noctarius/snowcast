@@ -16,9 +16,20 @@
  */
 package com.noctarius.snowcast;
 
+/**
+ * The SnowcastSequencerAlreadyRegisteredException is thrown whenever there is requested
+ * sequencer is already registered with the snowcast system in the cluster but the
+ * configurations do not match. snowcast follows the fail-fast principle to prevent
+ * conflicting IDs to be generated.
+ */
 public class SnowcastSequencerAlreadyRegisteredException
         extends SnowcastException {
 
+    /**
+     * Basic exception constructor
+     *
+     * @param message message to be used
+     */
     public SnowcastSequencerAlreadyRegisteredException(String message) {
         super(message);
     }
