@@ -137,6 +137,7 @@
             <Import-Package>
               com.hazelcast.client.*;resolution=Optional,
               javax.validation.*;resolution=Optional,
+              javax.annotation.*;resolution=Optional,
               com.hazelcast.core.*,
               com.hazelcast.util.*,
               com.hazelcast.spi.*,

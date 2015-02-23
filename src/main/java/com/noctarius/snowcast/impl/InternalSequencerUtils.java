@@ -124,10 +124,11 @@ public final class InternalSequencerUtils {
         return (int) (sequenceId & mask);
     }
 
-    public static void printStartupMessage(boolean lazyConfiguration) {
+    public static void printStartupMessage(boolean lazyConfiguration, boolean client) {
         StringBuilder sb = new StringBuilder(SnowcastConstants.SNOWCAST_ASCII_LOGO).append('\n');
-        sb.append("snowcast Version: ").append(SnowcastConstants.VERSION).append("    ");
-        sb.append("Build-Date: ").append(SnowcastConstants.BUILD_DATE).append('\n');
+        sb.append("snowcast ").append(client ? " client " : " node ").append(" mode - ");
+        sb.append(" version: ").append(SnowcastConstants.VERSION).append("    ");
+        sb.append("build-date: ").append(SnowcastConstants.BUILD_DATE).append('\n');
         if (lazyConfiguration) {
             sb.append("WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!\n");
         }
