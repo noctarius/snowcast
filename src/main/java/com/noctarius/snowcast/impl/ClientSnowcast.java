@@ -46,7 +46,7 @@ class ClientSnowcast
         this.client = getHazelcastClient(hazelcastInstance);
         ProxyManager proxyManager = getProxyManager(client);
         this.sequencerService = new ClientSequencerService(client, proxyManager);
-        printStartupMessage(false);
+        printStartupMessage(false, true);
     }
 
     @Nonnull

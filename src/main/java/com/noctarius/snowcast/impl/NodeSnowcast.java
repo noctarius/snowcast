@@ -79,7 +79,7 @@ class NodeSnowcast
         NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
         NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
         if (service != null) {
-            printStartupMessage(false);
+            printStartupMessage(false, false);
             return service;
         }
 
@@ -114,7 +114,7 @@ class NodeSnowcast
                 service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
                 if (service != null) {
                     service.init(nodeEngine, new Properties());
-                    printStartupMessage(true);
+                    printStartupMessage(true, false);
                     return service;
                 }
 
