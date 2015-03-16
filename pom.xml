@@ -11,12 +11,11 @@
   - See the License for the specific language governing permissions and
   - limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>1.0.0-RC1-SNAPSHOT</version>
+  <version>1.0.0-RC1</version>
   <description>snowcast is an auto-configuration, distributed, scalable ID generator on top of Hazelcast</description>
   <inceptionYear>2014</inceptionYear>
   <url>http://github.com/noctarius/snowcast</url>
@@ -40,6 +39,7 @@
     <connection>scm:git:git://github.com/noctarius/snowcast.git</connection>
     <developerConnection>scm:git:git@github.com:noctarius/snowcast.git</developerConnection>
     <url>https://github.com/noctarius/snowcast/</url>
+    <tag>snowcast-1.0.0-RC1</tag>
   </scm>
 
   <developers>
