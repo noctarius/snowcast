@@ -216,7 +216,17 @@ The property does not have to have a value, the simple existence of that propert
 
 ### Maven Coordinates
 
-snowcast is deployed as Apache Maven artifacts. At the moment there is no final release but snapshots are available. Snapshots are stored in the OSS Nexus environment at Sonatype, therefore you have to set up an external snapshot repository to your pom.xml as shown in the following snippet:
+snowcast is deployed as a Apache Maven artifact. All release candidates as well as final releases (GA) are deployed to Maven Central and available directly using Maven, Gradle and similar build systems.
+
+```xml
+<dependency>
+  <groupId>com.noctarius.snowcast</groupId>
+  <artifactId>snowcast</artifactId>
+  <version>1.0.0-RC1</version>
+</dependency>
+```
+
+Automatically build snapshot builds are stored in the OSS Nexus environment at Sonatype, therefore you have to set up an external snapshot repository to your pom.xml as shown in the following snippet:
 
 ```xml
 <repositories>
