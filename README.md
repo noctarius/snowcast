@@ -243,7 +243,7 @@ Automatically build snapshot builds are stored in the OSS Nexus environment at S
 
 The Maven coordinates for the snowcast artifacts are:
 
-```plain
+```xml
 <dependency>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
