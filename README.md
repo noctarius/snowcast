@@ -202,7 +202,7 @@ No further configuration or user interaction is necessary to use lazy configurat
  (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_
 /____/_/ /_/\____/|__/|__/\___/\__,_/____/\__/
 
-snowcast node mode - version: 1.0.0-SNAPSHOT    build-date: Unknown build-date
+snowcast node mode -  version: 1.0.0-RC2-SNAPSHOT    build-date: 2015-04-04 14:08
 WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!
 ```
 
@@ -247,7 +247,7 @@ The Maven coordinates for the snowcast artifacts are:
 <dependency>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.0-RC2-SNAPSHOT</version>
 </dependency>
 ```
 
