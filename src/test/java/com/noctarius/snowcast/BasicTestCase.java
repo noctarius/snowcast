@@ -240,18 +240,23 @@ public class BasicTestCase
 
             assertNotNull(sequencer);
 
-            buildSnowcastSequencer(snowcast);
+            SnowcastEpoch epoch = SnowcastEpoch.byTimestamp(System.currentTimeMillis());
+            buildSnowcastSequencer(snowcast, epoch);
         } finally {
             factory.shutdownAll();
         }
     }
 
     private SnowcastSequencer buildSnowcastSequencer(Snowcast snowcast) {
-        String sequencerName = "SimpleSequencer";
-        int maxLogicalNodeCount = 128;
-
         // Build the custom epoch
         SnowcastEpoch epoch = buildEpoch();
+
+        return buildSnowcastSequencer(snowcast, epoch);
+    }
+
+    private SnowcastSequencer buildSnowcastSequencer(Snowcast snowcast, SnowcastEpoch epoch) {
+        String sequencerName = "SimpleSequencer";
+        int maxLogicalNodeCount = 128;
 
         // Create a sequencer for ID generation
         return snowcast.createSequencer(sequencerName, epoch, maxLogicalNodeCount);
