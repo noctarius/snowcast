@@ -15,7 +15,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>1.0.0-RC2</version>
+  <version>1.0.0-RC3-SNAPSHOT</version>
   <description>snowcast is an auto-configuration, distributed, scalable ID generator on top of Hazelcast</description>
   <inceptionYear>2014</inceptionYear>
   <url>http://github.com/noctarius/snowcast</url>
@@ -39,7 +39,7 @@
     <connection>scm:git:git://github.com/noctarius/snowcast.git</connection>
     <developerConnection>scm:git:git@github.com:noctarius/snowcast.git</developerConnection>
     <url>https://github.com/noctarius/snowcast/</url>
-    <tag>snowcast-1.0.0-RC2</tag>
+    <tag>HEAD</tag>
   </scm>
 
   <developers>
