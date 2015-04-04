@@ -116,7 +116,7 @@ In addition to our `com.noctarius.snowcast.Snowcast` factory, a custom epoch mus
 
 ```java
 Calendar calendar = GregorianCalendar.getInstance();
-calendar.set( 2014, 1, 1, 0, 0, 0 );
+calendar.set( 2014, Calendar.JANUARY, 1, 0, 0, 0 );
 SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
 ```
 
@@ -334,7 +334,7 @@ HazelcastInstance hazelcastClient = getHazelcastClient();
 Snowcast snowcast = SnowcastSystem.snowcast( hazelcastClient );
 
 Calendar calendar = GregorianCalendar.getInstance();
-calendar.set( 2014, 1, 1, 0, 0, 0 );
+calendar.set( 2014, Calendar.JANUARY, 1, 0, 0, 0 );
 SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
 
 SnowcastSequencer sequencer = snowcast.createSequencer( "sequencerName", epoch );

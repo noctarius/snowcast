@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast;
 
+import com.noctarius.snowcast.impl.ExceptionMessages;
+
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.Calendar;
@@ -120,8 +122,15 @@ public final class SnowcastEpoch {
      * @return a SnowcastEpoch instance based on the given calendars value
      */
     public static SnowcastEpoch byCalendar(@Nonnull Calendar calendar) {
+        calendar.set(Calendar.MILLISECOND, 0);
         long offset = calendar.getTimeInMillis();
-        return new SnowcastEpoch(offset);
+        SnowcastEpoch epoch = new SnowcastEpoch(offset);
+
+        if (epoch.getEpochTimestamp() < 0) {
+            String message = ExceptionMessages.ILLEGAL_CALENDAR_INSTANCE.buildMessage(calendar.getTime());
+            throw new SnowcastException(message);
+        }
+        return epoch;
     }
 
     /**

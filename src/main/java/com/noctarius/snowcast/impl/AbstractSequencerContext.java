@@ -17,6 +17,7 @@
 package com.noctarius.snowcast.impl;
 
 import com.noctarius.snowcast.SnowcastEpoch;
+import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastStateException;
 
@@ -100,6 +101,10 @@ abstract class AbstractSequencerContext {
 
         int logicalNodeID = checkStateAndLogicalNodeId();
         long timestamp = epoch.getEpochTimestamp();
+
+        if (timestamp < 0) {
+            throw new SnowcastIllegalStateException(ExceptionMessages.ILLEGAL_TIMESTAMP_GENERATED.buildMessage());
+        }
 
         int nextId;
         while (true) {

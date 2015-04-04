@@ -126,7 +126,17 @@ public enum ExceptionMessages {
     /**
      * backupCount must be equal or lower than %s
      */
-    BACKUP_COUNT_TOO_HIGH("backupCount must be equal or lower than %s");
+    BACKUP_COUNT_TOO_HIGH("backupCount must be equal or lower than %s"),
+
+    /**
+     * Illegal Timestamp generated, value below 0
+     */
+    ILLEGAL_TIMESTAMP_GENERATED("Illegal Timestamp generated, value below 0"),
+
+    /**
+     * The given Calendar's value '%s' seems to be in the future! Calendar months start at index 0
+     */
+    ILLEGAL_CALENDAR_INSTANCE("The given Calendar's value '%s' seems to be in the future! Calendar months start at index 0");
 
     private final String template;
 

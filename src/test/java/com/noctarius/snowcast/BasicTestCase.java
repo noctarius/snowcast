@@ -259,7 +259,7 @@ public class BasicTestCase
 
     private SnowcastEpoch buildEpoch() {
         Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2014, 1, 1, 0, 0, 0);
+        calendar.set(2014, 0, 1, 0, 0, 0);
         return SnowcastEpoch.byCalendar(calendar);
     }
 }
