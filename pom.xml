@@ -124,9 +124,6 @@
   <build>
     <resources>
       <resource>
-        <includes>
-          <include>snowcast-version.properties</include>
-        </includes>
         <directory>src/main/resources</directory>
         <filtering>true</filtering>
       </resource>
