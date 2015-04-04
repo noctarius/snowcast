@@ -17,12 +17,7 @@
 package com.noctarius.snowcast.impl;
 
 import java.io.InputStream;
-import java.text.DateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.jar.Attributes;
-import java.util.jar.JarFile;
-import java.util.jar.Manifest;
+import java.util.Properties;
 
 public final class SnowcastConstants {
 
@@ -83,20 +78,24 @@ public final class SnowcastConstants {
     // System Property to prevent lazy configuration
     public static final String PROPERTY_PREVENT_LAZY_CONFIGURATION = "com.noctarius.snowcast.prevent.lazy.configuration";
 
+    // File name for properties file containing build information
+    private static final String SNOWCAST_VERSION_FILE = "snowcast-version.properties";
+
+    // Property keys from build information file
+    private static final String SNOWCAST_VERSION_PROPERTY = "snowcast-version";
+    private static final String SNOWCAST_BUILD_DATE_PROPERTY = "snowcast-build-date";
+
     static {
         String version = "Unknown version";
         String buildDate = "Unknown build-date";
         try {
             ClassLoader classLoader = SnowcastConstants.class.getClassLoader();
-            InputStream manifestStream = classLoader.getResourceAsStream(JarFile.MANIFEST_NAME);
-            Manifest manifest = new Manifest(manifestStream);
+            InputStream versionFile = classLoader.getResourceAsStream(SNOWCAST_VERSION_FILE);
+            Properties properties = new Properties();
+            properties.load(versionFile);
 
-            Attributes attributes = manifest.getMainAttributes();
-            version = attributes.getValue("Bundle-Version");
-
-            long lastModified = Long.parseLong(attributes.getValue("Bnd-LastModified"));
-            Date date = new Date(lastModified);
-            buildDate = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.ENGLISH).format(date);
+            version = properties.getProperty(SNOWCAST_VERSION_PROPERTY);
+            buildDate = properties.getProperty(SNOWCAST_BUILD_DATE_PROPERTY);
         } catch (Exception e) {
             // We really want to ignore this, should never fail but if it does
             // there is no reason to prevent startup!

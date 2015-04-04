@@ -70,6 +70,8 @@
 
   <properties>
     <hazelcast.version>3.4</hazelcast.version>
+    <timestamp>${maven.build.timestamp}</timestamp>
+    <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>
 
   <dependencies>
@@ -120,6 +122,15 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <includes>
+          <include>snowcast-version.properties</include>
+        </includes>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.felix</groupId>
