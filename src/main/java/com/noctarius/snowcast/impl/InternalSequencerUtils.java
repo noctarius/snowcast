@@ -139,9 +139,9 @@ public final class InternalSequencerUtils {
         sb.append("snowcast ").append(client ? "client" : "node").append(" mode - ");
         sb.append(" version: ").append(SnowcastConstants.VERSION).append("    ");
         sb.append("build-date: ").append(SnowcastConstants.BUILD_DATE).append('\n');
-        if (lazyConfiguration) {
-            sb.append("WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!\n");
-        }
         System.out.println(sb.toString());
+        if (lazyConfiguration) {
+            System.err.println("WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!\n");
+        }
     }
 }
