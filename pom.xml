@@ -154,6 +154,7 @@
               com.hazelcast.partition.*,
               com.hazelcast.cluster.*,
               com.hazelcast.config.*,
+              com.hazelcast.logging.*,
               sun.misc.*
             </Import-Package>
           </instructions>
