@@ -36,6 +36,7 @@ import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogica
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateMaxMillisCounter;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.generateSequenceId;
 import static com.noctarius.snowcast.impl.SnowcastConstants.INCREMENT_RETRY_TIMEOUT_NANOS;
+import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_RETRY_GENERATE_IDS;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_COUNTER;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_COUNTER_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.TC_TIMESTAMP_READ_MASK;
@@ -107,12 +108,18 @@ abstract class AbstractSequencerContext {
         }
 
         int nextId;
+        int retry = 0;
         while (true) {
             checkAndUpdateTimestamp(timestamp);
 
             nextId = increment(timestamp);
             if (nextId != -1) {
                 break;
+            }
+
+            if (retry++ >= MAX_RETRY_GENERATE_IDS) {
+                String message = ExceptionMessages.GENERATION_MAX_RETRY_EXCEEDED.buildMessage(MAX_RETRY_GENERATE_IDS);
+                throw new SnowcastIllegalStateException(message);
             }
 
             TimeUnit.NANOSECONDS.sleep(INCREMENT_RETRY_TIMEOUT_NANOS);

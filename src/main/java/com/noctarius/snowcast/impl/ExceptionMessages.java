@@ -136,7 +136,12 @@ public enum ExceptionMessages {
     /**
      * The given Calendar's value '%s' seems to be in the future! Calendar months start at index 0
      */
-    ILLEGAL_CALENDAR_INSTANCE("The given Calendar's value '%s' seems to be in the future! Calendar months start at index 0");
+    ILLEGAL_CALENDAR_INSTANCE("The given Calendar's value '%s' seems to be in the future! Calendar months start at index 0"),
+
+    /**
+     * Generation of an ID failed after %s retries
+     */
+    GENERATION_MAX_RETRY_EXCEEDED("Generation of an ID failed after %s retries");
 
     private final String template;
 

@@ -75,6 +75,9 @@ public final class SnowcastConstants {
     // snowcast build date
     public static final String BUILD_DATE;
 
+    // Maximum retries to generate an ID before giving up
+    public static final int MAX_RETRY_GENERATE_IDS = 100;
+
     // System Property to prevent lazy configuration
     public static final String PROPERTY_PREVENT_LAZY_CONFIGURATION = "com.noctarius.snowcast.prevent.lazy.configuration";
 
