@@ -220,7 +220,7 @@ public final class SequencerPartition {
     }
 
     private void checkPartitionFreezeStatus() {
-        if (frozen == FROZEN) {
+        if (isFrozen()) {
             throw new SnowcastIllegalStateException(ExceptionMessages.PARTITION_IS_FROZEN.buildMessage());
         }
     }

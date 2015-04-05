@@ -42,6 +42,8 @@ import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBounde
 class ClientSequencerService
         implements SequencerService {
 
+    private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerService.class);
+
     private final ClientSequencerConstructorFunction sequencerConstructor;
 
     private final HazelcastClientInstanceImpl client;
@@ -60,6 +62,9 @@ class ClientSequencerService
                                              @Min(128) @Max(8192) int maxLogicalNodeCount,
                                              @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
 
+        TRACER.trace("register sequencer %s with epoch %s, max nodes %s, backups %s", sequencerName, epoch, maxLogicalNodeCount,
+                backupCount);
+
         int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
 
@@ -68,6 +73,7 @@ class ClientSequencerService
 
         Partition partition = partitionService.getPartition(sequencerName);
         int partitionId = partition.getPartitionId();
+        TRACER.trace("sequencer %s is owned by partition %s", sequencerName, partitionId);
 
         try {
             PartitionClientRequest request = new ClientCreateSequencerDefinitionRequest(sequencerName, partitionId, definition);
@@ -94,9 +100,11 @@ class ClientSequencerService
         ClientInvocationService invocationService = client.getInvocationService();
 
         String sequencerName = sequencer.getSequencerName();
+        TRACER.trace("destroy sequencer %s", sequencerName);
 
         Partition partition = partitionService.getPartition(sequencerName);
         int partitionId = partition.getPartitionId();
+        TRACER.trace("sequencer %s is owned by partition %s", sequencerName, partitionId);
 
         try {
             PartitionClientRequest request = new ClientDestroySequencerDefinitionRequest(sequencerName, partitionId);
@@ -114,15 +122,18 @@ class ClientSequencerService
 
         SequencerProvision provision = provisions.get(sequencerName);
         if (provision != null) {
+            TRACER.trace("return existing sequencer instance for %s", sequencerName);
             return provision;
         }
 
         synchronized (provisions) {
             provision = provisions.get(sequencerName);
             if (provision != null) {
+                TRACER.trace("return existing sequencer instance for %s (under lock)", sequencerName);
                 return provision;
             }
 
+            TRACER.trace("return and cache new sequencer instance for %s", sequencerName);
             provision = sequencerConstructor.createNew(definition);
             provisions.put(sequencerName, provision);
             return provision;

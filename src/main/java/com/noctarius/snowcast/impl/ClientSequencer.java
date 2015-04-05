@@ -132,6 +132,8 @@ public class ClientSequencer
     private static class ClientSequencerContext
             extends AbstractSequencerContext {
 
+        private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerContext.class);
+
         private final HazelcastClientInstanceImpl client;
 
         private volatile String channelRegistration;
@@ -145,6 +147,7 @@ public class ClientSequencer
         @Override
         @Max(8192)
         protected int doAttachLogicalNode(@Nonnull SequencerDefinition definition) {
+            TRACER.trace("doAttachLogicalNode begin");
             PartitionService partitionService = client.getPartitionService();
             ClientInvocationService invocationService = client.getInvocationService();
 
@@ -159,11 +162,14 @@ public class ClientSequencer
                 return client.getSerializationService().toObject(response);
             } catch (Exception e) {
                 throw new SnowcastException(e);
+            } finally {
+                TRACER.trace("doAttachLogicalNode end");
             }
         }
 
         @Override
         protected void doDetachLogicalNode(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
+            TRACER.trace("doDetachLogicalNode begin");
             PartitionService partitionService = client.getPartitionService();
             ClientInvocationService invocationService = client.getInvocationService();
 
@@ -177,15 +183,19 @@ public class ClientSequencer
                 future.get();
             } catch (Exception e) {
                 throw new SnowcastException(e);
+            } finally {
+                TRACER.trace("doDetachLogicalNode end");
             }
         }
 
         private void unregisterClientChannel(@Nonnull ClientSequencer clientSequencer) {
+            TRACER.trace("unregister from channel for sequencer %s", clientSequencer.getSequencerName());
             ClientRemoveChannelOperation operation = new ClientRemoveChannelOperation(getSequencerName(), channelRegistration);
             clientSequencer.stopListening(operation, channelRegistration);
         }
 
         public void initialize(@Nonnull ClientSequencer clientSequencer) {
+            TRACER.trace("register on channel for sequencer %s", clientSequencer.getSequencerName());
             ClientRegisterChannelOperation operation = new ClientRegisterChannelOperation(getSequencerName());
             ClientChannelHandler handler = new ClientChannelHandler(this, clientSequencer);
             channelRegistration = clientSequencer.listen(operation, getSequencerName(), handler);
@@ -194,6 +204,8 @@ public class ClientSequencer
 
     private static class ClientChannelHandler
             implements EventHandler<Portable> {
+
+        private static final Tracer TRACER = TracingUtils.tracer(ClientChannelHandler.class);
 
         private final ClientSequencerContext sequencerContext;
         private final ClientSequencer clientSequencer;
@@ -205,11 +217,13 @@ public class ClientSequencer
 
         @Override
         public void handle(@Nonnull Portable event) {
+            TRACER.trace("New event message retrieved");
             ClientContext context = clientSequencer.getContext();
             SerializationService serializationService = context.getSerializationService();
 
             Object message = serializationService.toObject(event);
             if (message instanceof ClientDestroySequencerNotification) {
+                TRACER.trace("ClientDestroySequencerNotification received");
                 clientSequencer.stateTransition(SnowcastSequenceState.Destroyed);
                 sequencerContext.unregisterClientChannel(clientSequencer);
             }

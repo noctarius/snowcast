@@ -48,6 +48,8 @@ abstract class AbstractSequencerContext {
 
     private static final AtomicLongFieldUpdater<AbstractSequencerContext> TIMESTAMP_AND_COUNTER_UPDATER;
 
+    private static final Tracer TRACER = TracingUtils.tracer(AbstractSequencerContext.class);
+
     static {
         STATE_UPDATER = AtomicReferenceFieldUpdater
                 .newUpdater(AbstractSequencerContext.class, SnowcastSequenceState.class, "state");
@@ -85,6 +87,11 @@ abstract class AbstractSequencerContext {
 
         // Just to prevent the "never-written" warning
         this.timestampAndCounter = 0;
+
+        TRACER.trace("nodeIdShiftFactor: %s", nodeIdShiftFactor);
+        TRACER.trace("logicalNodeIdReadMask: %s", logicalNodeIdReadMask);
+        TRACER.trace("counterReadMask: %s", counterReadMask);
+        TRACER.trace("maxMillisCounter: %s", maxMillisCounter);
     }
 
     @Nonnull
@@ -140,6 +147,7 @@ abstract class AbstractSequencerContext {
 
         // Request sequencer remote assignment
         this.logicalNodeId = doAttachLogicalNode(definition);
+        TRACER.trace("logicalNodeId '%s' attached", logicalNodeId);
     }
 
     final void detachLogicalNode() {
@@ -151,6 +159,7 @@ abstract class AbstractSequencerContext {
 
         // Remove sequencer remote assignment
         doDetachLogicalNode(definition, logicalNodeId);
+        TRACER.trace("logicalNodeId '%s' detached", logicalNodeId);
     }
 
     @Nonnegative
@@ -200,6 +209,7 @@ abstract class AbstractSequencerContext {
             }
 
             if (STATE_UPDATER.compareAndSet(this, state, newState)) {
+                TRACER.trace("stated updated: %s -> %s", state, newState);
                 return true;
             }
         }
@@ -245,6 +255,8 @@ abstract class AbstractSequencerContext {
             if (TIMESTAMP_AND_COUNTER_UPDATER.compareAndSet(this, timestampAndCounter, newTC)) {
                 return (int) counter;
             }
+
+            TRACER.trace("increment compareAndSwap failed, retrying");
         }
     }
 

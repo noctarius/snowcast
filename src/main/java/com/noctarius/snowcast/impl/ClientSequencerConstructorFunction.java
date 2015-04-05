@@ -28,6 +28,8 @@ import java.lang.reflect.Method;
 final class ClientSequencerConstructorFunction
         implements ConstructorFunction<SequencerDefinition, SequencerProvision> {
 
+    private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerConstructorFunction.class);
+
     private final HazelcastClientInstanceImpl client;
     private final ProxyManager proxyManager;
     private final ClientSequencerService sequencerService;
@@ -45,6 +47,7 @@ final class ClientSequencerConstructorFunction
     @Nonnull
     @Override
     public SequencerProvision createNew(@Nonnull SequencerDefinition definition) {
+        TRACER.trace("create new provision for definition %s", definition);
         ClientSequencer sequencer = new ClientSequencer(client, sequencerService, definition);
         initializeProxy(sequencer);
         sequencer.attachLogicalNode();
@@ -53,6 +56,7 @@ final class ClientSequencerConstructorFunction
 
     private void initializeProxy(@Nonnull ClientSequencer sequencer) {
         try {
+            TRACER.trace("initialize sequencer proxy %s", sequencer);
             proxyManagerInitialize.invoke(proxyManager, sequencer);
         } catch (Exception e) {
             throw new SnowcastException(e);
