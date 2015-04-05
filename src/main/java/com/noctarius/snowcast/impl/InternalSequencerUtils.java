@@ -135,7 +135,10 @@ public final class InternalSequencerUtils {
     }
 
     public static void printStartupMessage(boolean lazyConfiguration, boolean client) {
-        StringBuilder sb = new StringBuilder(SnowcastConstants.SNOWCAST_ASCII_LOGO).append('\n');
+        StringBuilder sb = new StringBuilder();
+        if (!SnowcastConstants.LOGO_DISABLED) {
+            sb.append(SnowcastConstants.SNOWCAST_ASCII_LOGO).append('\n');
+        }
         sb.append("snowcast ").append(client ? "client" : "node").append(" mode - ");
         sb.append(" version: ").append(SnowcastConstants.VERSION).append("    ");
         sb.append("build-date: ").append(SnowcastConstants.BUILD_DATE).append('\n');

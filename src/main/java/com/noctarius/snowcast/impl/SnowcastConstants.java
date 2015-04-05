@@ -78,6 +78,9 @@ public final class SnowcastConstants {
     // Is logging enabled at all
     public static final boolean LOGGING_ENABLED;
 
+    // Is logo disabled
+    public static final boolean LOGO_DISABLED;
+
     // Maximum retries to generate an ID before giving up
     public static final int MAX_RETRY_GENERATE_IDS = 100;
 
@@ -93,6 +96,9 @@ public final class SnowcastConstants {
 
     // System property to enable internal logging
     private static final String SNOWCAST_LOGGING_ENABLED_PROPERTY = "snowcast.logging.enabled";
+
+    // System property to disable startup logo
+    private static final String SNOWCAST_LOGO_DISABLE_PROPERTY = "snowcast.logo.disable";
 
     static {
         String version = "Unknown version";
@@ -111,7 +117,9 @@ public final class SnowcastConstants {
         }
         VERSION = version;
         BUILD_DATE = buildDate;
+
         LOGGING_ENABLED = Boolean.getBoolean(SNOWCAST_LOGGING_ENABLED_PROPERTY);
+        LOGO_DISABLED = Boolean.getBoolean(SNOWCAST_LOGO_DISABLE_PROPERTY);
     }
 
     private SnowcastConstants() {
