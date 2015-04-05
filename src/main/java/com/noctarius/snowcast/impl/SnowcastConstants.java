@@ -75,6 +75,9 @@ public final class SnowcastConstants {
     // snowcast build date
     public static final String BUILD_DATE;
 
+    // Is logging enabled at all
+    public static final boolean LOGGING_ENABLED;
+
     // Maximum retries to generate an ID before giving up
     public static final int MAX_RETRY_GENERATE_IDS = 100;
 
@@ -87,6 +90,9 @@ public final class SnowcastConstants {
     // Property keys from build information file
     private static final String SNOWCAST_VERSION_PROPERTY = "snowcast-version";
     private static final String SNOWCAST_BUILD_DATE_PROPERTY = "snowcast-build-date";
+
+    // System property to enable internal logging
+    private static final String SNOWCAST_LOGGING_ENABLED_PROPERTY = "snowcast.logging.enabled";
 
     static {
         String version = "Unknown version";
@@ -105,6 +111,7 @@ public final class SnowcastConstants {
         }
         VERSION = version;
         BUILD_DATE = buildDate;
+        LOGGING_ENABLED = Boolean.getBoolean(SNOWCAST_LOGGING_ENABLED_PROPERTY);
     }
 
     private SnowcastConstants() {
