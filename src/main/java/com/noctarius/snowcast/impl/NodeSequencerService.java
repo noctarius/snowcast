@@ -132,12 +132,12 @@ public class NodeSequencerService
 
     @Override
     public void reset() {
-        // TODO WUT?
+        // No action here, however not sure if this shouldn't kill all sequencers
     }
 
     @Override
     public void shutdown(boolean terminate) {
-        // TODO kill all sequencers
+        // No action here, however not sure if this shouldn't kill all sequencers
     }
 
     @Nullable
