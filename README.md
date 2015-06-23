@@ -15,6 +15,7 @@ The snowcast project is not sponsored or started by nor affiliated to Hazelcast,
 * [Why snowcast?](#why-snowcast)
 * [Usage of snowcast](#usage-of-snowcast)
 * [Hazelcast Configuration](#hazelcast-configuration)
+* [Hazelcast Client Configuration](#hazelcast-client-configuration)
 * [Maven Coordinates](#maven-coordinates)
 * [Javadoc](#javadoc)
 * [Multithreading](#multithreading)
@@ -213,6 +214,21 @@ For Technical Operations: To prevent lazy configuration from happening and to pr
 ```
 
 The property does not have to have a value, the simple existence of that property is enough to prevent lazy initialization from happening.
+
+### Hazelcast Client Configuration
+
+snowcast currently supports Hazelcast 3.4.x as well as Hazelcast 3.5.x and automatically registers a matching communication system.
+
+To use snowcast on Hazelcast clients no special configuration is necessary. Since clients just communicate with Hazelcast clusters using internal operations, no special service needs to registered, however the server-side must be set up by using [declarative](#using-the-declarative-configuration) or [programmatic](#using-the-configuration-api) to handle client requests. The lazy configuration hack doesn't work in that case. 
+
+Knowing that no special configuration is necessary, running a snowcast instance over a Hazelcast client is straight forward:
+
+```java
+HazelcastInstance hazelcastInstance = HazelcastClient.newHazelcastClient();
+Snowcast snowcast = SnowcastSystem.snowcast(client);
+```
+
+After initialization the snowcast instance can be used the same way as on a node side.
 
 ### Maven Coordinates
 
