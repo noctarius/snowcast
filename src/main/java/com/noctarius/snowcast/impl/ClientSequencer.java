@@ -19,7 +19,6 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.client.PartitionClientRequest;
 import com.hazelcast.client.spi.ClientContext;
-import com.hazelcast.client.spi.ClientInvocationService;
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.spi.EventHandler;
 import com.hazelcast.core.ICompletableFuture;
@@ -49,11 +48,11 @@ public class ClientSequencer
     private final ClientSequencerService sequencerService;
 
     ClientSequencer(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ClientSequencerService sequencerService,
-                    @Nonnull SequencerDefinition definition) {
+                    @Nonnull SequencerDefinition definition, @Nonnull ClientInvocator clientInvocator) {
 
         super(SnowcastConstants.SERVICE_NAME, definition.getSequencerName());
         this.sequencerService = sequencerService;
-        this.sequencerContext = new ClientSequencerContext(client, definition);
+        this.sequencerContext = new ClientSequencerContext(client, definition, clientInvocator);
     }
 
     @Nonnull
@@ -135,12 +134,16 @@ public class ClientSequencer
         private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerContext.class);
 
         private final HazelcastClientInstanceImpl client;
+        private final ClientInvocator clientInvocator;
 
         private volatile String channelRegistration;
 
-        private ClientSequencerContext(@Nonnull HazelcastClientInstanceImpl client, @Nonnull SequencerDefinition definition) {
+        private ClientSequencerContext(@Nonnull HazelcastClientInstanceImpl client, @Nonnull SequencerDefinition definition,
+                                       @Nonnull ClientInvocator clientInvocator) {
+
             super(definition);
             this.client = client;
+            this.clientInvocator = clientInvocator;
         }
 
         @Min(128)
@@ -149,15 +152,12 @@ public class ClientSequencer
         protected int doAttachLogicalNode(@Nonnull SequencerDefinition definition) {
             TRACER.trace("doAttachLogicalNode begin");
             PartitionService partitionService = client.getPartitionService();
-            ClientInvocationService invocationService = client.getInvocationService();
-
             Partition partition = partitionService.getPartition(getSequencerName());
             int partitionId = partition.getPartitionId();
 
             try {
                 PartitionClientRequest request = new ClientAttachLogicalNodeRequest(getSequencerName(), partitionId, definition);
-                //ICompletableFuture<Object> future = new ClientInvocation(client, request, partitionId).invoke();
-                ICompletableFuture<Object> future = invocationService.invokeOnPartitionOwner(request, partitionId);
+                ICompletableFuture<Object> future = clientInvocator.invoke(partitionId, request);
                 Object response = future.get();
                 return client.getSerializationService().toObject(response);
             } catch (Exception e) {
@@ -171,15 +171,12 @@ public class ClientSequencer
         protected void doDetachLogicalNode(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
             TRACER.trace("doDetachLogicalNode begin");
             PartitionService partitionService = client.getPartitionService();
-            ClientInvocationService invocationService = client.getInvocationService();
-
             Partition partition = partitionService.getPartition(getSequencerName());
             int partitionId = partition.getPartitionId();
 
             try {
                 PartitionClientRequest request = new ClientDetachLogicalNodeRequest(definition, partitionId, logicalNodeId);
-                //ICompletableFuture<Object> future = new ClientInvocation(client, request, partitionId).invoke();
-                ICompletableFuture<Object> future = invocationService.invokeOnPartitionOwner(request, partitionId);
+                ICompletableFuture<Object> future = clientInvocator.invoke(partitionId, request);
                 future.get();
             } catch (Exception e) {
                 throw new SnowcastException(e);

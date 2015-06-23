@@ -18,6 +18,8 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.core.DistributedObject;
+import com.hazelcast.instance.BuildInfo;
+import com.hazelcast.instance.BuildInfoProvider;
 import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.nio.serialization.SerializationService;
 import com.hazelcast.partition.InternalPartitionService;
@@ -34,7 +36,6 @@ import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.PartitionMigrationEvent;
 import com.hazelcast.spi.PartitionReplicationEvent;
 import com.hazelcast.spi.RemoteService;
-import com.hazelcast.spi.impl.EventServiceImpl;
 import com.hazelcast.util.ConcurrencyUtil;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
@@ -52,6 +53,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -72,6 +74,8 @@ public class NodeSequencerService
     private final ConcurrentMap<Integer, SequencerPartition> partitions;
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
+    private final Method getListenerMethod;
+
     private NodeEngine nodeEngine;
     private EventService eventService;
     private SerializationService serializationService;
@@ -79,6 +83,7 @@ public class NodeSequencerService
     public NodeSequencerService() {
         this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
         this.partitions = new ConcurrentHashMap<Integer, SequencerPartition>();
+        this.getListenerMethod = findEventRegistrationGetListener();
     }
 
     @Override
@@ -277,8 +282,7 @@ public class NodeSequencerService
         registrations = new ArrayList<EventRegistration>(registrations);
         Iterator<EventRegistration> iterator = registrations.iterator();
         while (iterator.hasNext()) {
-            EventServiceImpl.Registration registration = (EventServiceImpl.Registration) iterator.next();
-            ClientChannelHandler channelHandler = (ClientChannelHandler) registration.getListener();
+            ClientChannelHandler channelHandler = getClientChannelHandler(iterator.next());
             if (clientUuid.equals(channelHandler.endpoint.getUuid())) {
                 iterator.remove();
             }
@@ -333,6 +337,46 @@ public class NodeSequencerService
 
     @Override
     public void destroyDistributedObject(@Nonnull String objectName) {
+    }
+
+    private ClientChannelHandler getClientChannelHandler(EventRegistration registration) {
+        try {
+            return (ClientChannelHandler) getListenerMethod.invoke(registration);
+
+        } catch (Exception e) {
+            String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage("registration");
+            throw new SnowcastException(message, e);
+        }
+    }
+
+    private Method findEventRegistrationGetListener() {
+        BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
+        if (InternalSequencerUtils.isHazelcast34()) {
+            return hz34EventRegistrationGetListener(buildInfo);
+        }
+        return hz35EventRegistrationGetListener(buildInfo);
+    }
+
+    private Method hz34EventRegistrationGetListener(BuildInfo buildInfo) {
+        try {
+            Class<?> clazz = Class.forName("com.hazelcast.spi.impl.EventServiceImpl$Registration");
+            return clazz.getMethod("getListener");
+
+        } catch (Exception e) {
+            String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());
+            throw new SnowcastException(message, e);
+        }
+    }
+
+    private Method hz35EventRegistrationGetListener(BuildInfo buildInfo) {
+        try {
+            Class<?> clazz = Class.forName("com.hazelcast.spi.impl.eventservice.impl.Registration");
+            return clazz.getMethod("getListener");
+
+        } catch (Exception e) {
+            String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());
+            throw new SnowcastException(message, e);
+        }
     }
 
     private static class ClientChannelHandler {

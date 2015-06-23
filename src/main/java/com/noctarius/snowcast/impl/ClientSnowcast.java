@@ -40,12 +40,14 @@ class ClientSnowcast
     private final short backupCount;
     private final HazelcastClientInstanceImpl client;
     private final ClientSequencerService sequencerService;
+    private final ClientInvocator clientInvocator;
 
     ClientSnowcast(@Nonnull HazelcastInstance hazelcastInstance, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
         this.backupCount = backupCount;
         this.client = getHazelcastClient(hazelcastInstance);
+        this.clientInvocator = buildClientInvocator(client);
         ProxyManager proxyManager = getProxyManager(client);
-        this.sequencerService = new ClientSequencerService(client, proxyManager);
+        this.sequencerService = new ClientSequencerService(client, proxyManager, clientInvocator);
         printStartupMessage(false, true);
     }
 
@@ -93,5 +95,13 @@ class ClientSnowcast
             String message = ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED.buildMessage();
             throw new SnowcastException(message, e);
         }
+    }
+
+    @Nonnull
+    private ClientInvocator buildClientInvocator(HazelcastClientInstanceImpl client) {
+        if (InternalSequencerUtils.isHazelcast34()) {
+            return new Hazelcast34ClientInvocator(client);
+        }
+        return new Hazelcast35ClientInvocator(client);
     }
 }

@@ -31,14 +31,17 @@ final class ClientSequencerConstructorFunction
     private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerConstructorFunction.class);
 
     private final HazelcastClientInstanceImpl client;
+    private final ClientInvocator clientInvocator;
     private final ProxyManager proxyManager;
     private final ClientSequencerService sequencerService;
     private final Method proxyManagerInitialize;
 
     ClientSequencerConstructorFunction(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ProxyManager proxyManager,
-                                       @Nonnull ClientSequencerService sequencerService) {
+                                       @Nonnull ClientSequencerService sequencerService,
+                                       @Nonnull ClientInvocator clientInvocator) {
 
         this.client = client;
+        this.clientInvocator = clientInvocator;
         this.proxyManager = proxyManager;
         this.sequencerService = sequencerService;
         this.proxyManagerInitialize = getInitializeMethod();
@@ -48,7 +51,7 @@ final class ClientSequencerConstructorFunction
     @Override
     public SequencerProvision createNew(@Nonnull SequencerDefinition definition) {
         TRACER.trace("create new provision for definition %s", definition);
-        ClientSequencer sequencer = new ClientSequencer(client, sequencerService, definition);
+        ClientSequencer sequencer = new ClientSequencer(client, sequencerService, definition, clientInvocator);
         initializeProxy(sequencer);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);

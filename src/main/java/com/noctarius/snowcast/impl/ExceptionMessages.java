@@ -141,7 +141,12 @@ public enum ExceptionMessages {
     /**
      * Generation of an ID failed after %s retries
      */
-    GENERATION_MAX_RETRY_EXCEEDED("Generation of an ID failed after %s retries");
+    GENERATION_MAX_RETRY_EXCEEDED("Generation of an ID failed after %s retries"),
+
+    /**
+     * Setting up the internal state failed, unsupported Hazelcast version?
+     */
+    INTERNAL_SETUP_FAILED("Setting up the internal state failed, unsupported Hazelcast (%s) version?");
 
     private final String template;
 

@@ -16,6 +16,8 @@
  */
 package com.noctarius.snowcast.impl;
 
+import com.hazelcast.instance.BuildInfo;
+import com.hazelcast.instance.BuildInfoProvider;
 import com.hazelcast.util.QuickMath;
 import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 import com.noctarius.snowcast.SnowcastSequenceComparator;
@@ -146,5 +148,10 @@ public final class InternalSequencerUtils {
         if (lazyConfiguration) {
             System.err.println("WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!\n");
         }
+    }
+
+    public static boolean isHazelcast34() {
+        BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
+        return buildInfo != null && buildInfo.getVersion() != null && buildInfo.getVersion().startsWith("3.4");
     }
 }
