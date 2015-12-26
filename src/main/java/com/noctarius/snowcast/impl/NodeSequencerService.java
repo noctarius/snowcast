@@ -351,7 +351,7 @@ public class NodeSequencerService
 
     private Method findEventRegistrationGetListener() {
         BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
-        if (InternalSequencerUtils.isHazelcast34()) {
+        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_4) {
             return hz34EventRegistrationGetListener(buildInfo);
         }
         return hz35EventRegistrationGetListener(buildInfo);

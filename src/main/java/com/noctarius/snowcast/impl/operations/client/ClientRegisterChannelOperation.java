@@ -18,9 +18,13 @@ package com.noctarius.snowcast.impl.operations.client;
 
 import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.spi.EventRegistration;
+import com.noctarius.snowcast.SnowcastException;
+import com.noctarius.snowcast.impl.InternalSequencerUtils;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerPortableHook;
 import com.noctarius.snowcast.impl.SnowcastConstants;
+
+import java.lang.reflect.Method;
 
 public class ClientRegisterChannelOperation
         extends AbstractClientSequencerOperation {
@@ -40,8 +44,21 @@ public class ClientRegisterChannelOperation
         ClientEndpoint endpoint = getEndpoint();
         String registrationId = registration.getId();
 
-        endpoint.setListenerRegistration(SnowcastConstants.SERVICE_NAME, endpoint.getUuid(), registrationId);
+        if (InternalSequencerUtils.getHazelcastVersion() != SnowcastConstants.HazelcastVersion.V_3_5_x) {
+            activateListener(endpoint, registrationId);
+        }
         endpoint.sendResponse(registrationId, getCallId());
+    }
+
+    private void activateListener(ClientEndpoint endpoint, String registrationId) {
+        try {
+            Method setListenerRegistration = ClientEndpoint.class
+                    .getMethod("setListenerRegistration", String.class, String.class, String.class);
+            setListenerRegistration.setAccessible(true);
+            setListenerRegistration.invoke(endpoint, SnowcastConstants.SERVICE_NAME, endpoint.getUuid(), registrationId);
+        } catch (Exception e) {
+            throw new SnowcastException(e);
+        }
     }
 
     @Override

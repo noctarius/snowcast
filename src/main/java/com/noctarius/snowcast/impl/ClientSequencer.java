@@ -128,6 +128,11 @@ public class ClientSequencer
         return sequencerService;
     }
 
+    private void unregisterClientChannel(@Nonnull String uuid) {
+        ClientContext context = getContext();
+        context.getListenerService().deRegisterListener(uuid);
+    }
+
     private static class ClientSequencerContext
             extends AbstractSequencerContext {
 
@@ -187,8 +192,18 @@ public class ClientSequencer
 
         private void unregisterClientChannel(@Nonnull ClientSequencer clientSequencer) {
             TRACER.trace("unregister from channel for sequencer %s", clientSequencer.getSequencerName());
-            ClientRemoveChannelOperation operation = new ClientRemoveChannelOperation(getSequencerName(), channelRegistration);
-            clientSequencer.stopListening(operation, channelRegistration);
+            try {
+                ClientRemoveChannelOperation operation = new ClientRemoveChannelOperation(getSequencerName(), channelRegistration);
+                ICompletableFuture<Boolean> future = clientInvocator.invoke(-1, operation);
+                boolean result = future.get() == null ? false : (Boolean) future.get();
+                if (result) {
+                    clientSequencer.unregisterClientChannel(channelRegistration);
+                }
+            } catch (Exception e) {
+                throw new SnowcastException(e);
+            } finally {
+                TRACER.trace("unregisterClientChannel end");
+            }
         }
 
         public void initialize(@Nonnull ClientSequencer clientSequencer) {

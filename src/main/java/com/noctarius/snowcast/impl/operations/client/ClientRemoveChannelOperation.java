@@ -16,22 +16,30 @@
  */
 package com.noctarius.snowcast.impl.operations.client;
 
-import com.hazelcast.client.impl.client.BaseClientRemoveListenerRequest;
+import com.hazelcast.client.impl.client.CallableClientRequest;
+import com.hazelcast.nio.serialization.PortableReader;
+import com.hazelcast.nio.serialization.PortableWriter;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
 import com.noctarius.snowcast.impl.SequencerPortableHook;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 
+import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.security.Permission;
 
 public class ClientRemoveChannelOperation
-        extends BaseClientRemoveListenerRequest {
+        extends CallableClientRequest {
+
+    protected String sequencerName;
+    protected String registrationId;
 
     public ClientRemoveChannelOperation() {
     }
 
-    public ClientRemoveChannelOperation(String sequencerName, String registrationId) {
-        super(sequencerName, registrationId);
+    public ClientRemoveChannelOperation(@Nonnull String sequencerName, @Nonnull String registrationId) {
+        this.sequencerName = sequencerName;
+        this.registrationId = registrationId;
     }
 
     @Override
@@ -39,7 +47,7 @@ public class ClientRemoveChannelOperation
             throws Exception {
 
         NodeSequencerService sequencerService = getService();
-        sequencerService.unregisterClientChannel(getName(), registrationId);
+        sequencerService.unregisterClientChannel(sequencerName, registrationId);
         return Boolean.TRUE;
     }
 
@@ -61,5 +69,33 @@ public class ClientRemoveChannelOperation
     @Override
     public Permission getRequiredPermission() {
         return null;
+    }
+
+    @Override
+    public String getDistributedObjectName() {
+        return sequencerName;
+    }
+
+    @Override
+    public void write(@Nonnull PortableWriter writer)
+            throws IOException {
+        writer.writeUTF("n", sequencerName);
+        writer.writeUTF("r", registrationId);
+    }
+
+    @Override
+    public void read(@Nonnull PortableReader reader)
+            throws IOException {
+        sequencerName = reader.readUTF("n");
+        registrationId = reader.readUTF("r");
+    }
+
+    @Override
+    public Object[] getParameters() {
+        return new Object[]{registrationId};
+    }
+
+    public String getSequencerName() {
+        return sequencerName;
     }
 }

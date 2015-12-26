@@ -99,7 +99,7 @@ class ClientSnowcast
 
     @Nonnull
     private ClientInvocator buildClientInvocator(HazelcastClientInstanceImpl client) {
-        if (InternalSequencerUtils.isHazelcast34()) {
+        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_4) {
             return new Hazelcast34ClientInvocator(client);
         }
         return new Hazelcast35ClientInvocator(client);

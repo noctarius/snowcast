@@ -100,6 +100,13 @@ public final class SnowcastConstants {
     // System property to disable startup logo
     private static final String SNOWCAST_LOGO_DISABLE_PROPERTY = "snowcast.logo.disable";
 
+    public enum HazelcastVersion {
+        V_3_4,
+        V_3_5,
+        V_3_5_x,
+        Unknown
+    }
+
     static {
         String version = "Unknown version";
         String buildDate = "Unknown build-date";
