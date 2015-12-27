@@ -101,7 +101,7 @@ public final class SnowcastSequenceUtils {
     public static int logicalNodeId(long sequenceId, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShiftFactor = calculateLogicalNodeShifting(nodeCount);
-        long mask = calculateLogicalNodeMask(maxLogicalNodeCount, nodeIdShiftFactor);
+        long mask = calculateLogicalNodeMask(nodeCount, nodeIdShiftFactor);
         return InternalSequencerUtils.logicalNodeId(sequenceId, nodeIdShiftFactor, mask);
     }
 
@@ -133,7 +133,7 @@ public final class SnowcastSequenceUtils {
     public static int counterValue(long sequenceId, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShiftFactor = calculateLogicalNodeShifting(nodeCount);
-        long mask = calculateCounterMask(maxLogicalNodeCount, nodeIdShiftFactor);
+        long mask = calculateCounterMask(nodeCount, nodeIdShiftFactor);
         return InternalSequencerUtils.counterValue(sequenceId, mask);
     }
 
@@ -184,7 +184,7 @@ public final class SnowcastSequenceUtils {
     public static int compareSequence(long sequenceId1, long sequenceId2, @Min(128) @Max(8192) int maxLogicalNodeCount) {
         int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
         int nodeIdShifting = calculateLogicalNodeShifting(nodeCount);
-        long counterMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShifting);
+        long counterMask = calculateCounterMask(nodeCount, nodeIdShifting);
 
         long timestampValue1 = timestampValue(sequenceId1);
         long timestampValue2 = timestampValue(sequenceId2);

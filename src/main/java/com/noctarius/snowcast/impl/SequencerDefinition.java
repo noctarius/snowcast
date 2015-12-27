@@ -17,12 +17,16 @@
 package com.noctarius.snowcast.impl;
 
 import com.noctarius.snowcast.SnowcastEpoch;
+import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+
+import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_LOWER_BOUND;
+import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_UPPER_BOUND;
 
 public final class SequencerDefinition {
     private final String sequencerName;
@@ -33,6 +37,15 @@ public final class SequencerDefinition {
     public SequencerDefinition(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
                                @Min(128) @Max(8192) int maxLogicalNodeCount,
                                @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
+
+        if (maxLogicalNodeCount < NODE_ID_LOWER_BOUND) {
+            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("smaller", NODE_ID_LOWER_BOUND);
+            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
+        }
+        if (maxLogicalNodeCount > NODE_ID_UPPER_BOUND) {
+            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("larger", NODE_ID_UPPER_BOUND);
+            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
+        }
 
         this.sequencerName = sequencerName;
         this.epoch = epoch;
@@ -53,6 +66,11 @@ public final class SequencerDefinition {
     @Nonnegative
     public int getMaxLogicalNodeCount() {
         return maxLogicalNodeCount;
+    }
+
+    @Nonnegative
+    public int getBoundedMaxLogicalNodeCount() {
+        return InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
     }
 
     @Min(128)

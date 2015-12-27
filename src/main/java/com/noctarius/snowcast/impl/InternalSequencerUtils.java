@@ -19,6 +19,7 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.instance.BuildInfo;
 import com.hazelcast.instance.BuildInfoProvider;
 import com.hazelcast.util.QuickMath;
+import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 import com.noctarius.snowcast.SnowcastSequenceComparator;
 import com.noctarius.snowcast.SnowcastSequencer;
@@ -114,6 +115,11 @@ public final class InternalSequencerUtils {
 
     public static long generateSequenceId(@Nonnegative long timestamp, @Min(128) @Max(8192) int logicalNodeID,
                                           @Nonnegative int nextId, @Nonnegative int nodeIdShiftFactor) {
+
+        int maxCounter = calculateMaxMillisCounter(nodeIdShiftFactor);
+        if (maxCounter < nextId) {
+            throw new SnowcastException("Given nextId is greater than allowed max counter value");
+        }
 
         long id = timestamp << SHIFT_TIMESTAMP;
         id |= logicalNodeID << nodeIdShiftFactor;

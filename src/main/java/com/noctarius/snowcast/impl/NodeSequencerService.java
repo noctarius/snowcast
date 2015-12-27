@@ -61,7 +61,6 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class NodeSequencerService
@@ -98,8 +97,7 @@ public class NodeSequencerService
     public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
                                              @Min(128) @Max(8192) int maxLogicalNodeCount, short backupCount) {
 
-        int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
-        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
+        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, maxLogicalNodeCount, backupCount);
 
         Operation operation = new CreateSequencerDefinitionOperation(definition);
         SequencerDefinition realDefinition = invoke(operation, sequencerName);

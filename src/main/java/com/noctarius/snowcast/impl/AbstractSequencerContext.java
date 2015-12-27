@@ -79,7 +79,7 @@ abstract class AbstractSequencerContext {
         this.sequencerName = definition.getSequencerName();
         this.epoch = definition.getEpoch();
 
-        int maxLogicalNodeCount = definition.getMaxLogicalNodeCount();
+        int maxLogicalNodeCount = definition.getBoundedMaxLogicalNodeCount();
         this.nodeIdShiftFactor = calculateLogicalNodeShifting(maxLogicalNodeCount);
         this.logicalNodeIdReadMask = calculateLogicalNodeMask(maxLogicalNodeCount, nodeIdShiftFactor);
         this.counterReadMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShiftFactor);

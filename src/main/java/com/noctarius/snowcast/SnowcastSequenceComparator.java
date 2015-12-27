@@ -22,12 +22,6 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Comparator;
 
-import static com.noctarius.snowcast.SnowcastSequenceUtils.timestampValue;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounterMask;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.counterValue;
-
 /**
  * <p>This {@link java.util.Comparator} implementation can be used to compare and order two distinct
  * snowcast sequencer ids by their corresponding timestamps and counter values.<br/>
@@ -54,7 +48,7 @@ import static com.noctarius.snowcast.impl.InternalSequencerUtils.counterValue;
 public final class SnowcastSequenceComparator
         implements Comparator<Long> {
 
-    private final long counterMask;
+    private final int maxLogicalNodeCount;
 
     /**
      * This constructor creates a new SnowcastSequenceComparator instance bound to the given
@@ -70,9 +64,7 @@ public final class SnowcastSequenceComparator
      * @param maxLogicalNodeCount the maximal logical node count
      */
     public SnowcastSequenceComparator(@Min(128) @Max(8192) int maxLogicalNodeCount) {
-        int nodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
-        int nodeIdShifting = calculateLogicalNodeShifting(nodeCount);
-        this.counterMask = calculateCounterMask(maxLogicalNodeCount, nodeIdShifting);
+        this.maxLogicalNodeCount = maxLogicalNodeCount;
     }
 
     /**
@@ -80,18 +72,6 @@ public final class SnowcastSequenceComparator
      */
     @Override
     public int compare(@Nonnull Long sequenceId1, @Nonnull Long sequenceId2) {
-        long timestampValue1 = timestampValue(sequenceId1);
-        long timestampValue2 = timestampValue(sequenceId2);
-
-        if (timestampValue1 < timestampValue2) {
-            return -1;
-        } else if (timestampValue1 > timestampValue2) {
-            return 1;
-        }
-
-        int counterValue1 = counterValue(sequenceId1, counterMask);
-        int counterValue2 = counterValue(sequenceId2, counterMask);
-
-        return counterValue1 < counterValue2 ? -1 : counterValue1 == counterValue2 ? 0 : 1;
+        return SnowcastSequenceUtils.compareSequence(sequenceId1, sequenceId2, maxLogicalNodeCount);
     }
 }

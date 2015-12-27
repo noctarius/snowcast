@@ -68,8 +68,7 @@ class ClientSequencerService
         TRACER.trace("register sequencer %s with epoch %s, max nodes %s, backups %s", sequencerName, epoch, maxLogicalNodeCount,
                 backupCount);
 
-        int boundedMaxLogicalNodeCount = calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
-        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, boundedMaxLogicalNodeCount, backupCount);
+        SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, maxLogicalNodeCount, backupCount);
 
         PartitionService partitionService = client.getPartitionService();
         Partition partition = partitionService.getPartition(sequencerName);

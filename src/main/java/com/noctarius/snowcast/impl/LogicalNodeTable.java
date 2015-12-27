@@ -60,7 +60,7 @@ class LogicalNodeTable {
     private volatile Object[] assignmentTable;
 
     LogicalNodeTable(@Nonnegative int partitionId, @Nonnull SequencerDefinition definition) {
-        this(partitionId, definition, new Object[definition.getMaxLogicalNodeCount()]);
+        this(partitionId, definition, new Object[definition.getBoundedMaxLogicalNodeCount()]);
     }
 
     private LogicalNodeTable(@Nonnegative int partitionId, @Nonnull SequencerDefinition definition,
@@ -203,7 +203,7 @@ class LogicalNodeTable {
         SequencerDefinition definition = in.readObject();
         short size = in.readShort();
 
-        Object[] assignmentTable = new Object[definition.getMaxLogicalNodeCount()];
+        Object[] assignmentTable = new Object[definition.getBoundedMaxLogicalNodeCount()];
         for (int i = 0; i < size; i++) {
             short index = in.readShort();
             Address address = new Address();
