@@ -29,6 +29,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.generateSequenceId;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
@@ -234,6 +238,72 @@ public class ClientBasicTestCase
             assertNotNull(sequencer);
 
             sequencer.attachLogicalNode();
+        } finally {
+            HazelcastClient.shutdownAll();
+            Hazelcast.shutdownAll();
+        }
+    }
+
+    @Test
+    public void test_sequencer_counter_value()
+            throws Exception {
+
+        Hazelcast.newHazelcastInstance(config);
+        HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(client);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            int boundedNodeCount = calculateBoundedMaxLogicalNodeCount(128);
+            int shifting = calculateLogicalNodeShifting(boundedNodeCount);
+            long sequence = generateSequenceId(10000, 10, 100, shifting);
+
+            assertEquals(100, sequencer.counterValue(sequence));
+        } finally {
+            HazelcastClient.shutdownAll();
+            Hazelcast.shutdownAll();
+        }
+    }
+
+    @Test
+    public void test_sequencer_timestamp()
+            throws Exception {
+
+        Hazelcast.newHazelcastInstance(config);
+        HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(client);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            int boundedNodeCount = calculateBoundedMaxLogicalNodeCount(128);
+            int shifting = calculateLogicalNodeShifting(boundedNodeCount);
+            long sequence = generateSequenceId(10000, 10, 100, shifting);
+
+            assertEquals(10000, sequencer.timestampValue(sequence));
+        } finally {
+            HazelcastClient.shutdownAll();
+            Hazelcast.shutdownAll();
+        }
+    }
+
+    @Test
+    public void test_sequencer_logical_node_id()
+            throws Exception {
+
+        Hazelcast.newHazelcastInstance(config);
+        HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
+
+        try {
+            Snowcast snowcast = SnowcastSystem.snowcast(client);
+            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
+
+            int boundedNodeCount = calculateBoundedMaxLogicalNodeCount(128);
+            int shifting = calculateLogicalNodeShifting(boundedNodeCount);
+            long sequence = generateSequenceId(10000, 10, 100, shifting);
+
+            assertEquals(10, sequencer.logicalNodeId(sequence));
         } finally {
             HazelcastClient.shutdownAll();
             Hazelcast.shutdownAll();
