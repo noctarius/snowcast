@@ -72,13 +72,19 @@ public class LogicalNodeTableTestCase {
     public void test_attach_exceed_nodes_count()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 1, (short) 1);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
-        Address address1 = new Address("localhost", 12345);
-        int logicalNodeId1 = logicalNodeTable.attachLogicalNode(address1);
-        Address assigned1 = logicalNodeTable.getAttachedLogicalNode(logicalNodeId1);
-        assertEquals(address1, assigned1);
+        try {
+            for (int i = 0; i < 128; i++) {
+                Address address = new Address("localhost", 10000 + i);
+                int logicalNodeId = logicalNodeTable.attachLogicalNode(address);
+                Address assigned = logicalNodeTable.getAttachedLogicalNode(logicalNodeId);
+                assertEquals(address, assigned);
+            }
+        } catch (SnowcastNodeIdsExceededException e) {
+            fail("Node Ids exceeded too early");
+        }
 
         Address address2 = new Address("localhost", 54321);
         logicalNodeTable.attachLogicalNode(address2);
@@ -88,7 +94,7 @@ public class LogicalNodeTableTestCase {
     public void test_illegal_detach()
             throws Exception {
 
-        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 2, (short) 1);
+        SequencerDefinition definition = new SequencerDefinition("empty", SnowcastEpoch.byTimestamp(1), 128, (short) 1);
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         Address address1 = new Address("localhost", 12345);
