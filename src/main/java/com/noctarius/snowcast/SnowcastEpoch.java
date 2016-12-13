@@ -28,18 +28,18 @@ import java.util.concurrent.TimeUnit;
  * is defined as a offset to the standard Java timestamp and is used to offer more
  * bits to the internal timestamp value of a snowcast sequence ID.</p>
  * <p>To build a SnowcastEpoch multiple ways are possible. The most commonly used is
- * utilizing the Java Calendar API as shown in the following snippet:
+ * utilizing the Java Calendar API as shown in the following snippet:</p>
  * <pre>
  *     Calendar calendar = GregorianCalendar.getInstance();
  *     calendar.set( 2014, 1, 1, 0, 0, 0 );
  *     SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
- * </pre></p>
+ * </pre>
  * <p>Another way is by providing a Java long timestamp value. The important note is,
  * that Java timestamps are based on milliseconds whereas standard Linux timestamps
- * are based on seconds
+ * are based on seconds</p>
  * <pre>
  *     SnowcastEpoch epoch = SnowcastEpoch.byTimestamp( 13885308000000 );
- * </pre></p>
+ * </pre>
  */
 public final class SnowcastEpoch {
 

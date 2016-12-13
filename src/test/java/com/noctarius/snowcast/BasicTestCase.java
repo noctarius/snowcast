@@ -79,27 +79,7 @@ public class BasicTestCase
     }
 
     @Test(expected = SnowcastException.class)
-    public void test_simple_sequencer_initialization_fails_prevent_lazy_configuration()
-            throws Exception {
-
-        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
-
-        try {
-            System.setProperty(SnowcastConstants.PROPERTY_PREVENT_LAZY_CONFIGURATION, "");
-
-            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
-            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
-
-            assertNotNull(sequencer);
-        } finally {
-            factory.shutdownAll();
-            System.getProperties().remove(SnowcastConstants.PROPERTY_PREVENT_LAZY_CONFIGURATION);
-        }
-    }
-
-    @Test
-    public void test_simple_sequencer_initialization_lazy_initialization()
+    public void test_simple_sequencer_initialization_fails_service_not_registered()
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
@@ -125,9 +105,6 @@ public class BasicTestCase
         try {
             Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
             SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast);
-
-            assertNotNull(sequencer);
-            assertNotNull(sequencer.next());
         } finally {
             factory.shutdownAll();
         }

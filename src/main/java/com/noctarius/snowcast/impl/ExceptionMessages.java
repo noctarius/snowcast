@@ -38,14 +38,9 @@ public enum ExceptionMessages {
     ILLEGAL_DETACH_ATTEMPT("Illegal detach attempt, address on slot is wrong"),
 
     /**
-     * Failed to register snowcast service lazily
+     * snowcast service is not registered
      */
-    SERVICE_REGISTRATION_FAILED("Failed to register snowcast service lazily"),
-
-    /**
-     * snowcast service is not registered and lazy configuration is disabled
-     */
-    SERVICE_NOT_REGISTERED("snowcast service is not registered and lazy configuration is disabled"),
+    SERVICE_NOT_REGISTERED("snowcast service is not registered"),
 
     /**
      * Failed to retrieve NodeEngine from HazelcastInstance, not a proxy?

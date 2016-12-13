@@ -33,13 +33,14 @@ import java.util.Map;
 import static com.noctarius.snowcast.impl.SnowcastConstants.USER_CONTEXT_LOOKUP_NAME;
 
 /**
- * <p>The <ii>SnowcastSystem</ii> class is the entrance point into using snowcast. By providing the passed in
+ * <p>The <tt>SnowcastSystem</tt> class is the entrance point into using snowcast. By providing the passed in
  * {@link com.hazelcast.core.HazelcastInstance} instance (no matter if it is a Hazelcast embedded node or Hazelcast client)
  * the internal factory will create the appropriate {@link com.noctarius.snowcast.Snowcast} instance.</p>
  * <p>Creation of the {@link com.noctarius.snowcast.Snowcast} instance is fully thread-safe, the creation result is cached and
  * only one instance will be created for the same {@link com.hazelcast.core.HazelcastInstance}.</p>
  * <p>
  * A basic example on how to use the snowcast API to generate IDs will show the following snippet:
+ * </p>
  * <pre>
  * // Create a HazelcastInstance
  * Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
@@ -62,7 +63,6 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.USER_CONTEXT_LOOKUP_
  *     System.out.println( id );
  * }
  * </pre>
- * </p>
  */
 @ThreadSafe
 public final class SnowcastSystem {

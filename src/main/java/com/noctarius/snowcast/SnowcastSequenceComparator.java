@@ -24,25 +24,25 @@ import java.util.Comparator;
 
 /**
  * <p>This {@link java.util.Comparator} implementation can be used to compare and order two distinct
- * snowcast sequencer ids by their corresponding timestamps and counter values.<br/>
+ * snowcast sequencer ids by their corresponding timestamps and counter values.<br>
  * This is meant for legacy code or to integrate it with existing frameworks. In general use cases
  * {@link com.noctarius.snowcast.SnowcastSequenceUtils#compareSequence(long, long)} or
  * {@link com.noctarius.snowcast.SnowcastSequenceUtils#compareSequence(long, long, int)}
  * should be preferred to prevent some unnecessary boxing/unboxing from <tt>long</tt> to <tt>Long</tt>
  * and back.</p>
- * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:
+ * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:</p>
  * <pre>
- *     List<Long> elements = getSequencerIds();
+ *     List&lt;Long&gt; elements = getSequencerIds();
  *     Collections.sort( elements, new SnowcastSequenceComparator( 128 ) );
  *     System.out.println( elements );
  * </pre>
- * Alternatively an instance can be retrieved using a convenience method and a already existing
+ * <p>Alternatively an instance can be retrieved using a convenience method and a already existing
  * {@link com.noctarius.snowcast.SnowcastSequencer} instance:
+ * </p>
  * <pre>
  *     SnowcastSequencer sequencer = getSnowcastSequencer();
- *     Comparator<Long> comparator = SnowcastSequenceUtils.snowcastSequenceComparator( sequencer );
+ *     Comparator&lt;Long&gt; comparator = SnowcastSequenceUtils.snowcastSequenceComparator( sequencer );
  * </pre>
- * </p>
  */
 @ThreadSafe
 public final class SnowcastSequenceComparator
@@ -52,13 +52,13 @@ public final class SnowcastSequenceComparator
 
     /**
      * This constructor creates a new SnowcastSequenceComparator instance bound to the given
-     * maximal logical node count.<br/>
+     * maximal logical node count.<br>
      * There is also a convenience method in {@link com.noctarius.snowcast.SnowcastSequenceUtils}
      * to easy the creation process when a {@link com.noctarius.snowcast.SnowcastSequencer} is
      * available:
      * <pre>
      *     SnowcastSequencer sequencer = getSnowcastSequencer();
-     *     Comparator<Long> comparator = SnowcastSequenceUtils.snowcastSequenceComparator( sequencer );
+     *     Comparator&lt;Long&gt; comparator = SnowcastSequenceUtils.snowcastSequenceComparator( sequencer );
      * </pre>
      *
      * @param maxLogicalNodeCount the maximal logical node count

@@ -64,31 +64,6 @@ public class MultiNodeTestCase
     }
 
     @Test
-    public void test_simple_sequencer_initialization_lazy_initialization()
-            throws Exception {
-
-        TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config1);
-        factory.newHazelcastInstance(config2);
-
-        try {
-            String sequencerName = generateKeyNotOwnedBy(hazelcastInstance);
-            Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
-            SnowcastSequencer sequencer = buildSnowcastSequencer(snowcast, sequencerName);
-
-            assertNotNull(sequencer);
-
-            // Request the current state of the sequencer
-            SnowcastSequenceState state = sequencer.getSequencerState();
-
-            // Destroy the sequencer, cluster-wide operation
-            snowcast.destroySequencer(sequencer);
-        } finally {
-            factory.shutdownAll();
-        }
-    }
-
-    @Test
     public void test_single_id_generation()
             throws Exception {
 

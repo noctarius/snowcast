@@ -69,7 +69,7 @@
   </ciManagement>
 
   <properties>
-    <hazelcast.version>3.5.4</hazelcast.version>
+    <hazelcast.version>3.5.5</hazelcast.version>
     <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>

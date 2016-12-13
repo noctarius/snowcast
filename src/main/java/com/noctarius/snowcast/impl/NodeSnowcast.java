@@ -16,7 +16,7 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.config.ServiceConfig;
+import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.HazelcastInstanceImpl;
 import com.hazelcast.instance.HazelcastInstanceProxy;
@@ -32,11 +32,6 @@ import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
 
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.printStartupMessage;
 import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
@@ -75,54 +70,22 @@ class NodeSnowcast
 
     @Nonnull
     private NodeSequencerService getSequencerService(@Nonnull NodeEngine nodeEngine) {
-        // Ugly hacks due to lack in SPI
-        NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
-        NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
-        if (service != null) {
-            printStartupMessage(false, false);
-            return service;
-        }
+        try {
+            // Ugly hacks due to lack in SPI
+            NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
+            NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
+            if (service != null) {
+                printStartupMessage(false);
+                return service;
+            }
 
-        if (SnowcastConstants.preventLazyConfiguration()) {
+            // Service not registered!
             String message = ExceptionMessages.SERVICE_NOT_REGISTERED.buildMessage();
             throw new SnowcastException(message);
-        }
 
-        // More ugly hacks to come here!
-        try {
-            synchronized (this) {
-                // Probably initialized under lock contention
-                service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
-                if (service != null) {
-                    return service;
-                }
-
-                Field serviceManagerField = NodeEngineImpl.class.getDeclaredField("serviceManager");
-                serviceManagerField.setAccessible(true);
-                Object serviceManager = serviceManagerField.get(nodeEngineImpl);
-
-                Class<?> serviceManagerClass = serviceManager.getClass();
-                Method registerUserService = serviceManagerClass
-                        .getDeclaredMethod("registerUserService", Map.class, Map.class, ServiceConfig.class);
-                registerUserService.setAccessible(true);
-
-                ServiceConfig serviceConfig = new ServiceConfig().setEnabled(true).setName(SnowcastConstants.SERVICE_NAME)
-                                                                 .setServiceImpl(new NodeSequencerService());
-
-                registerUserService
-                        .invoke(serviceManager, new HashMap<String, Properties>(), Collections.emptyMap(), serviceConfig);
-                service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
-                if (service != null) {
-                    service.init(nodeEngine, new Properties());
-                    printStartupMessage(true, false);
-                    return service;
-                }
-
-                String message = ExceptionMessages.SERVICE_REGISTRATION_FAILED.buildMessage();
-                throw new SnowcastException(message);
-            }
-        } catch (Exception e) {
-            String message = ExceptionMessages.SERVICE_REGISTRATION_FAILED.buildMessage();
+        } catch (HazelcastException e) {
+            // Service not registered!
+            String message = ExceptionMessages.SERVICE_NOT_REGISTERED.buildMessage();
             throw new SnowcastException(message, e);
         }
     }

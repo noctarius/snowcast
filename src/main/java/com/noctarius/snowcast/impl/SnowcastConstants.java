@@ -84,9 +84,6 @@ public final class SnowcastConstants {
     // Maximum retries to generate an ID before giving up
     public static final int MAX_RETRY_GENERATE_IDS = 100;
 
-    // System Property to prevent lazy configuration
-    public static final String PROPERTY_PREVENT_LAZY_CONFIGURATION = "com.noctarius.snowcast.prevent.lazy.configuration";
-
     // File name for properties file containing build information
     private static final String SNOWCAST_VERSION_FILE = "snowcast-version.properties";
 
@@ -130,10 +127,5 @@ public final class SnowcastConstants {
     }
 
     private SnowcastConstants() {
-    }
-
-    public static boolean preventLazyConfiguration() {
-        String property = System.getProperty(PROPERTY_PREVENT_LAZY_CONFIGURATION);
-        return property != null;
     }
 }

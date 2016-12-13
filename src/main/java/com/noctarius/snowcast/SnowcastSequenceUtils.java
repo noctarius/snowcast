@@ -59,7 +59,7 @@ public final class SnowcastSequenceUtils {
 
     /**
      * This helper method extracts the timestamp value from a given sequence id. This timestamp value can be
-     * used to order multiple sequence ids depending on their generation time.<br/>
+     * used to order multiple sequence ids depending on their generation time.<br>
      * To compare timestamps and order sequence ids accordingly please find {@link #compareTimestamp(long, long)} as
      * well as {@link com.noctarius.snowcast.SnowcastTimestampComparator}.
      *

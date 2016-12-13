@@ -142,7 +142,7 @@ public final class InternalSequencerUtils {
         return (int) (sequenceId & mask);
     }
 
-    public static void printStartupMessage(boolean lazyConfiguration, boolean client) {
+    public static void printStartupMessage(boolean client) {
         StringBuilder sb = new StringBuilder();
         if (!SnowcastConstants.LOGO_DISABLED) {
             sb.append(SnowcastConstants.SNOWCAST_ASCII_LOGO).append('\n');
@@ -151,9 +151,6 @@ public final class InternalSequencerUtils {
         sb.append(" version: ").append(SnowcastConstants.VERSION).append("    ");
         sb.append("build-date: ").append(SnowcastConstants.BUILD_DATE).append('\n');
         System.out.println(sb.toString());
-        if (lazyConfiguration) {
-            System.err.println("WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!\n");
-        }
     }
 
     public static SnowcastConstants.HazelcastVersion getHazelcastVersion() {

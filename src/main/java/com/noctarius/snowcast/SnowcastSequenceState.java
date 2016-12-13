@@ -33,7 +33,7 @@ public enum SnowcastSequenceState {
 
     /**
      * A {@link com.noctarius.snowcast.SnowcastSequencer} in the state <tt>Attached</tt>
-     * has a logical node id assigned and can be used to generate IDs.<br/>
+     * has a logical node id assigned and can be used to generate IDs.<br>
      * This is the <b>default</b> state after acquiring the sequencer for the first time!
      */
     Attached,

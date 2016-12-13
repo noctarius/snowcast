@@ -48,7 +48,7 @@ class ClientSnowcast
         this.clientInvocator = buildClientInvocator(client);
         ProxyManager proxyManager = getProxyManager(client);
         this.sequencerService = new ClientSequencerService(client, proxyManager, clientInvocator);
-        printStartupMessage(false, true);
+        printStartupMessage(true);
     }
 
     @Nonnull

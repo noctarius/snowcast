@@ -109,7 +109,8 @@ In snowcast the ID generators are called `SnowcastSequencer`. Those `com.noctari
 To retrieve a `SnowcastSequencer` we first have to create a snowcast instance which acts as a factory to create or destroy sequencers.
 
 ```java
-HazelcastInstance hazelcastInstance = getHazelcastInstance();
+Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
+HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
 Snowcast snowcast = SnowcastSystem.snowcast( hazelcastInstance );
 ```
 
@@ -190,36 +191,15 @@ For people configuring Hazelcast using the XML based configuration only, snowcas
 
 That way the snowcast service is registered into Hazelcast.
 
-#### Lazy Configuration Hack
+#### Lazy Configuration Hack (removed)
 
-This lazy initialization is meant to be used for convenience and the out-of-the-box experience, as the heading suggests this is not meant to be used in production. The reason is simple. All Hazelcast nodes need to have the service registered before the sequencer is retrieved. That said it is hard to achieve this state with more than one cluster node.
-
-No further configuration or user interaction is necessary to use lazy configuration as it happens automatically when no Hazelcast service is yet created. A warning is printed whenever this way of configuration is used. Please do not use it in production.
-
-```plain
-                                             __
-   _________  ____ _      ___________ ______/ /_
-  / ___/ __ \/ __ \ | /| / / ___/ __ `/ ___/ __/
- (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_
-/____/_/ /_/\____/|__/|__/\___/\__,_/____/\__/
-
-snowcast node mode -  version: 1.0.0-RC2    build-date: 2015-04-04 14:08
-WARNING: LAZY CONFIGURATION USED! DO NOT DO THIS IN PRODUCTION!
-```
-
-For Technical Operations: To prevent lazy configuration from happening and to provide a fast-fail behavior please set the Java system property:
-
-```plain
--Dcom.noctarius.snowcast.prevent.lazy.configuration
-```
-
-The property does not have to have a value, the simple existence of that property is enough to prevent lazy initialization from happening.
+The previously available "Lazy Configuration Hack" has been removed from snowcast 1.0.0.
 
 ### Hazelcast Client Configuration
 
 snowcast currently supports Hazelcast 3.4.x as well as Hazelcast 3.5.x and automatically registers a matching communication system.
 
-To use snowcast on Hazelcast clients no special configuration is necessary. Since clients just communicate with Hazelcast clusters using internal operations, no special service needs to registered, however the server-side must be set up by using [declarative](#using-the-declarative-configuration) or [programmatic](#using-the-configuration-api) to handle client requests. The lazy configuration hack doesn't work in that case. 
+To use snowcast on Hazelcast clients no special configuration is necessary. Since clients just communicate with Hazelcast clusters using internal operations, no special service needs to registered, however the server-side must be set up by using [declarative](#using-the-declarative-configuration) or [programmatic](#using-the-configuration-api) to handle client requests.
 
 Knowing that no special configuration is necessary, running a snowcast instance over a Hazelcast client is straight forward:
 

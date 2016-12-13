@@ -22,18 +22,17 @@ import java.util.Comparator;
 
 /**
  * <p>This {@link java.util.Comparator} implementation can be used to compare and order two distinct
- * snowcast sequencer ids by their corresponding timestamps.<br/>
+ * snowcast sequencer ids by their corresponding timestamps.<br>
  * This is meant for legacy code or to integrate it with existing frameworks. In general use cases
  * {@link com.noctarius.snowcast.SnowcastSequenceUtils#compareTimestamp(long, long)}
  * should be preferred to prevent some unnecessary boxing/unboxing from <tt>long</tt> to <tt>Long</tt>
  * and back.</p>
- * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:
+ * <p>This comparator can be used just as any other Java {@link java.util.Comparator}:</p>
  * <pre>
- *     List<Long> elements = getSequencerIds();
+ *     List&lt;Long&gt; elements = getSequencerIds();
  *     Collections.sort( elements, SnowcastTimestampComparator.INSTANCE );
  *     System.out.println( elements );
  * </pre>
- * </p>
  */
 @ThreadSafe
 public enum SnowcastTimestampComparator
@@ -42,7 +41,7 @@ public enum SnowcastTimestampComparator
     /**
      * The singleton instance for this {@link java.util.Comparator} implementation. Since the
      * implementation is completely stateless this instance is fine to be used in multi-threading
-     * environments.<br/>
+     * environments.<br>
      * More information on the implementation detail are available here:
      * {@link com.noctarius.snowcast.SnowcastTimestampComparator}.
      */
