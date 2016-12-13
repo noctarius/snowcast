@@ -218,7 +218,7 @@ snowcast is deployed as a Apache Maven artifact. All release candidates as well 
 <dependency>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>1.0.0-RC3</version>
+  <version>1.0.0</version>
 </dependency>
 ```
 
@@ -243,7 +243,7 @@ The Maven coordinates for the snowcast artifacts are:
 <dependency>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>1.0.0-RC4-SNAPSHOT</version>
+  <version>2.0.0-SNAPSHOT</version>
 </dependency>
 ```
 
