@@ -148,11 +148,15 @@ Destroying a sequencer is a cluster operation and will destroy all sequencers re
 
 ### Hazelcast Configuration
 
-Hazelcast requires custom services to be configured upfront using either the Configuration API or by utilizing the, XML based, declarative configuration.
+snowcast 2.0 uses a custom service that is automatically registered with Hazelcast on startup. To get started with snowcast simply provide the according JAR file in the classpath of the application. No additional step's necessary. For older snowcast versions see below.
+
+For snowcast 1.0; Hazelcast requires custom services to be configured upfront using either the Configuration API or by utilizing the, XML based, declarative configuration.
 
 snowcast offers three different ways to register the snowcast service with Hazelcast by providing support for the two already named ones and additionally is equipped with a hack to lazily registers itself as a Hazelcast service on first acquisition. This way is not meant to be used in production, the reason will be shown in a bit.
 
 #### Using the Configuration API
+ 
+As of snowcast 2.0 no manual configuration is required anymore. This chapter, however, stays for reference of snowcast 1.0. 
 
 The simplest way to configure snowcast is using the Hazelcast Configuration API. snowcast provides the user with a helper class to configure all necessary options.
 
@@ -172,6 +176,8 @@ HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance( config );
 ```
 
 #### Using the Declarative Configuration
+
+As of snowcast 2.0 no manual configuration is required anymore. This chapter, however, stays for reference of snowcast 1.0. 
 
 For people configuring Hazelcast using the XML based configuration only, snowcast also supports a configuration based on declarative configuration. As a disadvantage using the declarative configuration the internal classname of the service is bound to the configuration. Whenever the classname might change for any reason instantiating Hazelcast might fail for an non-obvious reason. Using the [Configuration API](#using-the-configuration-api) is recommended.
 
@@ -197,7 +203,9 @@ The previously available "Lazy Configuration Hack" has been removed from snowcas
 
 ### Hazelcast Client Configuration
 
-snowcast currently supports Hazelcast 3.4.x as well as Hazelcast 3.5.x and automatically registers a matching communication system.
+snowcast 2.0 snapshots currently support Hazelcast 3.7.x, 3.8.x and maybe 3.6.x (untested). The underlying communication system is automatically registered.
+
+For older versions, snowcast 1.0 supports Hazelcast 3.4.x as well as Hazelcast 3.5.x and automatically registers a matching communication system.
 
 To use snowcast on Hazelcast clients no special configuration is necessary. Since clients just communicate with Hazelcast clusters using internal operations, no special service needs to registered, however the server-side must be set up by using [declarative](#using-the-declarative-configuration) or [programmatic](#using-the-configuration-api) to handle client requests.
 
