@@ -16,18 +16,11 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
-import com.hazelcast.client.impl.client.PartitionClientRequest;
 import com.hazelcast.client.spi.ProxyManager;
-import com.hazelcast.core.ICompletableFuture;
-import com.hazelcast.core.Partition;
-import com.hazelcast.core.PartitionService;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
-import com.noctarius.snowcast.impl.operations.client.ClientCreateSequencerDefinitionRequest;
-import com.noctarius.snowcast.impl.operations.client.ClientDestroySequencerDefinitionRequest;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -36,8 +29,6 @@ import javax.validation.constraints.Min;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
-
 class ClientSequencerService
         implements SequencerService {
 
@@ -45,18 +36,14 @@ class ClientSequencerService
 
     private final ClientSequencerConstructorFunction sequencerConstructor;
 
-    private final HazelcastClientInstanceImpl client;
-    private final ClientInvocator clientInvocator;
+    private final ClientCodec clientCodec;
 
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
-    ClientSequencerService(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ProxyManager proxyManager,
-                           @Nonnull ClientInvocator clientInvocator) {
-
-        this.client = client;
-        this.sequencerConstructor = new ClientSequencerConstructorFunction(client, proxyManager, this, clientInvocator);
+    ClientSequencerService(@Nonnull ProxyManager proxyManager, @Nonnull ClientCodec clientCodec) {
+        this.sequencerConstructor = new ClientSequencerConstructorFunction(proxyManager, this, clientCodec);
         this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
-        this.clientInvocator = clientInvocator;
+        this.clientCodec = clientCodec;
     }
 
     @Nonnull
@@ -65,24 +52,16 @@ class ClientSequencerService
                                              @Min(128) @Max(8192) int maxLogicalNodeCount,
                                              @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
 
-        TRACER.trace("register sequencer %s with epoch %s, max nodes %s, backups %s", sequencerName, epoch, maxLogicalNodeCount,
-                backupCount);
+        TRACER.trace("register sequencer %s with epoch %s, max nodes %s, backups %s", //
+                sequencerName, epoch, maxLogicalNodeCount, backupCount);
 
         SequencerDefinition definition = new SequencerDefinition(sequencerName, epoch, maxLogicalNodeCount, backupCount);
 
-        PartitionService partitionService = client.getPartitionService();
-        Partition partition = partitionService.getPartition(sequencerName);
-        int partitionId = partition.getPartitionId();
-        TRACER.trace("sequencer %s is owned by partition %s", sequencerName, partitionId);
-
         try {
-            PartitionClientRequest request = new ClientCreateSequencerDefinitionRequest(sequencerName, partitionId, definition);
-            ICompletableFuture<Object> future = clientInvocator.invoke(partitionId, request);
-            Object response = future.get();
-            SequencerDefinition realDefinition = client.getSerializationService().toObject(response);
+            SequencerDefinition realDefinition = clientCodec.createSequencerDefinition(sequencerName, definition);
             return getOrCreateSequencerProvision(realDefinition).getSequencer();
-        } catch (Exception e) {
-            throw new SnowcastException(e);
+        } finally {
+            TRACER.trace("register sequencer %s end", sequencerName);
         }
     }
 
@@ -95,21 +74,13 @@ class ClientSequencerService
 
         ((InternalSequencer) sequencer).stateTransition(SnowcastSequenceState.Destroyed);
 
-        PartitionService partitionService = client.getPartitionService();
-
         String sequencerName = sequencer.getSequencerName();
         TRACER.trace("destroy sequencer %s", sequencerName);
 
-        Partition partition = partitionService.getPartition(sequencerName);
-        int partitionId = partition.getPartitionId();
-        TRACER.trace("sequencer %s is owned by partition %s", sequencerName, partitionId);
-
         try {
-            PartitionClientRequest request = new ClientDestroySequencerDefinitionRequest(sequencerName, partitionId);
-            ICompletableFuture<Object> future = clientInvocator.invoke(partitionId, request);
-            future.get();
-        } catch (Exception e) {
-            throw new SnowcastException(e);
+            clientCodec.destroySequencerDefinition(sequencerName);
+        } finally {
+            TRACER.trace("destroy sequencer %s end", sequencerName);
         }
     }
 

@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.noctarius.snowcast.impl.operations.client;
+package com.noctarius.snowcast.impl.operations.clientcodec;
 
-import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.instance.MemberImpl;
 import com.hazelcast.spi.BackupAwareOperation;
 import com.hazelcast.spi.EventRegistration;
@@ -30,6 +29,7 @@ import com.noctarius.snowcast.impl.notification.ClientDestroySequencerNotificati
 import com.noctarius.snowcast.impl.operations.BackupDestroySequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DestroySequencerOperation;
 
+import javax.annotation.Nonnull;
 import java.util.Collection;
 
 import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
@@ -40,8 +40,8 @@ class ClientDestroySequencerDefinitionOperation
 
     private transient int backupCount;
 
-    ClientDestroySequencerDefinitionOperation(String sequencerName, ClientEndpoint endpoint) {
-        super(sequencerName, endpoint);
+    ClientDestroySequencerDefinitionOperation(@Nonnull String sequencerName, @Nonnull MessageChannel messageChannel) {
+        super(sequencerName, messageChannel);
     }
 
     @Override
@@ -64,13 +64,13 @@ class ClientDestroySequencerDefinitionOperation
 
         OperationService operationService = nodeEngine.getOperationService();
         DestroySequencerOperation operation = new DestroySequencerOperation(sequencerName);
-        for (MemberImpl member : nodeEngine.getClusterService().getMemberList()) {
+        for (MemberImpl member : nodeEngine.getClusterService().getMemberImpls()) {
             if (!member.localMember()) {
                 operationService.invokeOnTarget(SERVICE_NAME, operation, member.getAddress());
             }
         }
 
-        String clientUuid = getEndpoint().getUuid();
+        String clientUuid = getMessageChannel().getUuid();
 
         ClientDestroySequencerNotification notification = new ClientDestroySequencerNotification(sequencerName);
         Collection<EventRegistration> registrations = sequencerService.findClientChannelRegistrations(sequencerName, clientUuid);

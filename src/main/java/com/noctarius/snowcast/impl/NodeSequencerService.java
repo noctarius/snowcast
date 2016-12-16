@@ -16,14 +16,12 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.client.ClientEndpoint;
+import com.hazelcast.client.impl.protocol.ClientMessage;
+import com.hazelcast.client.impl.protocol.codec.SnowcastRegisterChannelCodec;
 import com.hazelcast.core.DistributedObject;
 import com.hazelcast.instance.BuildInfo;
 import com.hazelcast.instance.BuildInfoProvider;
 import com.hazelcast.nio.serialization.Data;
-import com.hazelcast.nio.serialization.SerializationService;
-import com.hazelcast.partition.InternalPartitionService;
-import com.hazelcast.partition.MigrationEndpoint;
 import com.hazelcast.spi.EventPublishingService;
 import com.hazelcast.spi.EventRegistration;
 import com.hazelcast.spi.EventService;
@@ -36,6 +34,10 @@ import com.hazelcast.spi.OperationService;
 import com.hazelcast.spi.PartitionMigrationEvent;
 import com.hazelcast.spi.PartitionReplicationEvent;
 import com.hazelcast.spi.RemoteService;
+import com.hazelcast.spi.partition.IPartitionService;
+import com.hazelcast.spi.partition.MigrationEndpoint;
+import com.hazelcast.spi.serialization.SerializationService;
+import com.hazelcast.util.Clock;
 import com.hazelcast.util.ConcurrencyUtil;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
@@ -47,6 +49,7 @@ import com.noctarius.snowcast.impl.operations.CreateSequencerDefinitionOperation
 import com.noctarius.snowcast.impl.operations.DestroySequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DetachLogicalNodeOperation;
 import com.noctarius.snowcast.impl.operations.SequencerReplicationOperation;
+import com.noctarius.snowcast.impl.operations.clientcodec.MessageChannel;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -182,19 +185,14 @@ public class NodeSequencerService
     }
 
     @Override
-    public void clearPartitionReplica(@Nonnegative int partitionId) {
-        partitions.remove(partitionId);
-    }
-
-    @Override
     public void dispatchEvent(@Nonnull Object event, @Nonnull Object listener) {
         if (listener instanceof ClientChannelHandler) {
-            ((ClientChannelHandler) listener).handleEvent(event);
+            ((ClientChannelHandler) listener).onMessage(event);
         }
     }
 
     public int attachSequencer(@Nonnull SequencerDefinition definition) {
-        InternalPartitionService partitionService = nodeEngine.getPartitionService();
+        IPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
 
         AttachLogicalNodeOperation operation = new AttachLogicalNodeOperation(definition);
@@ -205,7 +203,7 @@ public class NodeSequencerService
     }
 
     public void detachSequencer(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
-        InternalPartitionService partitionService = nodeEngine.getPartitionService();
+        IPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
 
         DetachLogicalNodeOperation operation = new DetachLogicalNodeOperation(definition, logicalNodeId);
@@ -217,7 +215,7 @@ public class NodeSequencerService
 
     @Nonnull
     public SequencerDefinition registerSequencerDefinition(@Nonnull SequencerDefinition definition) {
-        InternalPartitionService partitionService = nodeEngine.getPartitionService();
+        IPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(definition.getSequencerName());
         SequencerPartition partition = getSequencerPartition(partitionId);
         return partition.checkOrRegisterSequencerDefinition(definition);
@@ -225,7 +223,7 @@ public class NodeSequencerService
 
     @Nullable
     public SequencerDefinition unregisterSequencerDefinition(@Nonnull String sequencerName) {
-        InternalPartitionService partitionService = nodeEngine.getPartitionService();
+        IPartitionService partitionService = nodeEngine.getPartitionService();
         int partitionId = partitionService.getPartitionId(sequencerName);
         SequencerPartition partition = getSequencerPartition(partitionId);
         return partition.destroySequencerDefinition(sequencerName);
@@ -256,8 +254,8 @@ public class NodeSequencerService
     }
 
     @Nonnull
-    public EventRegistration registerClientChannel(@Nonnull String sequencerName, @Nonnull ClientEndpoint endpoint, int callId) {
-        ClientChannelHandler clientChannelHandler = new ClientChannelHandler(endpoint, callId, serializationService);
+    public EventRegistration registerClientChannel(@Nonnull String sequencerName, @Nonnull MessageChannel messageChannel) {
+        ClientChannelHandler clientChannelHandler = new ClientChannelHandler(messageChannel, serializationService);
         return eventService.registerLocalListener(SnowcastConstants.SERVICE_NAME, sequencerName, clientChannelHandler);
     }
 
@@ -281,7 +279,7 @@ public class NodeSequencerService
         Iterator<EventRegistration> iterator = registrations.iterator();
         while (iterator.hasNext()) {
             ClientChannelHandler channelHandler = getClientChannelHandler(iterator.next());
-            if (clientUuid.equals(channelHandler.endpoint.getUuid())) {
+            if (clientUuid.equals(channelHandler.messageChannel.getUuid())) {
                 iterator.remove();
             }
         }
@@ -292,7 +290,7 @@ public class NodeSequencerService
     @Nullable
     private <T> T invoke(@Nonnull Operation operation, @Nonnull String sequencerName) {
         try {
-            InternalPartitionService partitionService = nodeEngine.getPartitionService();
+            IPartitionService partitionService = nodeEngine.getPartitionService();
             int partitionId = partitionService.getPartitionId(sequencerName);
             OperationService operationService = nodeEngine.getOperationService();
 
@@ -349,24 +347,15 @@ public class NodeSequencerService
 
     private Method findEventRegistrationGetListener() {
         BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
-        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_4) {
-            return hz34EventRegistrationGetListener(buildInfo);
+        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_6) {
+            return hz36EventRegistrationGetListener(buildInfo);
         }
-        return hz35EventRegistrationGetListener(buildInfo);
+        String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
+        throw new SnowcastException(message);
     }
 
-    private Method hz34EventRegistrationGetListener(BuildInfo buildInfo) {
-        try {
-            Class<?> clazz = Class.forName("com.hazelcast.spi.impl.EventServiceImpl$Registration");
-            return clazz.getMethod("getListener");
-
-        } catch (Exception e) {
-            String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());
-            throw new SnowcastException(message, e);
-        }
-    }
-
-    private Method hz35EventRegistrationGetListener(BuildInfo buildInfo) {
+    //TODO
+    private Method hz36EventRegistrationGetListener(BuildInfo buildInfo) {
         try {
             Class<?> clazz = Class.forName("com.hazelcast.spi.impl.eventservice.impl.Registration");
             return clazz.getMethod("getListener");
@@ -377,21 +366,25 @@ public class NodeSequencerService
         }
     }
 
-    private static class ClientChannelHandler {
-        private final ClientEndpoint endpoint;
-        private final Data clientUuidData;
-        private final int callId;
+    private class ClientChannelHandler {
 
-        public ClientChannelHandler(@Nonnull ClientEndpoint endpoint, int callId,
-                                    @Nonnull SerializationService serializationService) {
+        private final MessageChannel messageChannel;
+        private final SerializationService serializationService;
 
-            this.clientUuidData = serializationService.toData(endpoint.getUuid());
-            this.endpoint = endpoint;
-            this.callId = callId;
+        public ClientChannelHandler(@Nonnull MessageChannel messageChannel, @Nonnull SerializationService serializationService) {
+            this.messageChannel = messageChannel;
+            this.serializationService = serializationService;
         }
 
-        public void handleEvent(@Nonnull Object event) {
-            endpoint.sendEvent(clientUuidData, event, callId);
+        public void onMessage(Object message) {
+
+            String publisherUuid = nodeEngine.getClusterService().getLocalMember().getUuid();
+
+            Data messageData = serializationService.toData(message);
+            ClientMessage eventMessage = SnowcastRegisterChannelCodec
+                    .encodeTopicEvent(messageData, Clock.currentTimeMillis(), publisherUuid);
+
+            messageChannel.sendClientMessage(eventMessage);
         }
     }
 }

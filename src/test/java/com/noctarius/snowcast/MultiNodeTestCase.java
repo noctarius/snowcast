@@ -16,7 +16,6 @@
  */
 package com.noctarius.snowcast;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastTestSupport;
@@ -34,17 +33,13 @@ import static org.junit.Assert.fail;
 public class MultiNodeTestCase
         extends HazelcastTestSupport {
 
-    private final Config config1 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-    private final Config config2 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-    private final Config config3 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-
     @Test
     public void test_simple_sequencer_initialization()
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config1);
-        factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
+        factory.newHazelcastInstance();
 
         try {
             String sequencerName = generateKeyNotOwnedBy(hazelcastInstance);
@@ -68,8 +63,8 @@ public class MultiNodeTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config1);
-        factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
+        factory.newHazelcastInstance();
 
         try {
             String sequencerName = generateKeyNotOwnedBy(hazelcastInstance);
@@ -88,8 +83,8 @@ public class MultiNodeTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config1);
-        factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
+        factory.newHazelcastInstance();
 
         try {
             String sequencerName = generateKeyNotOwnedBy(hazelcastInstance);
@@ -113,8 +108,8 @@ public class MultiNodeTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(config1);
-        factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
+        factory.newHazelcastInstance();
 
         try {
             String sequencerName = generateKeyNotOwnedBy(hazelcastInstance);
@@ -149,8 +144,8 @@ public class MultiNodeTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             // Build the custom epoch
@@ -194,8 +189,8 @@ public class MultiNodeTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             // Build the custom epoch
@@ -241,9 +236,9 @@ public class MultiNodeTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(3);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
-        HazelcastInstance hazelcastInstance3 = factory.newHazelcastInstance(config3);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance3 = factory.newHazelcastInstance();
 
         try {
             // Build the custom epoch

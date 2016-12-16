@@ -16,9 +16,9 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.nio.serialization.ArrayDataSerializableFactory;
+import com.hazelcast.internal.serialization.DataSerializerHook;
+import com.hazelcast.internal.serialization.impl.ArrayDataSerializableFactory;
 import com.hazelcast.nio.serialization.DataSerializableFactory;
-import com.hazelcast.nio.serialization.DataSerializerHook;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
 import com.hazelcast.util.ConstructorFunction;
 import com.noctarius.snowcast.impl.operations.AttachLogicalNodeOperation;
@@ -39,6 +39,7 @@ public class SequencerDataSerializerHook
         implements DataSerializerHook {
 
     public static final int FACTORY_ID;
+    public static final int SEQUENCER_DEFINITION_FACTORY_ID;
 
     public static final int TYPE_ATTACH_LOGICAL_NODE = 0;
     public static final int TYPE_DETACH_LOGICAL_NODE = 1;
@@ -58,6 +59,7 @@ public class SequencerDataSerializerHook
 
     static {
         FACTORY_ID = Integer.getInteger("com.noctarius.snowcast.factoryid", DEFAULT_FACTORY_ID);
+        SEQUENCER_DEFINITION_FACTORY_ID = FACTORY_ID + 1;
     }
 
     @Override

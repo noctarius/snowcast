@@ -76,7 +76,7 @@ public class SequencerDefinitionSerializerHook
         @Override
         @Nonnegative
         public int getTypeId() {
-            return SequencerDataSerializerHook.FACTORY_ID;
+            return SequencerDataSerializerHook.SEQUENCER_DEFINITION_FACTORY_ID;
         }
 
         @Override

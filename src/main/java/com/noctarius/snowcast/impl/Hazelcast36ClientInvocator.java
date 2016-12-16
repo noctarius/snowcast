@@ -16,15 +16,33 @@
  */
 package com.noctarius.snowcast.impl;
 
+import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.protocol.ClientMessage;
+import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.core.ICompletableFuture;
+import com.hazelcast.util.ExceptionUtil;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-interface ClientInvocator {
+final class Hazelcast36ClientInvocator
+        implements ClientInvocator {
+
+    private final HazelcastClientInstanceImpl client;
+
+    Hazelcast36ClientInvocator(@Nonnull HazelcastClientInstanceImpl client) {
+        this.client = client;
+    }
 
     @Nonnull
-    ICompletableFuture<ClientMessage> invoke(@Nonnegative int partitionId, @Nonnull ClientMessage request);
+    @Override
+    public ICompletableFuture<ClientMessage> invoke(@Nonnegative int partitionId, @Nonnull ClientMessage request) {
+        try {
+            ClientInvocation clientInvocation = new ClientInvocation(client, request, partitionId);
+            return clientInvocation.invoke();
 
+        } catch (Exception e) {
+            throw ExceptionUtil.rethrow(e);
+        }
+    }
 }

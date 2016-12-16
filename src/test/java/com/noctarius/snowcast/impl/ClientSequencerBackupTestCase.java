@@ -20,6 +20,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.PartitionService;
@@ -28,7 +29,6 @@ import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.noctarius.snowcast.Snowcast;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastNodeConfigurator;
 import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.SnowcastSystem;
 import org.junit.Test;
@@ -46,8 +46,8 @@ public class ClientSequencerBackupTestCase
         System.setProperty("java.net.preferIPv4Stack", "true");
     }
 
-    private final Config config1 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-    private final Config config2 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
+    private final Config config1 = new XmlConfigBuilder().build();
+    private final Config config2 = new XmlConfigBuilder().build();
     private final ClientConfig clientConfig = new XmlClientConfigBuilder().build();
 
     public ClientSequencerBackupTestCase() {

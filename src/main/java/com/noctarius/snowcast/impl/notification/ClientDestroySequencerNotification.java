@@ -16,16 +16,14 @@
  */
 package com.noctarius.snowcast.impl.notification;
 
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.PortableReader;
-import com.hazelcast.nio.serialization.PortableWriter;
-import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
-import com.noctarius.snowcast.impl.SequencerPortableHook;
+import com.hazelcast.nio.ObjectDataInput;
+import com.hazelcast.nio.ObjectDataOutput;
+import com.hazelcast.nio.serialization.DataSerializable;
 
 import java.io.IOException;
 
 public class ClientDestroySequencerNotification
-        implements Portable {
+        implements DataSerializable {
 
     private String sequencerName;
 
@@ -36,31 +34,21 @@ public class ClientDestroySequencerNotification
         this.sequencerName = sequencerName;
     }
 
-    @Override
-    public int getFactoryId() {
-        return SequencerDataSerializerHook.FACTORY_ID;
-    }
-
-    @Override
-    public int getClassId() {
-        return SequencerPortableHook.TYPE_DESTROY_SEQUENCER;
-    }
-
-    @Override
-    public void writePortable(PortableWriter writer)
-            throws IOException {
-
-        writer.writeUTF("sn", sequencerName);
-    }
-
-    @Override
-    public void readPortable(PortableReader reader)
-            throws IOException {
-
-        this.sequencerName = reader.readUTF("sn");
-    }
-
     public String getSequencerName() {
         return sequencerName;
+    }
+
+    @Override
+    public void writeData(ObjectDataOutput out)
+            throws IOException {
+
+        out.writeUTF(sequencerName);
+    }
+
+    @Override
+    public void readData(ObjectDataInput in)
+            throws IOException {
+
+        sequencerName = in.readUTF();
     }
 }

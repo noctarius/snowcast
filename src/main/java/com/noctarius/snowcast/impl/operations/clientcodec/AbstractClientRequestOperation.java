@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.noctarius.snowcast.impl.operations.client;
+package com.noctarius.snowcast.impl.operations.clientcodec;
 
-import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.Operation;
@@ -29,11 +28,11 @@ abstract class AbstractClientRequestOperation
         implements PartitionAwareOperation {
 
     private final String sequencerName;
-    private final ClientEndpoint endpoint;
+    private final MessageChannel messageChannel;
 
-    AbstractClientRequestOperation(String sequencerName, ClientEndpoint endpoint) {
+    AbstractClientRequestOperation(String sequencerName, MessageChannel messageChannel) {
         this.sequencerName = sequencerName;
-        this.endpoint = endpoint;
+        this.messageChannel = messageChannel;
     }
 
     @Override
@@ -65,7 +64,7 @@ abstract class AbstractClientRequestOperation
         return sequencerName;
     }
 
-    ClientEndpoint getEndpoint() {
-        return endpoint;
+    MessageChannel getMessageChannel() {
+        return messageChannel;
     }
 }

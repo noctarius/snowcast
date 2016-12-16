@@ -16,8 +16,8 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.partition.MigrationEndpoint;
 import com.hazelcast.spi.PartitionMigrationEvent;
+import com.hazelcast.spi.partition.MigrationEndpoint;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -32,7 +32,7 @@ public class MigrationSimulationTestCase {
         NodeSequencerService sequencerService = new NodeSequencerService();
         SequencerPartition partition = sequencerService.getSequencerPartition(1);
 
-        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.SOURCE, 1);
+        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.SOURCE, 1, 2, 3);
 
         sequencerService.beforeMigration(event);
         assertTrue(partition.isFrozen());
@@ -45,7 +45,7 @@ public class MigrationSimulationTestCase {
         NodeSequencerService sequencerService = new NodeSequencerService();
         SequencerPartition partition = sequencerService.getSequencerPartition(1);
 
-        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.DESTINATION, 1);
+        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.DESTINATION, 1, 2, 3);
 
         sequencerService.beforeMigration(event);
         assertTrue(partition.isFrozen());
@@ -58,7 +58,7 @@ public class MigrationSimulationTestCase {
         NodeSequencerService sequencerService = new NodeSequencerService();
         SequencerPartition partition = sequencerService.getSequencerPartition(1);
 
-        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.SOURCE, 1);
+        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.SOURCE, 1, 2, 3);
 
         sequencerService.beforeMigration(event);
         assertTrue(partition.isFrozen());
@@ -74,7 +74,7 @@ public class MigrationSimulationTestCase {
         NodeSequencerService sequencerService = new NodeSequencerService();
         SequencerPartition partition = sequencerService.getSequencerPartition(1);
 
-        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.DESTINATION, 1);
+        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.DESTINATION, 1, 2, 3);
 
         sequencerService.beforeMigration(event);
         assertTrue(partition.isFrozen());
@@ -90,7 +90,7 @@ public class MigrationSimulationTestCase {
         NodeSequencerService sequencerService = new NodeSequencerService();
         SequencerPartition partition = sequencerService.getSequencerPartition(1);
 
-        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.SOURCE, 1);
+        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.SOURCE, 1, 2, 3);
 
         sequencerService.beforeMigration(event);
         assertTrue(partition.isFrozen());
@@ -106,7 +106,7 @@ public class MigrationSimulationTestCase {
         NodeSequencerService sequencerService = new NodeSequencerService();
         SequencerPartition partition = sequencerService.getSequencerPartition(1);
 
-        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.DESTINATION, 1);
+        PartitionMigrationEvent event = new PartitionMigrationEvent(MigrationEndpoint.DESTINATION, 1, 2, 3);
 
         sequencerService.beforeMigration(event);
         assertTrue(partition.isFrozen());

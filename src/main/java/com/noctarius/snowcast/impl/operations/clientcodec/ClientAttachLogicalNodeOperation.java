@@ -14,24 +14,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.noctarius.snowcast.impl.operations.client;
+package com.noctarius.snowcast.impl.operations.clientcodec;
 
-import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.spi.BackupAwareOperation;
 import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.SequencerDefinition;
-import com.noctarius.snowcast.impl.operations.BackupCreateSequencerDefinitionOperation;
+import com.noctarius.snowcast.impl.SequencerPartition;
+import com.noctarius.snowcast.impl.operations.BackupAttachLogicalNodeOperation;
 
-class ClientCreateSequencerDefinitionOperation
+import javax.annotation.Nonnull;
+
+class ClientAttachLogicalNodeOperation
         extends AbstractClientRequestOperation
         implements BackupAwareOperation {
 
     private final SequencerDefinition definition;
-    private SequencerDefinition response;
 
-    ClientCreateSequencerDefinitionOperation(String sequencerName, ClientEndpoint endpoint, SequencerDefinition definition) {
-        super(sequencerName, endpoint);
+    private Integer logicalNodeId;
+
+    public ClientAttachLogicalNodeOperation(@Nonnull String sequencerName, @Nonnull MessageChannel messageChannel,
+                                            @Nonnull SequencerDefinition definition) {
+
+        super(sequencerName, messageChannel);
         this.definition = definition;
     }
 
@@ -40,12 +45,13 @@ class ClientCreateSequencerDefinitionOperation
             throws Exception {
 
         NodeSequencerService sequencerService = getService();
-        response = sequencerService.registerSequencerDefinition(definition);
+        SequencerPartition partition = sequencerService.getSequencerPartition(getPartitionId());
+        logicalNodeId = partition.attachLogicalNode(definition, getMessageChannel().getAddress());
     }
 
     @Override
     public Object getResponse() {
-        return response;
+        return logicalNodeId;
     }
 
     @Override
@@ -55,7 +61,7 @@ class ClientCreateSequencerDefinitionOperation
 
     @Override
     public int getSyncBackupCount() {
-        return response.getBackupCount();
+        return definition.getBackupCount();
     }
 
     @Override
@@ -65,6 +71,6 @@ class ClientCreateSequencerDefinitionOperation
 
     @Override
     public Operation getBackupOperation() {
-        return new BackupCreateSequencerDefinitionOperation(definition);
+        return new BackupAttachLogicalNodeOperation(definition, logicalNodeId, getMessageChannel().getAddress());
     }
 }

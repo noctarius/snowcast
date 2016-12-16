@@ -28,11 +28,6 @@ class DummyProxy
     }
 
     @Override
-    public Object getId() {
-        return sequencerName;
-    }
-
-    @Override
     public String getPartitionKey() {
         return sequencerName;
     }

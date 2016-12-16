@@ -16,24 +16,18 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
-import com.hazelcast.client.impl.client.PartitionClientRequest;
+import com.hazelcast.client.impl.protocol.ClientMessage;
+import com.hazelcast.client.impl.protocol.codec.SnowcastRegisterChannelCodec;
+import com.hazelcast.client.impl.protocol.codec.SnowcastRemoveChannelCodec;
 import com.hazelcast.client.spi.ClientContext;
 import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.spi.EventHandler;
-import com.hazelcast.core.ICompletableFuture;
-import com.hazelcast.core.Partition;
-import com.hazelcast.core.PartitionService;
-import com.hazelcast.nio.serialization.Portable;
-import com.hazelcast.nio.serialization.SerializationService;
-import com.noctarius.snowcast.SnowcastException;
+import com.hazelcast.client.spi.impl.ListenerMessageCodec;
+import com.hazelcast.nio.serialization.Data;
+import com.hazelcast.spi.serialization.SerializationService;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.impl.notification.ClientDestroySequencerNotification;
-import com.noctarius.snowcast.impl.operations.client.ClientAttachLogicalNodeRequest;
-import com.noctarius.snowcast.impl.operations.client.ClientDetachLogicalNodeRequest;
-import com.noctarius.snowcast.impl.operations.client.ClientRegisterChannelOperation;
-import com.noctarius.snowcast.impl.operations.client.ClientRemoveChannelOperation;
 
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
@@ -47,12 +41,12 @@ public class ClientSequencer
     private final ClientSequencerContext sequencerContext;
     private final ClientSequencerService sequencerService;
 
-    ClientSequencer(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ClientSequencerService sequencerService,
-                    @Nonnull SequencerDefinition definition, @Nonnull ClientInvocator clientInvocator) {
+    ClientSequencer(@Nonnull ClientSequencerService sequencerService, @Nonnull SequencerDefinition definition,
+                    @Nonnull ClientCodec clientCodec) {
 
         super(SnowcastConstants.SERVICE_NAME, definition.getSequencerName());
         this.sequencerService = sequencerService;
-        this.sequencerContext = new ClientSequencerContext(client, definition, clientInvocator);
+        this.sequencerContext = new ClientSequencerContext(definition, clientCodec);
     }
 
     @Nonnull
@@ -130,7 +124,7 @@ public class ClientSequencer
 
     private void unregisterClientChannel(@Nonnull String uuid) {
         ClientContext context = getContext();
-        context.getListenerService().deRegisterListener(uuid);
+        context.getListenerService().deregisterListener(uuid);
     }
 
     private static class ClientSequencerContext
@@ -138,17 +132,14 @@ public class ClientSequencer
 
         private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerContext.class);
 
-        private final HazelcastClientInstanceImpl client;
-        private final ClientInvocator clientInvocator;
+        private final ListenerMessageCodec listenerMessageCodec = new SequencerListenerMessageCodec();
+        private final ClientCodec clientCodec;
 
         private volatile String channelRegistration;
 
-        private ClientSequencerContext(@Nonnull HazelcastClientInstanceImpl client, @Nonnull SequencerDefinition definition,
-                                       @Nonnull ClientInvocator clientInvocator) {
-
+        private ClientSequencerContext(@Nonnull SequencerDefinition definition, @Nonnull ClientCodec clientCodec) {
             super(definition);
-            this.client = client;
-            this.clientInvocator = clientInvocator;
+            this.clientCodec = clientCodec;
         }
 
         @Min(128)
@@ -156,17 +147,8 @@ public class ClientSequencer
         @Max(8192)
         protected int doAttachLogicalNode(@Nonnull SequencerDefinition definition) {
             TRACER.trace("doAttachLogicalNode begin");
-            PartitionService partitionService = client.getPartitionService();
-            Partition partition = partitionService.getPartition(getSequencerName());
-            int partitionId = partition.getPartitionId();
-
             try {
-                PartitionClientRequest request = new ClientAttachLogicalNodeRequest(getSequencerName(), partitionId, definition);
-                ICompletableFuture<Object> future = clientInvocator.invoke(partitionId, request);
-                Object response = future.get();
-                return client.getSerializationService().toObject(response);
-            } catch (Exception e) {
-                throw new SnowcastException(e);
+                return clientCodec.attachLogicalNode(getSequencerName(), definition);
             } finally {
                 TRACER.trace("doAttachLogicalNode end");
             }
@@ -175,16 +157,8 @@ public class ClientSequencer
         @Override
         protected void doDetachLogicalNode(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
             TRACER.trace("doDetachLogicalNode begin");
-            PartitionService partitionService = client.getPartitionService();
-            Partition partition = partitionService.getPartition(getSequencerName());
-            int partitionId = partition.getPartitionId();
-
             try {
-                PartitionClientRequest request = new ClientDetachLogicalNodeRequest(definition, partitionId, logicalNodeId);
-                ICompletableFuture<Object> future = clientInvocator.invoke(partitionId, request);
-                future.get();
-            } catch (Exception e) {
-                throw new SnowcastException(e);
+                clientCodec.detachLogicalNode(getSequencerName(), definition, logicalNodeId);
             } finally {
                 TRACER.trace("doDetachLogicalNode end");
             }
@@ -193,29 +167,49 @@ public class ClientSequencer
         private void unregisterClientChannel(@Nonnull ClientSequencer clientSequencer) {
             TRACER.trace("unregister from channel for sequencer %s", clientSequencer.getSequencerName());
             try {
-                ClientRemoveChannelOperation operation = new ClientRemoveChannelOperation(getSequencerName(), channelRegistration);
-                ICompletableFuture<Boolean> future = clientInvocator.invoke(-1, operation);
-                boolean result = future.get() == null ? false : (Boolean) future.get();
+                boolean result = clientCodec.removeChannel(getSequencerName(), channelRegistration);
                 if (result) {
                     clientSequencer.unregisterClientChannel(channelRegistration);
                 }
-            } catch (Exception e) {
-                throw new SnowcastException(e);
             } finally {
                 TRACER.trace("unregisterClientChannel end");
             }
         }
 
-        public void initialize(@Nonnull ClientSequencer clientSequencer) {
+        void initialize(@Nonnull ClientSequencer clientSequencer) {
             TRACER.trace("register on channel for sequencer %s", clientSequencer.getSequencerName());
-            ClientRegisterChannelOperation operation = new ClientRegisterChannelOperation(getSequencerName());
             ClientChannelHandler handler = new ClientChannelHandler(this, clientSequencer);
-            channelRegistration = clientSequencer.listen(operation, getSequencerName(), handler);
+            channelRegistration = clientSequencer.registerListener(listenerMessageCodec, handler);
+        }
+
+        private class SequencerListenerMessageCodec
+                implements ListenerMessageCodec {
+
+            @Override
+            public ClientMessage encodeAddRequest(boolean localOnly) {
+                return SnowcastRegisterChannelCodec.encodeRequest(getSequencerName());
+            }
+
+            @Override
+            public String decodeAddResponse(ClientMessage clientMessage) {
+                return SnowcastRegisterChannelCodec.decodeResponse(clientMessage).response;
+            }
+
+            @Override
+            public ClientMessage encodeRemoveRequest(String realRegistrationId) {
+                return SnowcastRemoveChannelCodec.encodeRequest(getSequencerName(), realRegistrationId);
+            }
+
+            @Override
+            public boolean decodeRemoveResponse(ClientMessage clientMessage) {
+                return SnowcastRemoveChannelCodec.decodeResponse(clientMessage).response;
+            }
         }
     }
 
     private static class ClientChannelHandler
-            implements EventHandler<Portable> {
+            extends SnowcastRegisterChannelCodec.AbstractEventHandler
+            implements EventHandler<ClientMessage> {
 
         private static final Tracer TRACER = TracingUtils.tracer(ClientChannelHandler.class);
 
@@ -228,12 +222,12 @@ public class ClientSequencer
         }
 
         @Override
-        public void handle(@Nonnull Portable event) {
+        public void handle(Data item, long publishTime, String uuid) {
             TRACER.trace("New event message retrieved");
             ClientContext context = clientSequencer.getContext();
             SerializationService serializationService = context.getSerializationService();
 
-            Object message = serializationService.toObject(event);
+            Object message = serializationService.toObject(item);
             if (message instanceof ClientDestroySequencerNotification) {
                 TRACER.trace("ClientDestroySequencerNotification received");
                 clientSequencer.stateTransition(SnowcastSequenceState.Destroyed);

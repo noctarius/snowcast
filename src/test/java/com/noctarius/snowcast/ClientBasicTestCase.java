@@ -20,6 +20,7 @@ import com.hazelcast.client.HazelcastClient;
 import com.hazelcast.client.config.ClientConfig;
 import com.hazelcast.client.config.XmlClientConfigBuilder;
 import com.hazelcast.config.Config;
+import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.test.HazelcastTestSupport;
@@ -43,7 +44,7 @@ public class ClientBasicTestCase
         System.setProperty("java.net.preferIPv4Stack", "true");
     }
 
-    private final Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
+    private final Config config = new XmlConfigBuilder().build();
     private final ClientConfig clientConfig = new XmlClientConfigBuilder().build();
 
     public ClientBasicTestCase() {
@@ -169,7 +170,7 @@ public class ClientBasicTestCase
     public void test_id_generation_in_detached_state()
             throws Exception {
 
-        Hazelcast.newHazelcastInstance(config);
+        Hazelcast.newHazelcastInstance();
         HazelcastInstance client = HazelcastClient.newHazelcastClient(clientConfig);
 
         try {

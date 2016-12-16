@@ -16,7 +16,6 @@
  */
 package com.noctarius.snowcast;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
@@ -34,8 +33,6 @@ import static junit.framework.TestCase.assertEquals;
 
 public class SnowcastSequenceUtilsTestCase
         extends HazelcastTestSupport {
-
-    private static final Config CONFIG = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
 
     @Test
     public void test_compareSequence_first_higher_by_timestamp() {
@@ -156,7 +153,7 @@ public class SnowcastSequenceUtilsTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(CONFIG);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
 
         try {
             Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
@@ -180,7 +177,7 @@ public class SnowcastSequenceUtilsTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(CONFIG);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
 
         try {
             Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
@@ -204,7 +201,7 @@ public class SnowcastSequenceUtilsTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(CONFIG);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
 
         try {
             Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
@@ -228,7 +225,7 @@ public class SnowcastSequenceUtilsTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(CONFIG);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
 
         try {
             Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);
@@ -252,7 +249,7 @@ public class SnowcastSequenceUtilsTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(1);
-        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance(CONFIG);
+        HazelcastInstance hazelcastInstance = factory.newHazelcastInstance();
 
         try {
             Snowcast snowcast = SnowcastSystem.snowcast(hazelcastInstance);

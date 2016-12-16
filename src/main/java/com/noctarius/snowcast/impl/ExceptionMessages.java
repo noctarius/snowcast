@@ -141,7 +141,12 @@ public enum ExceptionMessages {
     /**
      * Setting up the internal state failed, unsupported Hazelcast version?
      */
-    INTERNAL_SETUP_FAILED("Setting up the internal state failed, unsupported Hazelcast (%s) version?");
+    INTERNAL_SETUP_FAILED("Setting up the internal state failed, unsupported Hazelcast (%s) version?"),
+
+    /**
+     * Found an unknown Hazelcast version
+     */
+    UNKNOWN_HAZELCAST_VERSION("Found an unknown Hazelcast version");
 
     private final String template;
 

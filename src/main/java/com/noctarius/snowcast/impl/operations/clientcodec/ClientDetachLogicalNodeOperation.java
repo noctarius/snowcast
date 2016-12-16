@@ -14,9 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.noctarius.snowcast.impl.operations.client;
+package com.noctarius.snowcast.impl.operations.clientcodec;
 
-import com.hazelcast.client.ClientEndpoint;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.BackupAwareOperation;
@@ -26,6 +25,7 @@ import com.noctarius.snowcast.impl.SequencerDefinition;
 import com.noctarius.snowcast.impl.SequencerPartition;
 import com.noctarius.snowcast.impl.operations.BackupDetachLogicalNodeOperation;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 
 class ClientDetachLogicalNodeOperation
@@ -35,10 +35,10 @@ class ClientDetachLogicalNodeOperation
     private int logicalNodeId;
     private final SequencerDefinition definition;
 
-    ClientDetachLogicalNodeOperation(String sequencerName, SequencerDefinition definition, ClientEndpoint endpoint,
-                                     int logicalNodeId) {
+    ClientDetachLogicalNodeOperation(@Nonnull String sequencerName, @Nonnull SequencerDefinition definition,
+                                     @Nonnull MessageChannel messageChannel, int logicalNodeId) {
 
-        super(sequencerName, endpoint);
+        super(sequencerName, messageChannel);
         this.definition = definition;
         this.logicalNodeId = logicalNodeId;
     }
@@ -49,7 +49,7 @@ class ClientDetachLogicalNodeOperation
 
         NodeSequencerService sequencerService = getService();
         SequencerPartition partition = sequencerService.getSequencerPartition(getPartitionId());
-        partition.detachLogicalNode(getSequencerName(), getEndpoint().getConnection().getEndPoint(), logicalNodeId);
+        partition.detachLogicalNode(getSequencerName(), getMessageChannel().getAddress(), logicalNodeId);
     }
 
     @Override
@@ -95,6 +95,6 @@ class ClientDetachLogicalNodeOperation
 
     @Override
     public Operation getBackupOperation() {
-        return new BackupDetachLogicalNodeOperation(definition, logicalNodeId, getEndpoint().getConnection().getEndPoint());
+        return new BackupDetachLogicalNodeOperation(definition, logicalNodeId, getMessageChannel().getAddress());
     }
 }

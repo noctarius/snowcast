@@ -16,7 +16,6 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.config.Config;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.PartitionService;
 import com.hazelcast.nio.Address;
@@ -25,7 +24,6 @@ import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.noctarius.snowcast.Snowcast;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastNodeConfigurator;
 import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.SnowcastSystem;
 import org.junit.Test;
@@ -38,14 +36,11 @@ import static org.junit.Assert.assertEquals;
 public class SequencerBackupTestCase
         extends HazelcastTestSupport {
 
-    private final Config config1 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-    private final Config config2 = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-
     @Test
     public void test_simple_backup_create_sequencer_definition_owner() {
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             final String sequencerName = generateKeyOwnedBy(hazelcastInstance1);
@@ -87,8 +82,8 @@ public class SequencerBackupTestCase
     @Test
     public void test_simple_backup_create_sequencer_definition_non_owner() {
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             final String sequencerName = generateKeyOwnedBy(hazelcastInstance1);
@@ -130,8 +125,8 @@ public class SequencerBackupTestCase
     @Test
     public void test_simple_backup_destroy_sequencer_definition_owner() {
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             final String sequencerName = generateKeyOwnedBy(hazelcastInstance1);
@@ -188,8 +183,8 @@ public class SequencerBackupTestCase
     @Test
     public void test_simple_backup_destroy_sequencer_definition_non_owner() {
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             final String sequencerName = generateKeyOwnedBy(hazelcastInstance1);
@@ -248,8 +243,8 @@ public class SequencerBackupTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             final String sequencerName = generateKeyOwnedBy(hazelcastInstance1);
@@ -318,8 +313,8 @@ public class SequencerBackupTestCase
             throws Exception {
 
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);
-        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance(config1);
-        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance(config2);
+        HazelcastInstance hazelcastInstance1 = factory.newHazelcastInstance();
+        HazelcastInstance hazelcastInstance2 = factory.newHazelcastInstance();
 
         try {
             final String sequencerName = generateKeyOwnedBy(hazelcastInstance1);

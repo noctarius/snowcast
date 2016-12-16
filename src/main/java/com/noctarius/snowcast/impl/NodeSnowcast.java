@@ -49,6 +49,12 @@ class NodeSnowcast
         this.sequencerService = getSequencerService(nodeEngine);
     }
 
+    NodeSnowcast(@Nonnull NodeEngine nodeEngine, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
+        this.backupCount = backupCount;
+        this.nodeEngine = nodeEngine;
+        this.sequencerService = getSequencerService(nodeEngine);
+    }
+
     @Nonnull
     @Override
     public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch) {

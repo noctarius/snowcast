@@ -76,7 +76,7 @@ public class LogicalNodeTableTestCase {
         LogicalNodeTable logicalNodeTable = new LogicalNodeTable(1, definition);
 
         try {
-            for (int i = 0; i < 128; i++) {
+            for (int i = 0; i < definition.getBoundedMaxLogicalNodeCount(); i++) {
                 Address address = new Address("localhost", 10000 + i);
                 int logicalNodeId = logicalNodeTable.attachLogicalNode(address);
                 Address assigned = logicalNodeTable.getAttachedLogicalNode(logicalNodeId);

@@ -69,7 +69,7 @@ public class DestroySequencerDefinitionOperation
         OperationService operationService = nodeEngine.getOperationService();
 
         DestroySequencerOperation operation = new DestroySequencerOperation(sequencerName);
-        for (MemberImpl member : nodeEngine.getClusterService().getMemberList()) {
+        for (MemberImpl member : nodeEngine.getClusterService().getMemberImpls()) {
             if (!member.localMember() && !member.getAddress().equals(getCallerAddress())) {
                 operationService.invokeOnTarget(SERVICE_NAME, operation, member.getAddress());
             }

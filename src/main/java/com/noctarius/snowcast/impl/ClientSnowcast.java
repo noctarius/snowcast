@@ -18,6 +18,7 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.HazelcastClientProxy;
+import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.spi.ProxyManager;
 import com.hazelcast.core.HazelcastInstance;
 import com.noctarius.snowcast.Snowcast;
@@ -40,14 +41,15 @@ class ClientSnowcast
     private final short backupCount;
     private final HazelcastClientInstanceImpl client;
     private final ClientSequencerService sequencerService;
-    private final ClientInvocator clientInvocator;
+    private final ClientCodec clientCodec;
 
     ClientSnowcast(@Nonnull HazelcastInstance hazelcastInstance, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
         this.backupCount = backupCount;
         this.client = getHazelcastClient(hazelcastInstance);
-        this.clientInvocator = buildClientInvocator(client);
+        ClientInvocator clientInvocator = buildClientInvocator(client);
+        this.clientCodec = new ClientCodec(client, clientInvocator);
         ProxyManager proxyManager = getProxyManager(client);
-        this.sequencerService = new ClientSequencerService(client, proxyManager, clientInvocator);
+        this.sequencerService = new ClientSequencerService(proxyManager, clientCodec);
         printStartupMessage(true);
     }
 
@@ -99,9 +101,10 @@ class ClientSnowcast
 
     @Nonnull
     private ClientInvocator buildClientInvocator(HazelcastClientInstanceImpl client) {
-        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_4) {
-            return new Hazelcast34ClientInvocator(client);
+        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_6) {
+            return new Hazelcast36ClientInvocator(client);
         }
-        return new Hazelcast35ClientInvocator(client);
+        String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
+        throw new SnowcastException(message);
     }
 }
