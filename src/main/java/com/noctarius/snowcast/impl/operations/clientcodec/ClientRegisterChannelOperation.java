@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Christoph Engelbert (aka noctarius) and
+ * Copyright (c) 2015-2017, Christoph Engelbert (aka noctarius) and
  * contributors. All rights reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
