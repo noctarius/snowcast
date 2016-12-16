@@ -6,7 +6,7 @@ import com.hazelcast.instance.Node;
 import com.hazelcast.nio.Connection;
 import com.hazelcast.spi.Operation;
 
-public class DestroySequencerDefinitionMessageTask
+class DestroySequencerDefinitionMessageTask
         extends AbstractSnowcastMessageTask<SnowcastDestroySequencerDefinitionCodec.RequestParameters> {
 
     DestroySequencerDefinitionMessageTask(ClientMessage clientMessage, Node node, Connection connection) {

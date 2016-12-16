@@ -101,6 +101,7 @@ public final class SnowcastSystem {
     @Nonnull
     public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
                                     @Nonnegative @Max(Short.MAX_VALUE) int backupCount) {
+
         // Test for an already created instance first
         Map<String, Object> userContext = hazelcastInstance.getUserContext();
         Snowcast snowcast = (Snowcast) userContext.get(USER_CONTEXT_LOOKUP_NAME);
@@ -127,6 +128,7 @@ public final class SnowcastSystem {
                 snowcast = NodeSnowcastFactory.snowcast(hazelcastInstance, (short) backupCount);
             }
 
+            // Client setup
             if (snowcast == null) {
                 try {
                     String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";

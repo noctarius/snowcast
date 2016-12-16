@@ -75,7 +75,7 @@ public class PartitionReplication
 
         partitionId = in.readInt();
         int size = in.readInt();
-        logicalNodeTables = new ArrayList<LogicalNodeTable>(size);
+        logicalNodeTables = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
             LogicalNodeTable logicalNodeTable = LogicalNodeTable.readLogicalNodeTable(partitionId, in);
             logicalNodeTables.add(logicalNodeTable);

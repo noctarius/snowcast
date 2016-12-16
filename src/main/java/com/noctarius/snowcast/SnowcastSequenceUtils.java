@@ -23,7 +23,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-
 import java.util.Comparator;
 
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
@@ -151,7 +150,7 @@ public final class SnowcastSequenceUtils {
     public static int compareTimestamp(long sequenceId1, long sequenceId2) {
         long timestampValue1 = timestampValue(sequenceId1);
         long timestampValue2 = timestampValue(sequenceId2);
-        return timestampValue1 < timestampValue2 ? -1 : timestampValue1 == timestampValue2 ? 0 : 1;
+        return Long.compare(timestampValue1, timestampValue2);
     }
 
     /**
@@ -189,15 +188,13 @@ public final class SnowcastSequenceUtils {
         long timestampValue1 = timestampValue(sequenceId1);
         long timestampValue2 = timestampValue(sequenceId2);
 
-        if (timestampValue1 < timestampValue2) {
-            return -1;
-        } else if (timestampValue1 > timestampValue2) {
-            return 1;
+        int compare = Long.compare(timestampValue1, timestampValue2);
+        if (compare != 0) {
+            return compare;
         }
 
         int counterValue1 = InternalSequencerUtils.counterValue(sequenceId1, counterMask);
         int counterValue2 = InternalSequencerUtils.counterValue(sequenceId2, counterMask);
-
-        return counterValue1 < counterValue2 ? -1 : counterValue1 == counterValue2 ? 0 : 1;
+        return Integer.compare(counterValue1, counterValue2);
     }
 }

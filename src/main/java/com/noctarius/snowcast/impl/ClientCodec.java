@@ -10,24 +10,19 @@ import com.hazelcast.client.impl.protocol.codec.SnowcastRegisterChannelCodec;
 import com.hazelcast.client.impl.protocol.codec.SnowcastRemoveChannelCodec;
 import com.hazelcast.core.Partition;
 import com.hazelcast.core.PartitionService;
-import com.hazelcast.spi.serialization.SerializationService;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastException;
 
 import javax.annotation.Nonnull;
 
-public final class ClientCodec {
+final class ClientCodec {
 
     private final ClientInvocator clientInvocator;
-    private final HazelcastClientInstanceImpl client;
     private final PartitionService partitionService;
-    private final SerializationService serializationService;
 
-    public ClientCodec(HazelcastClientInstanceImpl client, ClientInvocator clientInvocator) {
-        this.client = client;
+    ClientCodec(HazelcastClientInstanceImpl client, ClientInvocator clientInvocator) {
         this.clientInvocator = clientInvocator;
         this.partitionService = client.getPartitionService();
-        this.serializationService = client.getSerializationService();
     }
 
     int attachLogicalNode(@Nonnull String sequencerName, @Nonnull SequencerDefinition sequencerDefinition) {

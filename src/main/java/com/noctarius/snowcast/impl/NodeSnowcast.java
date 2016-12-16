@@ -40,18 +40,11 @@ class NodeSnowcast
         implements Snowcast {
 
     private final short backupCount;
-    private final NodeEngine nodeEngine;
     private final NodeSequencerService sequencerService;
 
     NodeSnowcast(@Nonnull HazelcastInstance hazelcastInstance, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
         this.backupCount = backupCount;
-        this.nodeEngine = getNodeEngine(hazelcastInstance);
-        this.sequencerService = getSequencerService(nodeEngine);
-    }
-
-    NodeSnowcast(@Nonnull NodeEngine nodeEngine, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
-        this.backupCount = backupCount;
-        this.nodeEngine = nodeEngine;
+        NodeEngine nodeEngine = getNodeEngine(hazelcastInstance);
         this.sequencerService = getSequencerService(nodeEngine);
     }
 
@@ -77,9 +70,7 @@ class NodeSnowcast
     @Nonnull
     private NodeSequencerService getSequencerService(@Nonnull NodeEngine nodeEngine) {
         try {
-            // Ugly hacks due to lack in SPI
-            NodeEngineImpl nodeEngineImpl = (NodeEngineImpl) nodeEngine;
-            NodeSequencerService service = nodeEngineImpl.getService(SnowcastConstants.SERVICE_NAME);
+            NodeSequencerService service = nodeEngine.getService(SnowcastConstants.SERVICE_NAME);
             if (service != null) {
                 printStartupMessage(false);
                 return service;
@@ -100,6 +91,7 @@ class NodeSnowcast
     private NodeEngine getNodeEngine(@Nonnull HazelcastInstance hazelcastInstance) {
         try {
             // Ugly hack due to lack in SPI
+            //ACCESSIBILITY_HACK
             Field originalField = HazelcastInstanceProxy.class.getDeclaredField("original");
             originalField.setAccessible(true);
             HazelcastInstanceImpl impl = (HazelcastInstanceImpl) originalField.get(hazelcastInstance);

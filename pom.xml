@@ -11,7 +11,8 @@
   - See the License for the specific language governing permissions and
   - limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
@@ -156,6 +157,8 @@
             </Private-Package>
             <Import-Package>
               com.hazelcast.client.*;resolution=Optional,
+              com.hazelcast.map.impl.*;resolution=Optional,
+              com.hazelcast.mapreduce.*;resolution=Optional,
               javax.validation.*;resolution=Optional,
               javax.annotation.*;resolution=Optional,
               com.hazelcast.core.*,
@@ -167,6 +170,9 @@
               com.hazelcast.cluster.*,
               com.hazelcast.config.*,
               com.hazelcast.logging.*,
+              com.hazelcast.internal.cluster.*,
+              com.hazelcast.internal.serialization.*,
+              com.hazelcast.internal.serialization.impl.*,
               sun.misc.*
             </Import-Package>
           </instructions>

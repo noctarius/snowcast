@@ -16,6 +16,9 @@
  */
 package com.noctarius.snowcast;
 
+import com.hazelcast.core.HazelcastInstance;
+
+import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.Max;
@@ -80,4 +83,37 @@ public interface Snowcast {
      * @param sequencer the sequencer to destroy
      */
     void destroySequencer(@Nonnull SnowcastSequencer sequencer);
+
+    /**
+     * Creates or retrieves (a cached) {@link com.noctarius.snowcast.Snowcast} instance assigned to the passed in
+     * {@link com.hazelcast.core.HazelcastInstance}. An implicit value of 1 (ONE) will be configured as the backup count
+     * for all {@link com.noctarius.snowcast.SnowcastSequencer} instances created by the returned
+     * {@link com.noctarius.snowcast.Snowcast} instance.
+     *
+     * @param hazelcastInstance the HazelcastInstance with link the Snowcast instance to
+     * @return a created or cached Snowcast instance, linked to the given HazelcastInstance
+     * @throws com.noctarius.snowcast.SnowcastException if creation fails for various reasons
+     */
+    @Nonnull
+    static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance) {
+        return snowcast(hazelcastInstance, 1);
+    }
+
+    /**
+     * Creates or retrieves (a cached) {@link com.noctarius.snowcast.Snowcast} instance assigned to the passed in
+     * {@link com.hazelcast.core.HazelcastInstance}. The defined <tt>backupCount</tt> will be set as the backup count
+     * for all {@link com.noctarius.snowcast.SnowcastSequencer} instances created by the returned
+     * {@link com.noctarius.snowcast.Snowcast} instance.
+     *
+     * @param hazelcastInstance the HazelcastInstance with link the Snowcast instance to
+     * @param backupCount       the amount of backups to be stored on other nodes, default is one backup
+     * @return a created or cached Snowcast instance, linked to the given HazelcastInstance
+     * @throws com.noctarius.snowcast.SnowcastException if creation fails for various reasons
+     */
+    @Nonnull
+    public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
+                                    @Nonnegative @Max(Short.MAX_VALUE) int backupCount) {
+
+        return SnowcastSystem.snowcast(hazelcastInstance, backupCount);
+    }
 }

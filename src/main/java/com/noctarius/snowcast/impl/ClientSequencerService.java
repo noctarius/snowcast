@@ -42,7 +42,7 @@ class ClientSequencerService
 
     ClientSequencerService(@Nonnull ProxyManager proxyManager, @Nonnull ClientCodec clientCodec) {
         this.sequencerConstructor = new ClientSequencerConstructorFunction(proxyManager, this, clientCodec);
-        this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
+        this.provisions = new ConcurrentHashMap<>();
         this.clientCodec = clientCodec;
     }
 
@@ -88,23 +88,12 @@ class ClientSequencerService
     private SequencerProvision getOrCreateSequencerProvision(@Nonnull SequencerDefinition definition) {
         String sequencerName = definition.getSequencerName();
 
-        SequencerProvision provision = provisions.get(sequencerName);
-        if (provision != null) {
-            TRACER.trace("return existing sequencer instance for %s", sequencerName);
-            return provision;
-        }
-
-        synchronized (provisions) {
-            provision = provisions.get(sequencerName);
-            if (provision != null) {
-                TRACER.trace("return existing sequencer instance for %s (under lock)", sequencerName);
-                return provision;
-            }
-
+        SequencerProvision provision = provisions.computeIfAbsent(sequencerName, name -> {
             TRACER.trace("return and cache new sequencer instance for %s", sequencerName);
-            provision = sequencerConstructor.createNew(definition);
-            provisions.put(sequencerName, provision);
-            return provision;
-        }
+            return sequencerConstructor.createNew(definition);
+        });
+
+        TRACER.trace("return existing sequencer instance for %s", sequencerName);
+        return provision;
     }
 }

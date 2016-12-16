@@ -8,7 +8,7 @@ import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.impl.SequencerDefinition;
 
-public class AttachLogicalNodeMessageTask
+class AttachLogicalNodeMessageTask
         extends AbstractSnowcastMessageTask<SnowcastAttachLogicalNodeCodec.RequestParameters> {
 
     AttachLogicalNodeMessageTask(ClientMessage clientMessage, Node node, Connection connection) {

@@ -38,16 +38,14 @@ class ClientSnowcast
         implements Snowcast {
 
     private final short backupCount;
-    private final HazelcastClientInstanceImpl client;
     private final ClientSequencerService sequencerService;
-    private final ClientCodec clientCodec;
 
     ClientSnowcast(@Nonnull HazelcastInstance hazelcastInstance, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
         this.backupCount = backupCount;
-        this.client = getHazelcastClient(hazelcastInstance);
+        HazelcastClientInstanceImpl client = getHazelcastClient(hazelcastInstance);
         ClientInvocator clientInvocator = buildClientInvocator(client);
-        this.clientCodec = new ClientCodec(client, clientInvocator);
-        ProxyManager proxyManager = getProxyManager(client);
+        ClientCodec clientCodec = new ClientCodec(client, clientInvocator);
+        ProxyManager proxyManager = client.getProxyManager();
         this.sequencerService = new ClientSequencerService(proxyManager, clientCodec);
         printStartupMessage(true);
     }
@@ -73,25 +71,12 @@ class ClientSnowcast
 
     @Nonnull
     private HazelcastClientInstanceImpl getHazelcastClient(@Nonnull HazelcastInstance hazelcastInstance) {
+        //ACCESSIBILITY_HACK
         try {
             // Ugly hack due to lack in SPI
             Field clientField = HazelcastClientProxy.class.getDeclaredField("client");
             clientField.setAccessible(true);
             return (HazelcastClientInstanceImpl) clientField.get(hazelcastInstance);
-        } catch (Exception e) {
-            String message = ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED.buildMessage();
-            throw new SnowcastException(message, e);
-        }
-    }
-
-    @Nonnull
-    private ProxyManager getProxyManager(@Nonnull HazelcastClientInstanceImpl client) {
-        try {
-            // And another ugly hack due to lack in SPI
-            Field proxyManagerField = HazelcastClientInstanceImpl.class.getDeclaredField("proxyManager");
-            proxyManagerField.setAccessible(true);
-
-            return (ProxyManager) proxyManagerField.get(client);
         } catch (Exception e) {
             String message = ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED.buildMessage();
             throw new SnowcastException(message, e);

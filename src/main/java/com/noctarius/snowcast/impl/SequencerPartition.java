@@ -57,7 +57,7 @@ public final class SequencerPartition {
 
     public SequencerPartition(@Nonnegative int partitionId) {
         this.partitionId = partitionId;
-        this.logicalNodeTables = new ConcurrentHashMap<String, LogicalNodeTable>();
+        this.logicalNodeTables = new ConcurrentHashMap<>();
     }
 
     public int getPartitionId() {
@@ -139,24 +139,14 @@ public final class SequencerPartition {
     @Nonnull
     SequencerDefinition checkOrRegisterSequencerDefinition(@Nonnull SequencerDefinition definition) {
         String sequencerName = definition.getSequencerName();
-        LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
-        if (logicalNodeTable != null) {
-            SequencerDefinition other = logicalNodeTable.getSequencerDefinition();
-            return checkSequencerDefinitions(definition, other);
-        }
 
-        synchronized (logicalNodeTables) {
-            logicalNodeTable = logicalNodeTables.get(sequencerName);
-            if (logicalNodeTable != null) {
-                SequencerDefinition other = logicalNodeTable.getSequencerDefinition();
-                return checkSequencerDefinitions(definition, other);
-            }
-
+        LogicalNodeTable logicalNodeTable = logicalNodeTables.computeIfAbsent(sequencerName, name -> {
             checkPartitionFreezeStatus();
+            return new LogicalNodeTable(partitionId, definition);
+        });
 
-            logicalNodeTables.put(sequencerName, new LogicalNodeTable(partitionId, definition));
-            return definition;
-        }
+        SequencerDefinition other = logicalNodeTable.getSequencerDefinition();
+        return checkSequencerDefinitions(definition, other);
     }
 
     @Nullable
@@ -192,31 +182,27 @@ public final class SequencerPartition {
     }
 
     void freeze() {
-        while (true) {
-            int frozen = this.frozen;
-            if (frozen == FROZEN) {
-                return;
-            }
-            if (UNSAFE.compareAndSwapInt(this, FROZEN_OFFSET, frozen, FROZEN)) {
-                return;
-            }
-        }
+        updateFreezeStatus(FROZEN);
     }
 
     void unfreeze() {
-        while (true) {
-            int frozen = this.frozen;
-            if (frozen == UNFROZEN) {
-                return;
-            }
-            if (UNSAFE.compareAndSwapInt(this, FROZEN_OFFSET, frozen, UNFROZEN)) {
-                return;
-            }
-        }
+        updateFreezeStatus(UNFROZEN);
     }
 
     boolean isFrozen() {
         return frozen == FROZEN;
+    }
+
+    private void updateFreezeStatus(int newStatus) {
+        while (true) {
+            int frozen = this.frozen;
+            if (frozen == newStatus) {
+                return;
+            }
+            if (UNSAFE.compareAndSwapInt(this, FROZEN_OFFSET, frozen, newStatus)) {
+                return;
+            }
+        }
     }
 
     private void checkPartitionFreezeStatus() {

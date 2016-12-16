@@ -22,6 +22,8 @@ import com.hazelcast.util.ConstructorFunction;
 import com.noctarius.snowcast.SnowcastException;
 
 import javax.annotation.Nonnull;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 
 final class ClientSequencerConstructorFunction
@@ -32,7 +34,7 @@ final class ClientSequencerConstructorFunction
     private final ClientCodec clientCodec;
     private final ProxyManager proxyManager;
     private final ClientSequencerService sequencerService;
-    private final Method proxyManagerInitialize;
+    private final MethodHandle proxyManagerInitialize;
 
     ClientSequencerConstructorFunction(@Nonnull ProxyManager proxyManager, @Nonnull ClientSequencerService sequencerService,
                                        @Nonnull ClientCodec clientCodec) {
@@ -54,20 +56,22 @@ final class ClientSequencerConstructorFunction
     }
 
     private void initializeProxy(@Nonnull ClientSequencer sequencer) {
+        //ACCESSIBILITY_HACK
         try {
             TRACER.trace("initialize sequencer proxy %s", sequencer);
             proxyManagerInitialize.invoke(proxyManager, sequencer);
-        } catch (Exception e) {
+        } catch (Throwable e) {
             throw new SnowcastException(e);
         }
     }
 
     @Nonnull
-    private Method getInitializeMethod() {
+    private MethodHandle getInitializeMethod() {
         try {
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
             Method method = ProxyManager.class.getDeclaredMethod("initialize", ClientProxy.class);
             method.setAccessible(true);
-            return method;
+            return lookup.unreflect(method);
         } catch (Exception e) {
             throw new SnowcastException(e);
         }

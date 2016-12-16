@@ -171,7 +171,7 @@ class LogicalNodeTable {
         return ((long) index << ARRAY_INDEX_SHIFT) + ARRAY_BASE_OFFSET;
     }
 
-    public static void writeLogicalNodeTable(@Nonnull LogicalNodeTable logicalNodeTable, @Nonnull ObjectDataOutput out)
+    static void writeLogicalNodeTable(@Nonnull LogicalNodeTable logicalNodeTable, @Nonnull ObjectDataOutput out)
             throws IOException {
 
         out.writeObject(logicalNodeTable.definition);
@@ -197,7 +197,7 @@ class LogicalNodeTable {
     }
 
     @Nonnull
-    public static LogicalNodeTable readLogicalNodeTable(@Nonnegative int partitionId, @Nonnull ObjectDataInput in)
+    static LogicalNodeTable readLogicalNodeTable(@Nonnegative int partitionId, @Nonnull ObjectDataInput in)
             throws IOException {
 
         SequencerDefinition definition = in.readObject();

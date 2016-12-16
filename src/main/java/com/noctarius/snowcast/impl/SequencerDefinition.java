@@ -32,6 +32,7 @@ public final class SequencerDefinition {
     private final String sequencerName;
     private final SnowcastEpoch epoch;
     private final int maxLogicalNodeCount;
+    private final int boundedMaxLogicalNodeCount;
     private final short backupCount;
 
     public SequencerDefinition(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
@@ -51,6 +52,7 @@ public final class SequencerDefinition {
         this.epoch = epoch;
         this.maxLogicalNodeCount = maxLogicalNodeCount;
         this.backupCount = backupCount;
+        this.boundedMaxLogicalNodeCount = InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
     }
 
     @Nonnull
@@ -70,7 +72,7 @@ public final class SequencerDefinition {
 
     @Nonnegative
     public int getBoundedMaxLogicalNodeCount() {
-        return InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount(maxLogicalNodeCount);
+        return boundedMaxLogicalNodeCount;
     }
 
     @Min(128)

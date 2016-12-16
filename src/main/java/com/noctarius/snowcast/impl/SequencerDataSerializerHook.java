@@ -72,72 +72,17 @@ public class SequencerDataSerializerHook
     @Override
     public DataSerializableFactory createFactory() {
         ConstructorFunction<Integer, IdentifiedDataSerializable>[] constructors = new ConstructorFunction[LEN];
-        constructors[TYPE_ATTACH_LOGICAL_NODE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer id) {
-                return new AttachLogicalNodeOperation();
-            }
-        };
-        constructors[TYPE_DETACH_LOGICAL_NODE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new DetachLogicalNodeOperation();
-            }
-        };
-        constructors[TYPE_CREATE_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new CreateSequencerDefinitionOperation();
-            }
-        };
-        constructors[TYPE_DESTROY_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new DestroySequencerDefinitionOperation();
-            }
-        };
-        constructors[TYPE_DESTROY_SEQUENCER] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new DestroySequencerOperation();
-            }
-        };
-        constructors[TYPE_REPLICATION_OPERATION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new SequencerReplicationOperation();
-            }
-        };
-        constructors[TYPE_PARTITION_REPLICATION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new PartitionReplication();
-            }
-        };
-        constructors[TYPE_BACKUP_CREATE_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new BackupCreateSequencerDefinitionOperation();
-            }
-        };
-        constructors[TYPE_BACKUP_DESTROY_SEQUENCER_DEFINITION] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new BackupDestroySequencerDefinitionOperation();
-            }
-        };
-        constructors[TYPE_BACKUP_ATTACH_LOGICAL_NODE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new BackupAttachLogicalNodeOperation();
-            }
-        };
-        constructors[TYPE_BACKUP_DETACH_LOGICAL_NODE] = new ConstructorFunction<Integer, IdentifiedDataSerializable>() {
-            @Override
-            public IdentifiedDataSerializable createNew(Integer arg) {
-                return new BackupDetachLogicalNodeOperation();
-            }
-        };
+        constructors[TYPE_ATTACH_LOGICAL_NODE] = id -> new AttachLogicalNodeOperation();
+        constructors[TYPE_DETACH_LOGICAL_NODE] = id -> new DetachLogicalNodeOperation();
+        constructors[TYPE_CREATE_SEQUENCER_DEFINITION] = id -> new CreateSequencerDefinitionOperation();
+        constructors[TYPE_DESTROY_SEQUENCER_DEFINITION] = id -> new DestroySequencerDefinitionOperation();
+        constructors[TYPE_DESTROY_SEQUENCER] = id -> new DestroySequencerOperation();
+        constructors[TYPE_REPLICATION_OPERATION] = id -> new SequencerReplicationOperation();
+        constructors[TYPE_PARTITION_REPLICATION] = id -> new PartitionReplication();
+        constructors[TYPE_BACKUP_CREATE_SEQUENCER_DEFINITION] = id -> new BackupCreateSequencerDefinitionOperation();
+        constructors[TYPE_BACKUP_DESTROY_SEQUENCER_DEFINITION] = id -> new BackupDestroySequencerDefinitionOperation();
+        constructors[TYPE_BACKUP_ATTACH_LOGICAL_NODE] = id -> new BackupAttachLogicalNodeOperation();
+        constructors[TYPE_BACKUP_DETACH_LOGICAL_NODE] = id -> new BackupDetachLogicalNodeOperation();
         return new ArrayDataSerializableFactory(constructors);
     }
 }

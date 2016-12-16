@@ -8,7 +8,7 @@ import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.impl.SequencerDefinition;
 
-public class CreateSequencerDefinitionMessageTask
+class CreateSequencerDefinitionMessageTask
         extends AbstractSnowcastMessageTask<SnowcastCreateSequencerDefinitionCodec.RequestParameters> {
 
     CreateSequencerDefinitionMessageTask(ClientMessage clientMessage, Node node, Connection connection) {

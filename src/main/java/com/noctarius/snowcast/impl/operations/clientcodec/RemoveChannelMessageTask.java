@@ -6,7 +6,7 @@ import com.hazelcast.instance.Node;
 import com.hazelcast.nio.Connection;
 import com.hazelcast.spi.Operation;
 
-public class RemoveChannelMessageTask
+class RemoveChannelMessageTask
         extends AbstractSnowcastMessageTask<SnowcastRemoveChannelCodec.RequestParameters> {
 
     RemoveChannelMessageTask(ClientMessage clientMessage, Node node, Connection connection) {

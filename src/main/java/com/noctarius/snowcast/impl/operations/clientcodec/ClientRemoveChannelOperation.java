@@ -20,14 +20,14 @@ import com.noctarius.snowcast.impl.NodeSequencerService;
 
 import javax.annotation.Nonnull;
 
-public class ClientRemoveChannelOperation
+class ClientRemoveChannelOperation
         extends AbstractClientRequestOperation {
 
-    protected String sequencerName;
-    protected String registrationId;
+    private String sequencerName;
+    private String registrationId;
 
-    public ClientRemoveChannelOperation(@Nonnull String sequencerName, @Nonnull MessageChannel messageChannel,
-                                        @Nonnull String registrationId) {
+    ClientRemoveChannelOperation(@Nonnull String sequencerName, @Nonnull MessageChannel messageChannel,
+                                 @Nonnull String registrationId) {
 
         super(sequencerName, messageChannel);
         this.sequencerName = sequencerName;

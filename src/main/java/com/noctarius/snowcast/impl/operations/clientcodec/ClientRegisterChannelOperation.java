@@ -19,14 +19,14 @@ package com.noctarius.snowcast.impl.operations.clientcodec;
 import com.hazelcast.spi.EventRegistration;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 
-public class ClientRegisterChannelOperation
+ class ClientRegisterChannelOperation
         extends AbstractClientRequestOperation {
 
-    public ClientRegisterChannelOperation(String sequencerName, MessageChannel messageChannel) {
+    private String registrationId;
+
+     ClientRegisterChannelOperation(String sequencerName, MessageChannel messageChannel) {
         super(sequencerName, messageChannel);
     }
-
-    private String registrationId;
 
     @Override
     public void run() {

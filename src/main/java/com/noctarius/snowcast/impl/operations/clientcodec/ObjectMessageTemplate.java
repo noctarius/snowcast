@@ -20,9 +20,6 @@ public interface ObjectMessageTemplate {
                                                                @Min(128) @Max(8192) int maxLogicalNodeCount,
                                                                @Nonnegative @Max(Short.MAX_VALUE) int backupCount);
 
-    //@Response(ObjectMessageConstants.SNOWCAST_EPOCH)
-    //SnowcastEpoch SnowcastEpoch(@Nonnegative long offset);
-
     @EventResponse(EventMessageConst.EVENT_TOPIC)
     void Topic(@Nonnull Data item, @Nonnegative long publishTime, @Nonnull String uuid);
 

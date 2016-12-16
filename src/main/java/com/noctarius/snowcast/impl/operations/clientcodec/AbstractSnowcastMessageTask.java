@@ -11,7 +11,7 @@ import com.noctarius.snowcast.impl.SnowcastConstants;
 
 import java.security.Permission;
 
-public abstract class AbstractSnowcastMessageTask<P>
+abstract class AbstractSnowcastMessageTask<P>
         extends AbstractInvocationMessageTask<P>
         implements MessageChannel {
 

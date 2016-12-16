@@ -142,20 +142,20 @@ public final class InternalSequencerUtils {
         return (int) (sequenceId & mask);
     }
 
-    public static void printStartupMessage(boolean client) {
+    static void printStartupMessage(boolean client) {
         StringBuilder sb = new StringBuilder();
         if (!SnowcastConstants.LOGO_DISABLED) {
             sb.append(SnowcastConstants.SNOWCAST_ASCII_LOGO).append('\n');
         }
-        sb.append("snowcast ").append(client ? "client" : "node").append(" mode - ");
+        sb.append("snowcast ").append(client ? "client" : "member").append(" mode - ");
         sb.append(" version: ").append(SnowcastConstants.VERSION).append("    ");
         sb.append("build-date: ").append(SnowcastConstants.BUILD_DATE).append('\n');
         System.out.println(sb.toString());
     }
 
-    public static SnowcastConstants.HazelcastVersion getHazelcastVersion() {
+    static SnowcastConstants.HazelcastVersion getHazelcastVersion() {
         BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
-        if (buildInfo == null || buildInfo.getVersion() == null) {
+        if (buildInfo.getVersion() == null) {
             return SnowcastConstants.HazelcastVersion.Unknown;
         }
 
