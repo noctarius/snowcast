@@ -109,8 +109,7 @@ In snowcast the ID generators are called `SnowcastSequencer`. Those `com.noctari
 To retrieve a `SnowcastSequencer` we first have to create a snowcast instance which acts as a factory to create or destroy sequencers.
 
 ```java
-Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance(config);
+HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance();
 Snowcast snowcast = SnowcastSystem.snowcast( hazelcastInstance );
 ```
 
