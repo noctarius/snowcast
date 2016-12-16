@@ -25,6 +25,7 @@ import com.hazelcast.nio.serialization.Data;
 import com.hazelcast.spi.EventPublishingService;
 import com.hazelcast.spi.EventRegistration;
 import com.hazelcast.spi.EventService;
+import com.hazelcast.spi.InternalCompletableFuture;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.ManagedService;
 import com.hazelcast.spi.MigrationAwareService;
@@ -44,6 +45,7 @@ import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
+import com.noctarius.snowcast.SnowcastSequencerAlreadyRegisteredException;
 import com.noctarius.snowcast.impl.operations.AttachLogicalNodeOperation;
 import com.noctarius.snowcast.impl.operations.CreateSequencerDefinitionOperation;
 import com.noctarius.snowcast.impl.operations.DestroySequencerDefinitionOperation;
@@ -56,7 +58,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.lang.reflect.Method;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -70,13 +74,17 @@ public class NodeSequencerService
         implements SequencerService, ManagedService, MigrationAwareService, RemoteService,
                    EventPublishingService<Object, Object> {
 
+    private static final MethodType FUTURE_GET_TYPE = MethodType.methodType(Object.class);
+    private static final MethodType GET_LISTENER_GET_TYPE = MethodType.methodType(Object.class);
+
     private final SequencerPartitionConstructorFunction partitionConstructor = new SequencerPartitionConstructorFunction();
     private final NodeSequencerConstructorFunction sequencerConstructor = new NodeSequencerConstructorFunction(this);
 
     private final ConcurrentMap<Integer, SequencerPartition> partitions;
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
-    private final Method getListenerMethod;
+    private final MethodHandle getListenerMethodHandle;
+    private final MethodHandle cfGetMethodHandle;
 
     private NodeEngine nodeEngine;
     private EventService eventService;
@@ -85,7 +93,8 @@ public class NodeSequencerService
     public NodeSequencerService() {
         this.provisions = new ConcurrentHashMap<String, SequencerProvision>();
         this.partitions = new ConcurrentHashMap<Integer, SequencerPartition>();
-        this.getListenerMethod = findEventRegistrationGetListener();
+        this.getListenerMethodHandle = findEventRegistrationGetListener();
+        this.cfGetMethodHandle = findCompletableFutureExecutorMethod();
     }
 
     @Override
@@ -199,7 +208,7 @@ public class NodeSequencerService
         OperationService operationService = nodeEngine.getOperationService();
 
         InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
-        return (Integer) invocationBuilder.invoke().getSafely();
+        return completableFutureGet(invocationBuilder.invoke());
     }
 
     public void detachSequencer(@Nonnull SequencerDefinition definition, @Min(128) @Max(8192) int logicalNodeId) {
@@ -210,7 +219,7 @@ public class NodeSequencerService
         OperationService operationService = nodeEngine.getOperationService();
 
         InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
-        invocationBuilder.invoke().getSafely();
+        completableFutureGet(invocationBuilder.invoke());
     }
 
     @Nonnull
@@ -295,7 +304,7 @@ public class NodeSequencerService
             OperationService operationService = nodeEngine.getOperationService();
 
             InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
-            return (T) invocationBuilder.invoke().getSafely();
+            return completableFutureGet(invocationBuilder.invoke());
         } catch (Exception e) {
             if (e instanceof SnowcastException) {
                 throw (SnowcastException) e;
@@ -335,30 +344,72 @@ public class NodeSequencerService
     public void destroyDistributedObject(@Nonnull String objectName) {
     }
 
-    private ClientChannelHandler getClientChannelHandler(EventRegistration registration) {
-        try {
-            return (ClientChannelHandler) getListenerMethod.invoke(registration);
+    private <T> T completableFutureGet(InternalCompletableFuture completableFuture) {
+        return executeMethodHandle(cfGetMethodHandle, completableFuture);
+    }
 
-        } catch (Exception e) {
-            String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage("registration");
-            throw new SnowcastException(message, e);
+    private ClientChannelHandler getClientChannelHandler(EventRegistration registration) {
+        return executeMethodHandle(getListenerMethodHandle, registration);
+    }
+
+    private <T> T executeMethodHandle(MethodHandle methodHandle, Object receiver) {
+        try {
+            return (T) methodHandle.invoke(receiver);
+
+        } catch (Throwable throwable) {
+            //VERSION_HACK
+            if (throwable instanceof SnowcastSequencerAlreadyRegisteredException) {
+                throw (SnowcastSequencerAlreadyRegisteredException) throwable;
+
+            } else if (throwable.getCause() instanceof SnowcastSequencerAlreadyRegisteredException) {
+                throw (SnowcastSequencerAlreadyRegisteredException) throwable.getCause();
+            }
+            String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage("completableFuture");
+            throw new SnowcastException(message, throwable);
         }
     }
 
-    private Method findEventRegistrationGetListener() {
-        BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
-        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_6) {
-            return hz36EventRegistrationGetListener(buildInfo);
+    private MethodHandle findEventRegistrationGetListener() {
+        if (InternalSequencerUtils.getHazelcastVersion() != SnowcastConstants.HazelcastVersion.Unknown) {
+            BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
+            return hz37EventRegistrationGetListener(buildInfo);
         }
         String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
         throw new SnowcastException(message);
     }
 
-    //TODO
-    private Method hz36EventRegistrationGetListener(BuildInfo buildInfo) {
+    private MethodHandle hz37EventRegistrationGetListener(BuildInfo buildInfo) {
+        //ACCESSIBILITY_HACK
         try {
             Class<?> clazz = Class.forName("com.hazelcast.spi.impl.eventservice.impl.Registration");
-            return clazz.getMethod("getListener");
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            return lookup.findVirtual(clazz, "getListener", GET_LISTENER_GET_TYPE);
+
+        } catch (Exception e) {
+            String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());
+            throw new SnowcastException(message, e);
+        }
+    }
+
+    private MethodHandle findCompletableFutureExecutorMethod() {
+        BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
+        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_7) {
+            return getCompletableFutureExecutorMethod(buildInfo, "com.hazelcast.spi.InternalCompletableFuture", "getSafely");
+
+        } else if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_8) {
+            return getCompletableFutureExecutorMethod(buildInfo, "java.util.concurrent.Future", "get");
+
+        }
+        String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
+        throw new SnowcastException(message);
+    }
+
+    private MethodHandle getCompletableFutureExecutorMethod(BuildInfo buildInfo, String className, String methodName) {
+        //VERSION_HACK
+        try {
+            Class<?> clazz = Class.forName(className);
+            MethodHandles.Lookup lookup = MethodHandles.lookup();
+            return lookup.findVirtual(clazz, methodName, FUTURE_GET_TYPE);
 
         } catch (Exception e) {
             String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());

@@ -147,7 +147,7 @@ Destroying a sequencer is a cluster operation and will destroy all sequencers re
 
 ### Hazelcast Configuration
 
-snowcast 2.0 uses a custom service that is automatically registered with Hazelcast on startup. To get started with snowcast simply provide the according JAR file in the classpath of the application. No additional step's necessary. For older snowcast versions see below.
+snowcast 2.0 uses a custom service that is automatically registered with Hazelcast on startup. It supports Hazelcast 3.7.x and 3.8.x. To get started with snowcast simply provide the according JAR file in the classpath of the application. No additional step's necessary. For older snowcast versions see below.
 
 For snowcast 1.0; Hazelcast requires custom services to be configured upfront using either the Configuration API or by utilizing the, XML based, declarative configuration.
 
@@ -202,7 +202,7 @@ The previously available "Lazy Configuration Hack" has been removed from snowcas
 
 ### Hazelcast Client Configuration
 
-snowcast 2.0 snapshots currently support Hazelcast 3.7.x, 3.8.x and maybe 3.6.x (untested). The underlying communication system is automatically registered.
+snowcast 2.0 snapshots currently support Hazelcast 3.7.x, 3.8.x. The underlying communication system is automatically registered.
 
 For older versions, snowcast 1.0 supports Hazelcast 3.4.x as well as Hazelcast 3.5.x and automatically registers a matching communication system.
 

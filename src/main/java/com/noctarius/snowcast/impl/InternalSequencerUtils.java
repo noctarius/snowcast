@@ -158,6 +158,12 @@ public final class InternalSequencerUtils {
         if (buildInfo == null || buildInfo.getVersion() == null) {
             return SnowcastConstants.HazelcastVersion.Unknown;
         }
-        return SnowcastConstants.HazelcastVersion.V_3_6;
+
+        if (buildInfo.getVersion().startsWith("3.7")) {
+            return SnowcastConstants.HazelcastVersion.V_3_7;
+        } else if (buildInfo.getVersion().startsWith("3.8")) {
+            return SnowcastConstants.HazelcastVersion.V_3_8;
+        }
+        return SnowcastConstants.HazelcastVersion.Unknown;
     }
 }

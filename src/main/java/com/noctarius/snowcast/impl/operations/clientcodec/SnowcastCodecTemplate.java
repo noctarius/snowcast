@@ -18,8 +18,8 @@ package com.noctarius.snowcast.impl.operations.clientcodec;
 
 import com.hazelcast.annotation.GenerateCodec;
 import com.hazelcast.annotation.Request;
-import com.hazelcast.client.impl.protocol.EventMessageConst;
-import com.hazelcast.client.impl.protocol.ResponseMessageConst;
+import com.hazelcast.client.impl.protocol.constants.EventMessageConst;
+import com.hazelcast.client.impl.protocol.constants.ResponseMessageConst;
 import com.noctarius.snowcast.impl.SequencerDefinition;
 
 import javax.annotation.Nonnegative;

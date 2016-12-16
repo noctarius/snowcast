@@ -25,12 +25,12 @@ import com.hazelcast.util.ExceptionUtil;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-final class Hazelcast36ClientInvocator
+final class Hazelcast37ClientInvocator
         implements ClientInvocator {
 
     private final HazelcastClientInstanceImpl client;
 
-    Hazelcast36ClientInvocator(@Nonnull HazelcastClientInstanceImpl client) {
+    Hazelcast37ClientInvocator(@Nonnull HazelcastClientInstanceImpl client) {
         this.client = client;
     }
 

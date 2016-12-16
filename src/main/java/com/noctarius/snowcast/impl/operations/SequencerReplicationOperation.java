@@ -19,7 +19,7 @@ package com.noctarius.snowcast.impl.operations;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import com.hazelcast.spi.AbstractOperation;
+import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.impl.NodeSequencerService;
 import com.noctarius.snowcast.impl.PartitionReplication;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
@@ -28,7 +28,7 @@ import com.noctarius.snowcast.impl.SequencerPartition;
 import java.io.IOException;
 
 public class SequencerReplicationOperation
-        extends AbstractOperation
+        extends Operation
         implements IdentifiedDataSerializable {
 
     private PartitionReplication partitionReplication;

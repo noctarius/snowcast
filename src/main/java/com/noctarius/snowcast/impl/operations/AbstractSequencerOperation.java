@@ -19,13 +19,13 @@ package com.noctarius.snowcast.impl.operations;
 import com.hazelcast.nio.ObjectDataInput;
 import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.nio.serialization.IdentifiedDataSerializable;
-import com.hazelcast.spi.AbstractOperation;
+import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.impl.SequencerDataSerializerHook;
 
 import java.io.IOException;
 
 abstract class AbstractSequencerOperation
-        extends AbstractOperation
+        extends Operation
         implements IdentifiedDataSerializable {
 
     private String sequencerName;

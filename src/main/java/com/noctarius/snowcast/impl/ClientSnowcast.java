@@ -18,7 +18,6 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.HazelcastClientProxy;
-import com.hazelcast.client.spi.ClientProxy;
 import com.hazelcast.client.spi.ProxyManager;
 import com.hazelcast.core.HazelcastInstance;
 import com.noctarius.snowcast.Snowcast;
@@ -101,8 +100,8 @@ class ClientSnowcast
 
     @Nonnull
     private ClientInvocator buildClientInvocator(HazelcastClientInstanceImpl client) {
-        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_6) {
-            return new Hazelcast36ClientInvocator(client);
+        if (InternalSequencerUtils.getHazelcastVersion() != SnowcastConstants.HazelcastVersion.Unknown) {
+            return new Hazelcast37ClientInvocator(client);
         }
         String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
         throw new SnowcastException(message);

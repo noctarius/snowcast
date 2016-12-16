@@ -3,7 +3,7 @@ package com.noctarius.snowcast.impl.operations.clientcodec;
 import com.hazelcast.annotation.EventResponse;
 import com.hazelcast.annotation.GenerateCodec;
 import com.hazelcast.annotation.Response;
-import com.hazelcast.client.impl.protocol.EventMessageConst;
+import com.hazelcast.client.impl.protocol.constants.EventMessageConst;
 import com.hazelcast.nio.serialization.Data;
 import com.noctarius.snowcast.impl.SequencerDefinition;
 
