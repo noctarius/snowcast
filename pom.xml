@@ -166,13 +166,9 @@
               com.hazelcast.spi.*,
               com.hazelcast.nio.*,
               com.hazelcast.instance.*,
-              com.hazelcast.partition.*,
-              com.hazelcast.cluster.*,
-              com.hazelcast.config.*,
               com.hazelcast.logging.*,
               com.hazelcast.internal.cluster.*,
               com.hazelcast.internal.serialization.*,
-              com.hazelcast.internal.serialization.impl.*,
               sun.misc.*
             </Import-Package>
           </instructions>
