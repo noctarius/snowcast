@@ -16,15 +16,12 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.core.HazelcastException;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.HazelcastInstanceImpl;
 import com.hazelcast.instance.HazelcastInstanceProxy;
 import com.hazelcast.spi.NodeEngine;
-import com.hazelcast.spi.impl.NodeEngineImpl;
 import com.noctarius.snowcast.Snowcast;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastSequencer;
 
 import javax.annotation.Nonnegative;
@@ -69,36 +66,22 @@ class NodeSnowcast
 
     @Nonnull
     private NodeSequencerService getSequencerService(@Nonnull NodeEngine nodeEngine) {
-        try {
+        return ExceptionUtils.execute(() -> {
             NodeSequencerService service = nodeEngine.getService(SnowcastConstants.SERVICE_NAME);
-            if (service != null) {
-                printStartupMessage(false);
-                return service;
-            }
-
-            // Service not registered!
-            String message = ExceptionMessages.SERVICE_NOT_REGISTERED.buildMessage();
-            throw new SnowcastException(message);
-
-        } catch (HazelcastException e) {
-            // Service not registered!
-            String message = ExceptionMessages.SERVICE_NOT_REGISTERED.buildMessage();
-            throw new SnowcastException(message, e);
-        }
+            printStartupMessage(false);
+            return service;
+        }, ExceptionMessages.SERVICE_NOT_REGISTERED);
     }
 
     @Nonnull
     private NodeEngine getNodeEngine(@Nonnull HazelcastInstance hazelcastInstance) {
-        try {
+        return ExceptionUtils.execute(() -> {
             // Ugly hack due to lack in SPI
             //ACCESSIBILITY_HACK
             Field originalField = HazelcastInstanceProxy.class.getDeclaredField("original");
             originalField.setAccessible(true);
             HazelcastInstanceImpl impl = (HazelcastInstanceImpl) originalField.get(hazelcastInstance);
             return impl.node.getNodeEngine();
-        } catch (Exception e) {
-            String message = ExceptionMessages.RETRIEVE_NODE_ENGINE_FAILED.buildMessage();
-            throw new SnowcastException(message, e);
-        }
+        }, ExceptionMessages.RETRIEVE_NODE_ENGINE_FAILED);
     }
 }

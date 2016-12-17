@@ -23,8 +23,6 @@ public interface MessageChannel {
 
     void sendClientMessage(ClientMessage clientMessage);
 
-    void sendClientMessage(Object partitionKey, ClientMessage clientMessage);
-
     Address getAddress();
 
     String getUuid();

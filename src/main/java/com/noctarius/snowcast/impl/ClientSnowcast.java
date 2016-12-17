@@ -72,15 +72,12 @@ class ClientSnowcast
     @Nonnull
     private HazelcastClientInstanceImpl getHazelcastClient(@Nonnull HazelcastInstance hazelcastInstance) {
         //ACCESSIBILITY_HACK
-        try {
+        return ExceptionUtils.execute(() -> {
             // Ugly hack due to lack in SPI
             Field clientField = HazelcastClientProxy.class.getDeclaredField("client");
             clientField.setAccessible(true);
             return (HazelcastClientInstanceImpl) clientField.get(hazelcastInstance);
-        } catch (Exception e) {
-            String message = ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED.buildMessage();
-            throw new SnowcastException(message, e);
-        }
+        }, ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED);
     }
 
     @Nonnull

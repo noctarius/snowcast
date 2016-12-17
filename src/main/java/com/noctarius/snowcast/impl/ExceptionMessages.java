@@ -150,7 +150,7 @@ public enum ExceptionMessages {
 
     private final String template;
 
-    private ExceptionMessages(String template) {
+    ExceptionMessages(String template) {
         this.template = template;
     }
 
@@ -158,15 +158,7 @@ public enum ExceptionMessages {
         return template;
     }
 
-    public String buildMessage(Object arg1) {
-        return String.format(template, arg1);
-    }
-
-    public String buildMessage(Object arg1, Object arg2) {
-        return String.format(template, arg1, arg2);
-    }
-
-    public String buildMessage(Object arg1, Object arg2, Object arg3) {
-        return String.format(template, arg1, arg2, arg3);
+    public String buildMessage(Object... args) {
+        return String.format(template, args);
     }
 }

@@ -68,11 +68,6 @@ abstract class AbstractSnowcastMessageTask<P>
     }
 
     @Override
-    public void sendClientMessage(Object partitionKey, ClientMessage clientMessage) {
-        super.sendClientMessage(partitionKey, clientMessage);
-    }
-
-    @Override
     public Address getAddress() {
         return endpoint.getConnection().getEndPoint();
     }

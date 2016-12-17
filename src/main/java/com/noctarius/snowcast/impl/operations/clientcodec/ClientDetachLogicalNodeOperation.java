@@ -16,8 +16,6 @@
  */
 package com.noctarius.snowcast.impl.operations.clientcodec;
 
-import com.hazelcast.nio.ObjectDataInput;
-import com.hazelcast.nio.ObjectDataOutput;
 import com.hazelcast.spi.BackupAwareOperation;
 import com.hazelcast.spi.Operation;
 import com.noctarius.snowcast.impl.NodeSequencerService;
@@ -26,7 +24,6 @@ import com.noctarius.snowcast.impl.SequencerPartition;
 import com.noctarius.snowcast.impl.operations.BackupDetachLogicalNodeOperation;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
 
 class ClientDetachLogicalNodeOperation
         extends AbstractClientRequestOperation
@@ -60,22 +57,6 @@ class ClientDetachLogicalNodeOperation
     @Override
     public Object getResponse() {
         return Boolean.TRUE;
-    }
-
-    @Override
-    protected void writeInternal(ObjectDataOutput out)
-            throws IOException {
-
-        super.writeInternal(out);
-        out.writeInt(logicalNodeId);
-    }
-
-    @Override
-    protected void readInternal(ObjectDataInput in)
-            throws IOException {
-
-        super.readInternal(in);
-        logicalNodeId = in.readInt();
     }
 
     @Override

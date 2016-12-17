@@ -67,6 +67,7 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.noctarius.snowcast.impl.ExceptionUtils.exceptionParameters;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class NodeSequencerService
@@ -366,15 +367,11 @@ public class NodeSequencerService
 
     private MethodHandle hz37EventRegistrationGetListener(BuildInfo buildInfo) {
         //ACCESSIBILITY_HACK
-        try {
+        return ExceptionUtils.execute(() -> {
             Class<?> clazz = Class.forName("com.hazelcast.spi.impl.eventservice.impl.Registration");
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             return lookup.findVirtual(clazz, "getListener", GET_LISTENER_GET_TYPE);
-
-        } catch (Exception e) {
-            String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());
-            throw new SnowcastException(message, e);
-        }
+        }, ExceptionMessages.INTERNAL_SETUP_FAILED, exceptionParameters(buildInfo.getVersion()));
     }
 
     private MethodHandle findFutureExecutorMethod() {
@@ -392,15 +389,11 @@ public class NodeSequencerService
 
     private MethodHandle getFutureExecutorMethod(BuildInfo buildInfo, String className, String methodName) {
         //VERSION_HACK
-        try {
+        return ExceptionUtils.execute(() -> {
             Class<?> clazz = Class.forName(className);
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             return lookup.findVirtual(clazz, methodName, FUTURE_GET_TYPE);
-
-        } catch (Exception e) {
-            String message = ExceptionMessages.INTERNAL_SETUP_FAILED.buildMessage(buildInfo.getVersion());
-            throw new SnowcastException(message, e);
-        }
+        }, ExceptionMessages.INTERNAL_SETUP_FAILED, exceptionParameters(buildInfo.getVersion()));
     }
 
     private class ClientChannelHandler {
