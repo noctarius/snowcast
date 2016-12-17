@@ -8,7 +8,7 @@
 
 ### Disclaimer
 
-The snowcast project is not sponsored or started by nor affiliated to Hazelcast, Inc. in any possible way. It is a spare-time project and Hazelcast, even though I employed by Hazelcast, does not offer any support to this project. There is also no commercial support, not at the current point in time. Apart from that I will give support in the best way possible.
+The snowcast project is not sponsored or started by nor affiliated to Hazelcast, Inc. in any possible way. It is a spare-time project and Hazelcast, even though I'm employed by Hazelcast, does not offer any support to this project. There is also no commercial support, not at the current point in time. Apart from that I will give support in the best way possible.
 
 ## Table of Contents
 * [The Problem](#the-problem)
