@@ -42,21 +42,6 @@ class AttachLogicalNodeMessageTask
     }
 
     @Override
-    public String getDistributedObjectName() {
-        return parameters.sequencerName;
-    }
-
-    @Override
-    public String getMethodName() {
-        return "execute";
-    }
-
-    @Override
-    public Object[] getParameters() {
-        return new Object[0];
-    }
-
-    @Override
     protected Operation createOperation() {
         String sequencerName = parameters.sequencerName;
         long epochOffset = parameters.epochOffset;

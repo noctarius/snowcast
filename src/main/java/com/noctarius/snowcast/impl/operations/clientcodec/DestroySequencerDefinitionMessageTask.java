@@ -43,19 +43,4 @@ class DestroySequencerDefinitionMessageTask
     protected ClientMessage encodeResponse(Object response) {
         return SnowcastDestroySequencerDefinitionCodec.encodeResponse((Boolean) response);
     }
-
-    @Override
-    public String getDistributedObjectName() {
-        return parameters.sequencerName;
-    }
-
-    @Override
-    public String getMethodName() {
-        return "execute";
-    }
-
-    @Override
-    public Object[] getParameters() {
-        return new Object[0];
-    }
 }

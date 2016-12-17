@@ -23,17 +23,21 @@ import com.hazelcast.nio.Address;
 import com.hazelcast.nio.Connection;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.Operation;
+import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 
+import java.lang.reflect.Field;
 import java.security.Permission;
 
 abstract class AbstractSnowcastMessageTask<P>
         extends AbstractInvocationMessageTask<P>
         implements MessageChannel {
 
-    AbstractSnowcastMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
+    private final String sequencerName;
 
+    AbstractSnowcastMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
         super(clientMessage, node, connection);
+        this.sequencerName = readSequencerNameField();
     }
 
     @Override
@@ -76,6 +80,39 @@ abstract class AbstractSnowcastMessageTask<P>
     @Override
     public String getUuid() {
         return endpoint.getUuid();
+    }
+
+    @Override
+    public String getMethodName() {
+        return getClass().getSimpleName().replace("MessageTask", "");
+    }
+
+    @Override
+    public String getDistributedObjectName() {
+        return sequencerName;
+    }
+
+    @Override
+    public Object[] getParameters() {
+        return new Object[0];
+    }
+
+    private String readSequencerNameField() {
+        try {
+            Field field = findSequencerNameField();
+            return (String) field.get(parameters);
+        } catch (Exception e) {
+            throw new SnowcastException(e);
+        }
+    }
+
+    private Field findSequencerNameField()
+            throws NoSuchFieldException {
+
+        Class<?> clazz = parameters.getClass();
+        Field field = clazz.getDeclaredField("sequencerName");
+        field.setAccessible(true);
+        return field;
     }
 
     protected abstract Operation createOperation();
