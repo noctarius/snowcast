@@ -33,11 +33,10 @@ abstract class AbstractSnowcastMessageTask<P>
         extends AbstractInvocationMessageTask<P>
         implements MessageChannel {
 
-    private final String sequencerName;
+    private String sequencerName;
 
     AbstractSnowcastMessageTask(ClientMessage clientMessage, Node node, Connection connection) {
         super(clientMessage, node, connection);
-        this.sequencerName = readSequencerNameField();
     }
 
     @Override
@@ -84,7 +83,7 @@ abstract class AbstractSnowcastMessageTask<P>
 
     @Override
     public String getDistributedObjectName() {
-        return sequencerName;
+        return readSequencerNameField();
     }
 
     @Override
@@ -93,21 +92,26 @@ abstract class AbstractSnowcastMessageTask<P>
     }
 
     private String readSequencerNameField() {
+        if (sequencerName != null) {
+            return sequencerName;
+        }
         try {
             Field field = findSequencerNameField();
-            return (String) field.get(parameters);
+            return (sequencerName = (String) field.get(parameters));
         } catch (Exception e) {
             throw new SnowcastException(e);
         }
     }
 
-    private Field findSequencerNameField()
-            throws NoSuchFieldException {
-
-        Class<?> clazz = parameters.getClass();
-        Field field = clazz.getDeclaredField("sequencerName");
-        field.setAccessible(true);
-        return field;
+    private Field findSequencerNameField() {
+        try {
+            Class<?> clazz = parameters.getClass();
+            Field field = clazz.getDeclaredField("sequencerName");
+            field.setAccessible(true);
+            return field;
+        } catch (Exception e) {
+            throw new SnowcastException(e);
+        }
     }
 
     protected abstract Operation createOperation();
