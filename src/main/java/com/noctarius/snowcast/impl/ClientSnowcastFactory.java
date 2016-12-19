@@ -16,7 +16,6 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.client.impl.HazelcastClientProxy;
 import com.hazelcast.core.HazelcastInstance;
 import com.noctarius.snowcast.Snowcast;
 
@@ -29,13 +28,6 @@ public final class ClientSnowcastFactory {
     public static Snowcast snowcast(@Nonnull HazelcastInstance hazelcastInstance,
                                     @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
 
-        if (hazelcastInstance instanceof HazelcastClientProxy) {
-            return new ClientSnowcast(hazelcastInstance, backupCount);
-        }
-
-        // Client type not yet supported
-        String className = hazelcastInstance.getClass().getCanonicalName();
-        String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage(className);
-        throw new IllegalArgumentException(message);
+        return new ClientSnowcast(hazelcastInstance, backupCount);
     }
 }
