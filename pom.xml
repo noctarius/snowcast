@@ -267,7 +267,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.2.201409121644</version>
+        <version>0.7.7.201606060606</version>
         <executions>
           <execution>
             <id>jacoco-initialize</id>
@@ -295,19 +295,6 @@
           <skipDeletedFiles>true</skipDeletedFiles>
           <pubScmUrl>scm:git:git@github.com:noctarius/snowcast.git</pubScmUrl>
           <scmBranch>gh-pages</scmBranch>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.pitest</groupId>
-        <artifactId>pitest-maven</artifactId>
-        <version>1.1.4</version>
-        <configuration>
-          <targetClasses>
-            <param>com.noctarius.snowcast*</param>
-          </targetClasses>
-          <targetTests>
-            <param>com.noctarius.snowcast*</param>
-          </targetTests>
         </configuration>
       </plugin>
       <plugin>
