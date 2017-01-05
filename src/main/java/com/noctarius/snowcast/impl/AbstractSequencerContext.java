@@ -271,7 +271,7 @@ abstract class AbstractSequencerContext {
     private int checkStateAndLogicalNodeId() {
         int logicalNodeId = this.logicalNodeId;
         if (logicalNodeId == -1) {
-            throw exception(SEQUENCER_NOT_ASSIGNED, sequencerName);
+            throw exception(SnowcastStateException::new, SEQUENCER_NOT_ASSIGNED, sequencerName);
         }
         SnowcastSequenceState state = this.state;
         if (state != Attached) {

@@ -132,7 +132,7 @@ class LogicalNodeTable {
         while (true) {
             Object[] assignmentTable = this.assignmentTable;
             if (assignmentTable[logicalNodeId] != null) {
-                throw exception(BACKUP_OUT_OF_SYNC, partitionId);
+                throw exception(SnowcastIllegalStateException::new, BACKUP_OUT_OF_SYNC, partitionId);
             }
 
             long offset = offset(logicalNodeId);

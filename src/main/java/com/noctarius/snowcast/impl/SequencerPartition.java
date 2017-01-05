@@ -20,6 +20,7 @@ import com.hazelcast.nio.Address;
 import com.hazelcast.nio.UnsafeHelper;
 import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastIllegalStateException;
+import com.noctarius.snowcast.SnowcastSequencerAlreadyRegisteredException;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nonnegative;
@@ -217,7 +218,7 @@ public final class SequencerPartition {
                                                           @Nullable SequencerDefinition other) {
 
         if (other != null && !other.equals(definition)) {
-            throw exception(SnowcastIllegalStateException::new, SEQUENCER_ALREADY_REGISTERED);
+            throw exception(SnowcastSequencerAlreadyRegisteredException::new, SEQUENCER_ALREADY_REGISTERED);
         }
         return other != null ? other : definition;
     }

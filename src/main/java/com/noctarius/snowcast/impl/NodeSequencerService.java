@@ -350,7 +350,7 @@ public class NodeSequencerService
             } else if (throwable.getCause() instanceof SnowcastSequencerAlreadyRegisteredException) {
                 throw (SnowcastSequencerAlreadyRegisteredException) throwable.getCause();
             }
-            throw exception(PARAMETER_IS_NOT_SUPPORTED, "completableFuture");
+            throw exception(SnowcastSequencerAlreadyRegisteredException::new, PARAMETER_IS_NOT_SUPPORTED, "completableFuture");
         }
     }
 
