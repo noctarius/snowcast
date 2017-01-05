@@ -2,9 +2,9 @@
 
 **snowcast** is an auto-configuration, distributed, scalable ID generator on top of [Hazelcast](http://www.hazelcast.org).
 
-![https://noctarius.ci.cloudbees.com/job/snowcast](https://noctarius.ci.cloudbees.com/job/snowcast/badge/icon)
-![https://codecov.io/github/noctarius/snowcast?branch=master](https://codecov.io/gh/noctarius/snowcast/branch/master/graph/badge.svg)
-![http://www.apache.org/licenses/LICENSE-2.0](https://img.shields.io/badge/license-Apache%20License%202-brightgreen.svg)
+[![](https://noctarius.ci.cloudbees.com/job/snowcast/badge/icon)](https://noctarius.ci.cloudbees.com/job/snowcast)
+[![](https://codecov.io/gh/noctarius/snowcast/branch/master/graph/badge.svg)](https://codecov.io/github/noctarius/snowcast?branch=master)
+[![](https://img.shields.io/badge/license-Apache%20License%202-brightgreen.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
 ### Disclaimer
 
