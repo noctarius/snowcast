@@ -27,7 +27,6 @@ import com.hazelcast.client.impl.protocol.codec.SnowcastRemoveChannelCodec;
 import com.hazelcast.core.Partition;
 import com.hazelcast.core.PartitionService;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastException;
 
 import javax.annotation.Nonnull;
 
@@ -105,12 +104,10 @@ final class ClientCodec {
     }
 
     private ClientMessage invoke(@Nonnull String sequencerName, @Nonnull ClientMessage request) {
-        try {
+        return ExceptionUtils.execute(() -> {
             int partitionId = partitionId(sequencerName);
             return clientInvocator.invoke(partitionId, request).get();
-        } catch (Exception e) {
-            throw new SnowcastException(e);
-        }
+        });
     }
 
     private SequencerDefinition decodeSequencerDefinition(ClientMessage response) {

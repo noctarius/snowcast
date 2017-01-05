@@ -63,11 +63,11 @@ public final class SnowcastConstants {
     public static final String USER_CONTEXT_LOOKUP_NAME = "noctarius::Snowcast::SequencerService";
 
     // snowcast ascii logo
-    public static final String SNOWCAST_ASCII_LOGO = "                                             __ \n" +
-            "   _________  ____ _      ___________ ______/ /_\n" +
-            "  / ___/ __ \\/ __ \\ | /| / / ___/ __ `/ ___/ __/\n" +
-            " (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_  \n" +
-            "/____/_/ /_/\\____/|__/|__/\\___/\\__,_/____/\\__/  \n";
+    public static final String SNOWCAST_ASCII_LOGO =
+            "                                             __ \n" + "   _________  ____ _      ___________ ______/ /_\n"
+                    + "  / ___/ __ \\/ __ \\ | /| / / ___/ __ `/ ___/ __/\n"
+                    + " (__  ) / / / /_/ / |/ |/ / /__/ /_/ (__  ) /_  \n"
+                    + "/____/_/ /_/\\____/|__/|__/\\___/\\__,_/____/\\__/  \n";
 
     // snowcast version
     public static final String VERSION;
@@ -98,9 +98,7 @@ public final class SnowcastConstants {
     private static final String SNOWCAST_LOGO_DISABLE_PROPERTY = "snowcast.logo.disable";
 
     public enum HazelcastVersion {
-        V_3_7,
-        V_3_8,
-        Unknown
+        V_3_7, V_3_8, Unknown
     }
 
     static {

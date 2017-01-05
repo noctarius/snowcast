@@ -23,7 +23,7 @@ import com.hazelcast.nio.Address;
 import com.hazelcast.nio.Connection;
 import com.hazelcast.spi.InvocationBuilder;
 import com.hazelcast.spi.Operation;
-import com.noctarius.snowcast.SnowcastException;
+import com.noctarius.snowcast.impl.ExceptionUtils;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 
 import java.lang.reflect.Field;
@@ -95,23 +95,19 @@ abstract class AbstractSnowcastMessageTask<P>
         if (sequencerName != null) {
             return sequencerName;
         }
-        try {
+        return ExceptionUtils.execute(() -> {
             Field field = findSequencerNameField();
             return (sequencerName = (String) field.get(parameters));
-        } catch (Exception e) {
-            throw new SnowcastException(e);
-        }
+        });
     }
 
     private Field findSequencerNameField() {
-        try {
+        return ExceptionUtils.execute(() -> {
             Class<?> clazz = parameters.getClass();
             Field field = clazz.getDeclaredField("sequencerName");
             field.setAccessible(true);
             return field;
-        } catch (Exception e) {
-            throw new SnowcastException(e);
-        }
+        });
     }
 
     protected abstract Operation createOperation();

@@ -295,19 +295,14 @@ public class NodeSequencerService
 
     @Nullable
     private <T> T invoke(@Nonnull Operation operation, @Nonnull String sequencerName) {
-        try {
+        return ExceptionUtils.execute(() -> {
             IPartitionService partitionService = nodeEngine.getPartitionService();
             int partitionId = partitionService.getPartitionId(sequencerName);
             OperationService operationService = nodeEngine.getOperationService();
 
             InvocationBuilder invocationBuilder = operationService.createInvocationBuilder(SERVICE_NAME, operation, partitionId);
             return completableFutureGet(invocationBuilder.invoke());
-        } catch (Exception e) {
-            if (e instanceof SnowcastException) {
-                throw (SnowcastException) e;
-            }
-            throw new SnowcastException(e);
-        }
+        });
     }
 
     @Nonnull

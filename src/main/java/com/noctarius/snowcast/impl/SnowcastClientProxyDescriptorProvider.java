@@ -25,18 +25,16 @@ public final class SnowcastClientProxyDescriptorProvider
 
     @Override
     public ClientProxyDescriptor[] createClientProxyDescriptors() {
-        return new ClientProxyDescriptor[] {
-                new ClientProxyDescriptor() {
-                    @Override
-                    public String getServiceName() {
-                        return SnowcastConstants.SERVICE_NAME;
-                    }
+        return new ClientProxyDescriptor[]{new ClientProxyDescriptor() {
+            @Override
+            public String getServiceName() {
+                return SnowcastConstants.SERVICE_NAME;
+            }
 
-                    @Override
-                    public Class<? extends ClientProxy> getClientProxyClass() {
-                        return ClientSequencer.class;
-                    }
-                }
-        };
+            @Override
+            public Class<? extends ClientProxy> getClientProxyClass() {
+                return ClientSequencer.class;
+            }
+        }};
     }
 }

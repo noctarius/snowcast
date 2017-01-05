@@ -21,20 +21,33 @@ import com.noctarius.snowcast.SnowcastException;
 import java.util.concurrent.Callable;
 import java.util.function.Supplier;
 
-class ExceptionUtils {
+public class ExceptionUtils {
 
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 
-    static Supplier<Object[]> exceptionParameters(Object... args) {
+    public static Supplier<Object[]> exceptionParameters(Object... args) {
         return () -> args;
     }
 
-    static <V> V execute(Callable<V> callable, ExceptionMessages exceptionMessage) {
+    public static <V> V execute(ThrowingCallable<V> callable) {
+        try {
+            return callable.call();
+        } catch (Throwable throwable) {
+            if (throwable instanceof SnowcastException) {
+                throw (SnowcastException) throwable;
+            } else if (throwable instanceof Error) {
+                throw (Error) throwable;
+            }
+            throw new SnowcastException(throwable);
+        }
+    }
+
+    public static <V> V execute(Callable<V> callable, ExceptionMessages exceptionMessage) {
         return execute(callable, exceptionMessage, () -> EMPTY_OBJECT_ARRAY);
     }
 
-    static <V> V execute(Callable<V> callable, ExceptionMessages exceptionMessage,
-                         Supplier<Object[]> exceptionParameterSupplier) {
+    public static <V> V execute(Callable<V> callable, ExceptionMessages exceptionMessage,
+                                Supplier<Object[]> exceptionParameterSupplier) {
 
         try {
             return callable.call();
@@ -43,5 +56,10 @@ class ExceptionUtils {
             String message = exceptionMessage.buildMessage(parameters);
             throw new SnowcastException(message);
         }
+    }
+
+    public interface ThrowingCallable<V> {
+        V call()
+                throws Throwable;
     }
 }

@@ -26,18 +26,16 @@ public final class SnowcastRemoteServiceDescriptorProvider
 
     @Override
     public RemoteServiceDescriptor[] createRemoteServiceDescriptors() {
-        return new RemoteServiceDescriptor[] {
-                new RemoteServiceDescriptor() {
-                    @Override
-                    public String getServiceName() {
-                        return SnowcastConstants.SERVICE_NAME;
-                    }
+        return new RemoteServiceDescriptor[]{new RemoteServiceDescriptor() {
+            @Override
+            public String getServiceName() {
+                return SnowcastConstants.SERVICE_NAME;
+            }
 
-                    @Override
-                    public RemoteService getService(NodeEngine nodeEngine) {
-                        return new NodeSequencerService();
-                    }
-                }
-        };
+            @Override
+            public RemoteService getService(NodeEngine nodeEngine) {
+                return new NodeSequencerService();
+            }
+        }};
     }
 }

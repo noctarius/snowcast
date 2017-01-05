@@ -20,6 +20,7 @@ import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.HazelcastInstanceProxy;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.noctarius.snowcast.impl.ExceptionMessages;
+import com.noctarius.snowcast.impl.ExceptionUtils;
 import com.noctarius.snowcast.impl.NodeSnowcastFactory;
 import com.noctarius.snowcast.impl.SequencerService;
 
@@ -130,18 +131,12 @@ public final class SnowcastSystem {
 
             // Client setup
             if (snowcast == null) {
-                try {
+                snowcast = ExceptionUtils.execute(() -> {
                     String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";
                     Class<?> clazz = ClassLoaderUtil.loadClass(null, className);
                     Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class, short.class);
-                    snowcast = (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance, (short) backupCount);
-
-                } catch (Exception e) {
-                    if (e instanceof SnowcastException) {
-                        throw (SnowcastException) e;
-                    }
-                    throw new SnowcastException(e);
-                }
+                    return (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance, (short) backupCount);
+                });
             }
 
             userContext.put(USER_CONTEXT_LOOKUP_NAME, snowcast);

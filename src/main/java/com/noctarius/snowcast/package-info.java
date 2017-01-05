@@ -22,10 +22,10 @@
  * or might generate conflicting IDs without recognizing it.</p>
  * <p>snowcast solves these and some other problems:</p>
  * <ul>
- *     <li>guaranteed uniqueness</li>
- *     <li>low network interaction</li>
- *     <li>order guarantee (natural ordering)</li>
- *     <li>low latency, high rate generation</li>
+ * <li>guaranteed uniqueness</li>
+ * <li>low network interaction</li>
+ * <li>order guarantee (natural ordering)</li>
+ * <li>low latency, high rate generation</li>
  * </ul>
  * <p>snowcast uses 64bit wide data types to generate unique IDs. Where there
  * is no unsigned long in Java, the IDs might be negative but internally are
