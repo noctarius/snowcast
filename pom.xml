@@ -154,6 +154,7 @@
             </Export-Package>
             <Private-Package>
               com.noctarius.snowcast.impl.*,
+              com.hazelcast.client.impl.protocol.codec.*;-split-package:=first
             </Private-Package>
             <Import-Package>
               com.hazelcast.client.*;resolution=Optional,
@@ -187,6 +188,24 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.12</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>target/generated-sources/annotations</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>      <plugin>
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <version>0.9</version>
@@ -239,7 +258,7 @@
               <excludePackageNames>*.impl.*</excludePackageNames>
               <detectJavaApiLink>true</detectJavaApiLink>
               <links>
-                <link>http://docs.hazelcast.org/docs/3.4/javadoc/</link>
+                <link>http://docs.hazelcast.org/docs/3.7/javadoc/</link>
               </links>
             </configuration>
           </execution>
