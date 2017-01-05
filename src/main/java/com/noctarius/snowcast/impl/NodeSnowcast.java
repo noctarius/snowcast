@@ -30,6 +30,8 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.lang.reflect.Field;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.RETRIEVE_NODE_ENGINE_FAILED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SERVICE_NOT_REGISTERED;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.printStartupMessage;
 import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
 
@@ -70,7 +72,7 @@ class NodeSnowcast
             NodeSequencerService service = nodeEngine.getService(SnowcastConstants.SERVICE_NAME);
             printStartupMessage(false);
             return service;
-        }, ExceptionMessages.SERVICE_NOT_REGISTERED);
+        }, SERVICE_NOT_REGISTERED);
     }
 
     @Nonnull
@@ -82,6 +84,6 @@ class NodeSnowcast
             originalField.setAccessible(true);
             HazelcastInstanceImpl impl = (HazelcastInstanceImpl) originalField.get(hazelcastInstance);
             return impl.node.getNodeEngine();
-        }, ExceptionMessages.RETRIEVE_NODE_ENGINE_FAILED);
+        }, RETRIEVE_NODE_ENGINE_FAILED);
     }
 }

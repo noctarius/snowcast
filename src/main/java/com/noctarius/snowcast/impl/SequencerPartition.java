@@ -20,7 +20,6 @@ import com.hazelcast.nio.Address;
 import com.hazelcast.nio.UnsafeHelper;
 import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastIllegalStateException;
-import com.noctarius.snowcast.SnowcastSequencerAlreadyRegisteredException;
 import sun.misc.Unsafe;
 
 import javax.annotation.Nonnegative;
@@ -29,6 +28,11 @@ import javax.annotation.Nullable;
 import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.noctarius.snowcast.impl.ExceptionMessages.PARTITION_IS_FROZEN;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SEQUENCER_ALREADY_REGISTERED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 
 public final class SequencerPartition {
 
@@ -74,8 +78,7 @@ public final class SequencerPartition {
 
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
-            String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-            throw new SnowcastIllegalStateException(message);
+            throw exception(SnowcastIllegalStateException::new, UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE, partitionId);
         }
         return logicalNodeTable.attachLogicalNode(address);
     }
@@ -97,8 +100,7 @@ public final class SequencerPartition {
 
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
-            String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-            throw new SnowcastIllegalStateException(message);
+            throw exception(SnowcastIllegalStateException::new, UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE, partitionId);
         }
         logicalNodeTable.assignLogicalNode(logicalNodeId, address);
     }
@@ -121,8 +123,7 @@ public final class SequencerPartition {
     Address getAttachedLogicalNode(@Nonnull String sequencerName, @Nonnegative int logicalNodeId) {
         LogicalNodeTable logicalNodeTable = logicalNodeTables.get(sequencerName);
         if (logicalNodeTable == null) {
-            String message = ExceptionMessages.UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-            throw new SnowcastIllegalStateException(message);
+            throw exception(SnowcastIllegalStateException::new, UNREGISTERED_SEQUENCER_LOGICAL_NODE_TABLE, partitionId);
         }
         return logicalNodeTable.getAttachedLogicalNode(logicalNodeId);
     }
@@ -207,7 +208,7 @@ public final class SequencerPartition {
 
     private void checkPartitionFreezeStatus() {
         if (isFrozen()) {
-            throw new SnowcastIllegalStateException(ExceptionMessages.PARTITION_IS_FROZEN.buildMessage());
+            throw exception(SnowcastIllegalStateException::new, PARTITION_IS_FROZEN, partitionId);
         }
     }
 
@@ -216,8 +217,7 @@ public final class SequencerPartition {
                                                           @Nullable SequencerDefinition other) {
 
         if (other != null && !other.equals(definition)) {
-            String message = ExceptionMessages.SEQUENCER_ALREADY_REGISTERED.buildMessage();
-            throw new SnowcastSequencerAlreadyRegisteredException(message);
+            throw exception(SnowcastIllegalStateException::new, SEQUENCER_ALREADY_REGISTERED);
         }
         return other != null ? other : definition;
     }

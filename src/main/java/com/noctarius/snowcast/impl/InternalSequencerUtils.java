@@ -19,7 +19,6 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.instance.BuildInfo;
 import com.hazelcast.instance.BuildInfoProvider;
 import com.hazelcast.util.QuickMath;
-import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 import com.noctarius.snowcast.SnowcastSequenceComparator;
 import com.noctarius.snowcast.SnowcastSequencer;
@@ -30,6 +29,10 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.Comparator;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_COUNT;
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY;
+import static com.noctarius.snowcast.impl.ExceptionMessages.NEXT_ID_LARGER_THAN_ALLOWED_MAX_COUNTER;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 import static com.noctarius.snowcast.impl.SnowcastConstants.ID_TIMESTAMP_READ_MASK;
 import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_1024;
 import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_128;
@@ -63,12 +66,12 @@ public final class InternalSequencerUtils {
     @Nonnegative
     public static int calculateBoundedMaxLogicalNodeCount(int maxLogicalNodeCount) {
         if (maxLogicalNodeCount < NODE_ID_LOWER_BOUND) {
-            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("smaller", NODE_ID_LOWER_BOUND);
-            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
+            throw exception(SnowcastMaxLogicalNodeIdOutOfBoundsException::new, //
+                    ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY, "smaller", NODE_ID_LOWER_BOUND);
         }
         if (maxLogicalNodeCount > NODE_ID_UPPER_BOUND) {
-            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("larger", NODE_ID_UPPER_BOUND);
-            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
+            throw exception(SnowcastMaxLogicalNodeIdOutOfBoundsException::new, //
+                    ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY, "larger", NODE_ID_UPPER_BOUND);
         }
         return QuickMath.nextPowerOfTwo(maxLogicalNodeCount) - 1;
     }
@@ -96,7 +99,7 @@ public final class InternalSequencerUtils {
             case MAX_LOGICAL_NODE_COUNT_8192:
                 return SHIFT_LOGICAL_NODE_ID_8192;
             default:
-                throw new IllegalArgumentException(ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_COUNT.buildMessage());
+                throw exception(IllegalArgumentException::new, ILLEGAL_MAX_LOGICAL_NODE_COUNT);
         }
     }
 
@@ -118,7 +121,7 @@ public final class InternalSequencerUtils {
 
         int maxCounter = calculateMaxMillisCounter(nodeIdShiftFactor);
         if (maxCounter < nextId) {
-            throw new SnowcastException("Given nextId is greater than allowed max counter value");
+            throw exception(NEXT_ID_LARGER_THAN_ALLOWED_MAX_COUNTER);
         }
 
         long id = timestamp << SHIFT_TIMESTAMP;

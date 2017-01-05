@@ -16,12 +16,13 @@
  */
 package com.noctarius.snowcast;
 
-import com.noctarius.snowcast.impl.ExceptionMessages;
-
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_CALENDAR_INSTANCE;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 
 /**
  * <p>The SnowcastEpoch is used to define a custom epoch for snowcast. A custom epoch
@@ -127,8 +128,7 @@ public final class SnowcastEpoch {
         SnowcastEpoch epoch = new SnowcastEpoch(offset);
 
         if (epoch.getEpochTimestamp() < 0) {
-            String message = ExceptionMessages.ILLEGAL_CALENDAR_INSTANCE.buildMessage(calendar.getTime());
-            throw new SnowcastException(message);
+            throw exception(ILLEGAL_CALENDAR_INSTANCE, calendar.getTime());
         }
         return epoch;
     }

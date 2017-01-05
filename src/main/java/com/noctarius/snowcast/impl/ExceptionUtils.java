@@ -19,11 +19,23 @@ package com.noctarius.snowcast.impl;
 import com.noctarius.snowcast.SnowcastException;
 
 import java.util.concurrent.Callable;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class ExceptionUtils {
 
     private static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+
+    public static SnowcastException exception(ExceptionMessages exceptionMessage, Object... exceptionParameters) {
+        return exception(SnowcastException::new, exceptionMessage, exceptionParameters);
+    }
+
+    public static <E extends Exception> E exception(Function<String, E> constructor, ExceptionMessages exceptionMessage,
+                                                    Object... exceptionParameters) {
+
+        String message = exceptionMessage.buildMessage(exceptionParameters);
+        return constructor.apply(message);
+    }
 
     public static Supplier<Object[]> exceptionParameters(Object... args) {
         return () -> args;

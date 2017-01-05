@@ -25,6 +25,8 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_LOWER_BOUND;
 import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_UPPER_BOUND;
 
@@ -40,12 +42,12 @@ public final class SequencerDefinition {
                                @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
 
         if (maxLogicalNodeCount < NODE_ID_LOWER_BOUND) {
-            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("smaller", NODE_ID_LOWER_BOUND);
-            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
+            throw exception(SnowcastMaxLogicalNodeIdOutOfBoundsException::new, //
+                    ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY, "smaller", NODE_ID_LOWER_BOUND);
         }
         if (maxLogicalNodeCount > NODE_ID_UPPER_BOUND) {
-            String message = ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY.buildMessage("larger", NODE_ID_UPPER_BOUND);
-            throw new SnowcastMaxLogicalNodeIdOutOfBoundsException(message);
+            throw exception(SnowcastMaxLogicalNodeIdOutOfBoundsException::new, //
+                    ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY, "larger", NODE_ID_UPPER_BOUND);
         }
 
         this.sequencerName = sequencerName;

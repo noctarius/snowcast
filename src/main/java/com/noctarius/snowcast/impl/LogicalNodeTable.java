@@ -32,6 +32,12 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.io.IOException;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.BACKUP_OUT_OF_SYNC;
+import static com.noctarius.snowcast.impl.ExceptionMessages.DATA_NOT_POWER_OF_TWO;
+import static com.noctarius.snowcast.impl.ExceptionMessages.ERROR_MERGING_LOGICAL_NODE_TABLE;
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_DETACH_ATTEMPT;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
+
 class LogicalNodeTable {
 
     private static final Unsafe UNSAFE = UnsafeHelper.UNSAFE;
@@ -46,7 +52,7 @@ class LogicalNodeTable {
             ARRAY_INDEX_SCALE = UNSAFE.arrayIndexScale(Object[].class);
 
             if ((ARRAY_INDEX_SCALE & (ARRAY_INDEX_SCALE - 1)) != 0) {
-                throw new SnowcastException(ExceptionMessages.DATA_NOT_POWER_OF_TWO.buildMessage());
+                throw exception(DATA_NOT_POWER_OF_TWO);
             }
             ARRAY_INDEX_SHIFT = 31 - Integer.numberOfLeadingZeros(ARRAY_INDEX_SCALE);
         } catch (Exception e) {
@@ -112,8 +118,7 @@ class LogicalNodeTable {
             }
 
             if (!address.equals(addressOnSlot)) {
-                String message = ExceptionMessages.ILLEGAL_DETACH_ATTEMPT.buildMessage();
-                throw new SnowcastIllegalStateException(message);
+                throw exception(SnowcastIllegalStateException::new, ILLEGAL_DETACH_ATTEMPT);
             }
 
             long offset = offset(logicalNodeId);
@@ -127,8 +132,7 @@ class LogicalNodeTable {
         while (true) {
             Object[] assignmentTable = this.assignmentTable;
             if (assignmentTable[logicalNodeId] != null) {
-                String message = ExceptionMessages.BACKUP_OUT_OF_SYNC.buildMessage(partitionId);
-                throw new SnowcastIllegalStateException(message);
+                throw exception(BACKUP_OUT_OF_SYNC, partitionId);
             }
 
             long offset = offset(logicalNodeId);
@@ -147,8 +151,7 @@ class LogicalNodeTable {
             Address currentAddress = (Address) assignmentTable[index];
             if (currentAddress != null) {
                 if (mergeableAddress != null && !currentAddress.equals(mergeableAddress)) {
-                    String message = ExceptionMessages.ERROR_MERGING_LOGICAL_NODE_TABLE.buildMessage(partitionId);
-                    throw new SnowcastIllegalStateException(message);
+                    throw exception(SnowcastIllegalStateException::new, ERROR_MERGING_LOGICAL_NODE_TABLE, partitionId);
                 }
             }
 

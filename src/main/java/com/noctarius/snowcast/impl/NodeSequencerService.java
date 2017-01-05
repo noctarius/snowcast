@@ -40,7 +40,6 @@ import com.hazelcast.spi.partition.MigrationEndpoint;
 import com.hazelcast.spi.serialization.SerializationService;
 import com.hazelcast.util.Clock;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastIllegalStateException;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
@@ -67,7 +66,13 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.INTERNAL_SETUP_FAILED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SEQUENCER_ALREADY_REGISTERED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.UNKNOWN_HAZELCAST_VERSION;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 import static com.noctarius.snowcast.impl.ExceptionUtils.exceptionParameters;
+import static com.noctarius.snowcast.impl.ExceptionUtils.execute;
 import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class NodeSequencerService
@@ -112,8 +117,7 @@ public class NodeSequencerService
         SequencerDefinition realDefinition = invoke(operation, sequencerName);
 
         if (!definition.equals(realDefinition)) {
-            String message = ExceptionMessages.SEQUENCER_ALREADY_REGISTERED.buildMessage();
-            throw new SnowcastIllegalStateException(message);
+            throw exception(SnowcastIllegalStateException::new, SEQUENCER_ALREADY_REGISTERED);
         }
 
         return getOrCreateSequencerProvision(realDefinition).getSequencer();
@@ -295,7 +299,7 @@ public class NodeSequencerService
 
     @Nullable
     private <T> T invoke(@Nonnull Operation operation, @Nonnull String sequencerName) {
-        return ExceptionUtils.execute(() -> {
+        return execute(() -> {
             IPartitionService partitionService = nodeEngine.getPartitionService();
             int partitionId = partitionService.getPartitionId(sequencerName);
             OperationService operationService = nodeEngine.getOperationService();
@@ -346,8 +350,7 @@ public class NodeSequencerService
             } else if (throwable.getCause() instanceof SnowcastSequencerAlreadyRegisteredException) {
                 throw (SnowcastSequencerAlreadyRegisteredException) throwable.getCause();
             }
-            String message = ExceptionMessages.PARAMETER_IS_NOT_SUPPORTED.buildMessage("completableFuture");
-            throw new SnowcastException(message, throwable);
+            throw exception(PARAMETER_IS_NOT_SUPPORTED, "completableFuture");
         }
     }
 
@@ -356,17 +359,16 @@ public class NodeSequencerService
             BuildInfo buildInfo = BuildInfoProvider.getBuildInfo();
             return hz37EventRegistrationGetListener(buildInfo);
         }
-        String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
-        throw new SnowcastException(message);
+        throw exception(UNKNOWN_HAZELCAST_VERSION);
     }
 
     private MethodHandle hz37EventRegistrationGetListener(BuildInfo buildInfo) {
         //ACCESSIBILITY_HACK
-        return ExceptionUtils.execute(() -> {
+        return execute(() -> {
             Class<?> clazz = Class.forName("com.hazelcast.spi.impl.eventservice.impl.Registration");
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             return lookup.findVirtual(clazz, "getListener", GET_LISTENER_GET_TYPE);
-        }, ExceptionMessages.INTERNAL_SETUP_FAILED, exceptionParameters(buildInfo.getVersion()));
+        }, INTERNAL_SETUP_FAILED, exceptionParameters(buildInfo.getVersion()));
     }
 
     private MethodHandle findFutureExecutorMethod() {
@@ -378,17 +380,16 @@ public class NodeSequencerService
             return getFutureExecutorMethod(buildInfo, "java.util.concurrent.Future", "get");
 
         }
-        String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
-        throw new SnowcastException(message);
+        throw exception(UNKNOWN_HAZELCAST_VERSION);
     }
 
     private MethodHandle getFutureExecutorMethod(BuildInfo buildInfo, String className, String methodName) {
         //VERSION_HACK
-        return ExceptionUtils.execute(() -> {
+        return execute(() -> {
             Class<?> clazz = Class.forName(className);
             MethodHandles.Lookup lookup = MethodHandles.lookup();
             return lookup.findVirtual(clazz, methodName, FUTURE_GET_TYPE);
-        }, ExceptionMessages.INTERNAL_SETUP_FAILED, exceptionParameters(buildInfo.getVersion()));
+        }, INTERNAL_SETUP_FAILED, exceptionParameters(buildInfo.getVersion()));
     }
 
     private class ClientChannelHandler {

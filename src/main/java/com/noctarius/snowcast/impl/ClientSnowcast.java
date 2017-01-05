@@ -22,7 +22,6 @@ import com.hazelcast.client.spi.ProxyManager;
 import com.hazelcast.core.HazelcastInstance;
 import com.noctarius.snowcast.Snowcast;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastSequencer;
 
 import javax.annotation.Nonnegative;
@@ -31,6 +30,9 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.lang.reflect.Field;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.UNKNOWN_HAZELCAST_VERSION;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.printStartupMessage;
 import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
 
@@ -77,7 +79,7 @@ class ClientSnowcast
             Field clientField = HazelcastClientProxy.class.getDeclaredField("client");
             clientField.setAccessible(true);
             return (HazelcastClientInstanceImpl) clientField.get(hazelcastInstance);
-        }, ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED);
+        }, RETRIEVE_CLIENT_ENGINE_FAILED);
     }
 
     @Nonnull
@@ -85,7 +87,6 @@ class ClientSnowcast
         if (InternalSequencerUtils.getHazelcastVersion() != SnowcastConstants.HazelcastVersion.Unknown) {
             return new Hazelcast37ClientInvocator(client);
         }
-        String message = ExceptionMessages.UNKNOWN_HAZELCAST_VERSION.buildMessage();
-        throw new SnowcastException(message);
+        throw exception(UNKNOWN_HAZELCAST_VERSION);
     }
 }

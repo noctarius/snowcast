@@ -144,6 +144,11 @@ public enum ExceptionMessages {
     INTERNAL_SETUP_FAILED("Setting up the internal state failed, unsupported Hazelcast (%s) version?"),
 
     /**
+     * Given nextId is greater than allowed max counter value
+     */
+    NEXT_ID_LARGER_THAN_ALLOWED_MAX_COUNTER("Given nextId is greater than allowed max counter value"),
+
+    /**
      * Found an unknown Hazelcast version
      */
     UNKNOWN_HAZELCAST_VERSION("Found an unknown Hazelcast version");

@@ -19,8 +19,6 @@ package com.noctarius.snowcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.HazelcastInstanceProxy;
 import com.hazelcast.nio.ClassLoaderUtil;
-import com.noctarius.snowcast.impl.ExceptionMessages;
-import com.noctarius.snowcast.impl.ExceptionUtils;
 import com.noctarius.snowcast.impl.NodeSnowcastFactory;
 import com.noctarius.snowcast.impl.SequencerService;
 
@@ -31,6 +29,10 @@ import javax.validation.constraints.Max;
 import java.lang.reflect.Method;
 import java.util.Map;
 
+import static com.noctarius.snowcast.impl.ExceptionMessages.BACKUP_COUNT_TOO_HIGH;
+import static com.noctarius.snowcast.impl.ExceptionMessages.BACKUP_COUNT_TOO_LOW;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
+import static com.noctarius.snowcast.impl.ExceptionUtils.execute;
 import static com.noctarius.snowcast.impl.SnowcastConstants.USER_CONTEXT_LOOKUP_NAME;
 
 /**
@@ -111,11 +113,10 @@ public final class SnowcastSystem {
         }
 
         if (backupCount < 0) {
-            throw new IllegalArgumentException(ExceptionMessages.BACKUP_COUNT_TOO_LOW.buildMessage());
+            throw exception(IllegalArgumentException::new, BACKUP_COUNT_TOO_LOW);
         }
         if (backupCount > Short.MAX_VALUE) {
-            String message = ExceptionMessages.BACKUP_COUNT_TOO_HIGH.buildMessage(Short.MAX_VALUE);
-            throw new IllegalArgumentException(message);
+            throw exception(IllegalArgumentException::new, BACKUP_COUNT_TOO_HIGH, Short.MAX_VALUE);
         }
 
         synchronized (CREATION_LOCK) {
@@ -131,7 +132,7 @@ public final class SnowcastSystem {
 
             // Client setup
             if (snowcast == null) {
-                snowcast = ExceptionUtils.execute(() -> {
+                snowcast = execute(() -> {
                     String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";
                     Class<?> clazz = ClassLoaderUtil.loadClass(null, className);
                     Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class, short.class);

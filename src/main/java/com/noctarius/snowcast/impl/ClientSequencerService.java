@@ -18,7 +18,6 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.spi.ProxyManager;
 import com.noctarius.snowcast.SnowcastEpoch;
-import com.noctarius.snowcast.SnowcastException;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 
@@ -28,6 +27,9 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_SEQUENCER_TYPE;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 
 class ClientSequencerService
         implements SequencerService {
@@ -68,8 +70,7 @@ class ClientSequencerService
     @Override
     public void destroySequencer(@Nonnull SnowcastSequencer sequencer) {
         if (!(sequencer instanceof ClientSequencer)) {
-            String message = ExceptionMessages.ILLEGAL_SEQUENCER_TYPE.buildMessage();
-            throw new SnowcastException(message);
+            throw exception(ILLEGAL_SEQUENCER_TYPE);
         }
 
         ((InternalSequencer) sequencer).stateTransition(SnowcastSequenceState.Destroyed);

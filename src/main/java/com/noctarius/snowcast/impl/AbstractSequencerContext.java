@@ -30,6 +30,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLongFieldUpdater;
 import java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
+import static com.noctarius.snowcast.SnowcastSequenceState.Attached;
+import static com.noctarius.snowcast.SnowcastSequenceState.Destroyed;
+import static com.noctarius.snowcast.SnowcastSequenceState.Detached;
+import static com.noctarius.snowcast.impl.ExceptionMessages.GENERATION_MAX_RETRY_EXCEEDED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_TIMESTAMP_GENERATED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SEQUENCER_IN_WRONG_STATE;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SEQUENCER_NOT_ASSIGNED;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SEQUENCER_WRONG_STATE_CANNOT_ATTACH;
+import static com.noctarius.snowcast.impl.ExceptionMessages.SEQUENCER_WRONG_STATE_CANNOT_DETACH;
+import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateCounterMask;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeMask;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
@@ -66,7 +76,7 @@ abstract class AbstractSequencerContext {
     private final long logicalNodeIdReadMask;
     private final long counterReadMask;
 
-    private volatile SnowcastSequenceState state = SnowcastSequenceState.Detached;
+    private volatile SnowcastSequenceState state = Detached;
 
     // Holds the currently assigned logical node id
     private volatile int logicalNodeId = -1;
@@ -111,7 +121,7 @@ abstract class AbstractSequencerContext {
         long timestamp = epoch.getEpochTimestamp();
 
         if (timestamp < 0) {
-            throw new SnowcastIllegalStateException(ExceptionMessages.ILLEGAL_TIMESTAMP_GENERATED.buildMessage());
+            throw exception(SnowcastIllegalStateException::new, ILLEGAL_TIMESTAMP_GENERATED);
         }
 
         int nextId;
@@ -125,8 +135,7 @@ abstract class AbstractSequencerContext {
             }
 
             if (retry++ >= MAX_RETRY_GENERATE_IDS) {
-                String message = ExceptionMessages.GENERATION_MAX_RETRY_EXCEEDED.buildMessage(MAX_RETRY_GENERATE_IDS);
-                throw new SnowcastIllegalStateException(message);
+                throw exception(SnowcastIllegalStateException::new, GENERATION_MAX_RETRY_EXCEEDED, MAX_RETRY_GENERATE_IDS);
             }
 
             TimeUnit.NANOSECONDS.sleep(INCREMENT_RETRY_TIMEOUT_NANOS);
@@ -143,7 +152,7 @@ abstract class AbstractSequencerContext {
 
     final void attachLogicalNode() {
         // Will fail if state transition is not allowed
-        stateTransition(SnowcastSequenceState.Attached);
+        stateTransition(Attached);
 
         // Request sequencer remote assignment
         this.logicalNodeId = doAttachLogicalNode(definition);
@@ -152,7 +161,7 @@ abstract class AbstractSequencerContext {
 
     final void detachLogicalNode() {
         // Will fail if state transition is not allowed
-        stateTransition(SnowcastSequenceState.Detached);
+        stateTransition(Detached);
 
         int logicalNodeId = this.logicalNodeId;
         this.logicalNodeId = -1;
@@ -187,23 +196,20 @@ abstract class AbstractSequencerContext {
         while (true) {
             SnowcastSequenceState state = this.state;
             if (state == newState) {
-                String message = ExceptionMessages.SEQUENCER_WRONG_STATE_CANNOT_ATTACH.buildMessage(sequencerName);
-                throw new SnowcastStateException(message);
+                throw exception(SnowcastStateException::new, SEQUENCER_WRONG_STATE_CANNOT_ATTACH, sequencerName);
             }
 
-            if (newState == SnowcastSequenceState.Detached) {
-                if (state != SnowcastSequenceState.Attached) {
-                    String message = ExceptionMessages.SEQUENCER_WRONG_STATE_CANNOT_DETACH.buildMessage(sequencerName);
-                    throw new SnowcastStateException(message);
+            if (newState == Detached) {
+                if (state != Attached) {
+                    throw exception(SnowcastStateException::new, SEQUENCER_WRONG_STATE_CANNOT_DETACH, sequencerName);
                 }
 
-            } else if (newState == SnowcastSequenceState.Attached) {
-                if (state != SnowcastSequenceState.Detached) {
-                    String message = ExceptionMessages.SEQUENCER_WRONG_STATE_CANNOT_ATTACH.buildMessage(sequencerName);
-                    throw new SnowcastStateException(message);
+            } else if (newState == Attached) {
+                if (state != Detached) {
+                    throw exception(SnowcastStateException::new, SEQUENCER_WRONG_STATE_CANNOT_ATTACH, sequencerName);
                 }
             } else {
-                if (state == SnowcastSequenceState.Destroyed) {
+                if (state == Destroyed) {
                     return true;
                 }
             }
@@ -265,14 +271,11 @@ abstract class AbstractSequencerContext {
     private int checkStateAndLogicalNodeId() {
         int logicalNodeId = this.logicalNodeId;
         if (logicalNodeId == -1) {
-            String message = ExceptionMessages.SEQUENCER_NOT_ASSIGNED.buildMessage(sequencerName);
-            throw new SnowcastStateException(message);
+            throw exception(SEQUENCER_NOT_ASSIGNED, sequencerName);
         }
         SnowcastSequenceState state = this.state;
-        if (state != SnowcastSequenceState.Attached) {
-            String message = ExceptionMessages.SEQUENCER_IN_WRONG_STATE
-                    .buildMessage(sequencerName, SnowcastSequenceState.Attached, state);
-            throw new SnowcastStateException(message);
+        if (state != Attached) {
+            throw exception(SnowcastStateException::new, SEQUENCER_IN_WRONG_STATE, sequencerName, Attached, state);
         }
         return logicalNodeId;
     }
