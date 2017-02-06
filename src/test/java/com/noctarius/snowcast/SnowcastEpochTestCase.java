@@ -18,6 +18,11 @@ package com.noctarius.snowcast;
 
 import org.junit.Test;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -26,7 +31,7 @@ import static org.junit.Assert.assertTrue;
 public class SnowcastEpochTestCase {
 
     @Test
-    public void testPositiveTimestamp()
+    public void testPositiveTimestampByCalendar()
             throws Exception {
 
         Calendar calendar = GregorianCalendar.getInstance();
@@ -35,6 +40,18 @@ public class SnowcastEpochTestCase {
         calendar.set(Calendar.SECOND, 0);
 
         SnowcastEpoch epoch = SnowcastEpoch.byCalendar(calendar);
+        long timestamp = epoch.getEpochTimestamp();
+
+        assertTrue(timestamp > 0);
+    }
+
+    @Test
+    public void testPositiveTimestamp()
+            throws Exception {
+
+        Instant instant = Instant.now().minus(1, ChronoUnit.MINUTES);
+
+        SnowcastEpoch epoch = SnowcastEpoch.byInstant(instant);
         long timestamp = epoch.getEpochTimestamp();
 
         assertTrue(timestamp > 0);
@@ -51,6 +68,15 @@ public class SnowcastEpochTestCase {
         calendar.set(Calendar.SECOND, 0);
 
         SnowcastEpoch.byCalendar(calendar);
+    }
+
+    @Test(expected = SnowcastException.class)
+    public void testFutureZonedDateTimeInstance()
+            throws Exception {
+
+        ZonedDateTime utc = ZonedDateTime.of(LocalDateTime.now(), ZoneOffset.UTC);
+        utc = utc.plusMonths(1);
+        SnowcastEpoch.byInstant(utc.toInstant());
     }
 
 }

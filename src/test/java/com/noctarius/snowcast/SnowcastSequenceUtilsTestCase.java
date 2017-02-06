@@ -22,13 +22,11 @@ import com.hazelcast.test.TestHazelcastInstanceFactory;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 import org.junit.Test;
 
-import java.util.Calendar;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Comparator;
-import java.util.GregorianCalendar;
 
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.generateSequenceId;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.*;
 import static junit.framework.TestCase.assertEquals;
 
 public class SnowcastSequenceUtilsTestCase
@@ -284,8 +282,7 @@ public class SnowcastSequenceUtilsTestCase
     }
 
     private SnowcastEpoch buildEpoch() {
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2014, 0, 1, 0, 0, 0);
-        return SnowcastEpoch.byCalendar(calendar);
+        ZonedDateTime utc = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        return SnowcastEpoch.byInstant(utc.toInstant());
     }
 }

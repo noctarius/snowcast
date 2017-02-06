@@ -16,12 +16,14 @@
  */
 package com.noctarius.snowcast;
 
-import javax.annotation.Nonnegative;
-import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
+import javax.annotation.Nonnegative;
+import javax.annotation.Nonnull;
 
 import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_CALENDAR_INSTANCE;
+import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_INSTANT;
 import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 
 /**
@@ -29,11 +31,10 @@ import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
  * is defined as a offset to the standard Java timestamp and is used to offer more
  * bits to the internal timestamp value of a snowcast sequence ID.</p>
  * <p>To build a SnowcastEpoch multiple ways are possible. The most commonly used is
- * utilizing the Java Calendar API as shown in the following snippet:</p>
+ * utilizing the Java Date and Time API {@code ZonedDateTime} as shown in the following snippet:</p>
  * <pre>
- *     Calendar calendar = GregorianCalendar.getInstance();
- *     calendar.set( 2014, 1, 1, 0, 0, 0 );
- *     SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
+ *     ZonedDateTime utc = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+ *     SnowcastEpoch epoch = SnowcastEpoch.byInstant( utc.toInstant() );
  * </pre>
  * <p>Another way is by providing a Java long timestamp value. The important note is,
  * that Java timestamps are based on milliseconds whereas standard Linux timestamps
@@ -121,6 +122,7 @@ public final class SnowcastEpoch {
      *
      * @param calendar the calendar instance to base the epoch on
      * @return a SnowcastEpoch instance based on the given calendars value
+     * @deprecated Replaced by {@link #byInstant(Instant)} 
      */
     public static SnowcastEpoch byCalendar(@Nonnull Calendar calendar) {
         calendar.set(Calendar.MILLISECOND, 0);
@@ -143,6 +145,23 @@ public final class SnowcastEpoch {
     @Nonnull
     public static SnowcastEpoch byTimestamp(@Nonnegative long timestamp) {
         return new SnowcastEpoch(timestamp);
+    }
+
+    /**
+     * Creates a custom epoch based on the given instant. 
+     *
+     * @param instant the instant value to base the epoch on
+     * @return a SnowcastEpoch instance based on the given timestamp value
+     */
+    @Nonnull
+    public static SnowcastEpoch byInstant(@Nonnull Instant instant) {
+        long offset = instant.toEpochMilli();
+        SnowcastEpoch epoch = new SnowcastEpoch(offset);
+        
+        if (epoch.getEpochTimestamp() < 0) {
+            throw exception(ILLEGAL_INSTANT, instant);
+        }
+        return epoch;
     }
 
     private static long getNow() {

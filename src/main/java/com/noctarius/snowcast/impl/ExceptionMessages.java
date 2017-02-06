@@ -134,6 +134,11 @@ public enum ExceptionMessages {
     ILLEGAL_CALENDAR_INSTANCE("The given Calendar's value '%s' seems to be in the future! Calendar months start at index 0"),
 
     /**
+     * The given Instant's value '%s' seems to be in the future!
+     */
+    ILLEGAL_INSTANT("The given Instant's value '%s' seems to be in the future!"),
+
+    /**
      * Generation of an ID failed after %s retries
      */
     GENERATION_MAX_RETRY_EXCEEDED("Generation of an ID failed after %s retries"),

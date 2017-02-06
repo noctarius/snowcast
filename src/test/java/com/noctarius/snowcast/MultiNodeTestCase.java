@@ -22,13 +22,10 @@ import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 public class MultiNodeTestCase
         extends HazelcastTestSupport {
@@ -304,8 +301,7 @@ public class MultiNodeTestCase
     }
 
     private SnowcastEpoch buildEpoch() {
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2014, 1, 1, 0, 0, 0);
-        return SnowcastEpoch.byCalendar(calendar);
+        ZonedDateTime utc = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        return SnowcastEpoch.byInstant(utc.toInstant());
     }
 }
