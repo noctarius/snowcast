@@ -28,8 +28,8 @@ import com.noctarius.snowcast.SnowcastSequencer;
 import com.noctarius.snowcast.SnowcastSystem;
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 import static org.junit.Assert.assertEquals;
 
@@ -395,8 +395,7 @@ public class SequencerBackupTestCase
     }
 
     private SnowcastEpoch buildEpoch() {
-        Calendar calendar = GregorianCalendar.getInstance();
-        calendar.set(2014, 1, 1, 0, 0, 0);
-        return SnowcastEpoch.byCalendar(calendar);
+        ZonedDateTime utc = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+        return SnowcastEpoch.byInstant(utc.toInstant());
     }
 }

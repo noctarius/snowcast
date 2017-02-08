@@ -56,13 +56,12 @@
  * </pre>
  * <p>As learned above the next step is to define a custom epoch which provides
  * our base value for the milliseconds part of the snowcast sequence IDs. This is commonly
- * done using the Java Calendar API:</p>
+ * done using the Java Date and Time API:</p>
  * <pre>
- *     Calendar calendar = GregorianCalendar.getInstance();
- *     calendar.set( 2014, 1, 1, 0, 0, 0 );
- *     SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
+ *     ZonedDateTime utc = ZonedDateTime.of(2017, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+ *     SnowcastEpoch epoch = SnowcastEpoch.byInstant( utc.toInstant() );
  * </pre>
- * <p>Our epoch is now configured to have the point-zero on midnight of Jan 1st, 2014.</p>
+ * <p>Our epoch is now configured to have the point-zero on midnight of Jan 1st, 2017, UTC time zone.</p>
  * <p>Preparations are done by now. Creating a {@link com.noctarius.snowcast.SnowcastSequencer}
  * using the {@link com.noctarius.snowcast.Snowcast} factory instance and the epoch,
  * together with a reference name, is now as easy as the following snippet:</p>
