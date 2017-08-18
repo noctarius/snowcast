@@ -48,7 +48,7 @@ final class ClientSequencerConstructorFunction
     @Override
     public SequencerProvision createNew(@Nonnull SequencerDefinition definition) {
         TRACER.trace("create new provision for definition %s", definition);
-        ClientSequencer sequencer = new ClientSequencer(sequencerService, definition, clientCodec);
+        ClientSequencer sequencer = new ClientSequencer(sequencerService, definition, clientCodec, proxyManager.getContext());
         initializeProxy(sequencer);
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);

@@ -70,7 +70,7 @@
   </ciManagement>
 
   <properties>
-    <hazelcast.version>3.7.4</hazelcast.version>
+    <hazelcast.version>3.9-SNAPSHOT</hazelcast.version>
     <timestamp>${maven.build.timestamp}</timestamp>
     <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
   </properties>
@@ -258,7 +258,7 @@
               <excludePackageNames>*.impl.*</excludePackageNames>
               <detectJavaApiLink>true</detectJavaApiLink>
               <links>
-                <link>http://docs.hazelcast.org/docs/3.7/javadoc/</link>
+                <link>http://docs.hazelcast.org/docs/3.8/javadoc/</link>
               </links>
             </configuration>
           </execution>

@@ -166,6 +166,8 @@ public final class InternalSequencerUtils {
             return SnowcastConstants.HazelcastVersion.V_3_7;
         } else if (buildInfo.getVersion().startsWith("3.8")) {
             return SnowcastConstants.HazelcastVersion.V_3_8;
+        } else if (buildInfo.getVersion().startsWith("3.9")) {
+            return SnowcastConstants.HazelcastVersion.V_3_9;
         }
         return SnowcastConstants.HazelcastVersion.Unknown;
     }

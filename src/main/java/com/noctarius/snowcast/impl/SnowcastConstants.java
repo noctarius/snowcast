@@ -98,7 +98,7 @@ public final class SnowcastConstants {
     private static final String SNOWCAST_LOGO_DISABLE_PROPERTY = "snowcast.logo.disable";
 
     public enum HazelcastVersion {
-        V_3_7, V_3_8, Unknown
+        V_3_7, V_3_8, V_3_9, Unknown
     }
 
     static {

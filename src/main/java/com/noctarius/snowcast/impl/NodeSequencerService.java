@@ -77,7 +77,7 @@ import static com.noctarius.snowcast.impl.SnowcastConstants.SERVICE_NAME;
 
 public class NodeSequencerService
         implements SequencerService, ManagedService, MigrationAwareService, RemoteService,
-                   EventPublishingService<Object, Object> {
+        EventPublishingService<Object, Object> {
 
     private static final MethodType FUTURE_GET_TYPE = MethodType.methodType(Object.class);
     private static final MethodType GET_LISTENER_GET_TYPE = MethodType.methodType(Object.class);
@@ -376,7 +376,8 @@ public class NodeSequencerService
         if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_7) {
             return getFutureExecutorMethod(buildInfo, "com.hazelcast.spi.InternalCompletableFuture", "getSafely");
 
-        } else if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_8) {
+        } else if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_8 ||
+                InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_9) {
             return getFutureExecutorMethod(buildInfo, "java.util.concurrent.Future", "get");
 
         }
