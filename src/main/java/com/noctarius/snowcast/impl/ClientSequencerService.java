@@ -17,6 +17,7 @@
 package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.spi.ProxyManager;
+import com.hazelcast.util.ConstructorFunction;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
@@ -36,14 +37,18 @@ class ClientSequencerService
 
     private static final Tracer TRACER = TracingUtils.tracer(ClientSequencerService.class);
 
-    private final ClientSequencerConstructorFunction sequencerConstructor;
+    private final ConstructorFunction<SequencerDefinition, SequencerProvision> sequencerConstructor;
 
     private final ClientCodec clientCodec;
 
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
     ClientSequencerService(@Nonnull ProxyManager proxyManager, @Nonnull ClientCodec clientCodec) {
-        this.sequencerConstructor = new ClientSequencerConstructorFunction(proxyManager, this, clientCodec);
+        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_9) {
+            this.sequencerConstructor = new ClientSequencerConstructorFunction39(proxyManager, this, clientCodec);
+        } else {
+            this.sequencerConstructor = new ClientSequencerConstructorFunction(proxyManager, this, clientCodec);
+        }
         this.provisions = new ConcurrentHashMap<>();
         this.clientCodec = clientCodec;
     }

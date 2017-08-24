@@ -42,13 +42,17 @@ public class ClientSequencer
     private final ClientSequencerService sequencerService;
 
     ClientSequencer(@Nonnull ClientSequencerService sequencerService, @Nonnull SequencerDefinition definition,
-                    @Nonnull ClientCodec clientCodec, @Nonnull ClientContext clientContext) {
+                    @Nonnull ClientCodec clientCodec) {
 
-        super(SnowcastConstants.SERVICE_NAME, definition.getSequencerName(), clientContext);
+        super(SnowcastConstants.SERVICE_NAME, definition.getSequencerName());
         this.sequencerService = sequencerService;
         this.sequencerContext = new ClientSequencerContext(definition, clientCodec);
     }
 
+    public void setClientContext(ClientContext clientContext) {
+        setContext(clientContext);
+    }
+    
     @Nonnull
     @Override
     public String getSequencerName() {
