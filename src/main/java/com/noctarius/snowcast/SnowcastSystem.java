@@ -17,6 +17,7 @@
 package com.noctarius.snowcast;
 
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.instance.HazelcastInstanceImpl;
 import com.hazelcast.instance.HazelcastInstanceProxy;
 import com.hazelcast.nio.ClassLoaderUtil;
 import com.noctarius.snowcast.impl.NodeSnowcastFactory;
@@ -126,7 +127,7 @@ public final class SnowcastSystem {
             }
 
             // Node setup
-            if (hazelcastInstance instanceof HazelcastInstanceProxy) {
+            if (hazelcastInstance instanceof HazelcastInstanceProxy || hazelcastInstance instanceof HazelcastInstanceImpl) {
                 snowcast = NodeSnowcastFactory.snowcast(hazelcastInstance, (short) backupCount);
             }
 

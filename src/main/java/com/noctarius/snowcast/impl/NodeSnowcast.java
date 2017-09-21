@@ -78,6 +78,9 @@ class NodeSnowcast
     @Nonnull
     private NodeEngine getNodeEngine(@Nonnull HazelcastInstance hazelcastInstance) {
         return ExceptionUtils.execute(() -> {
+            if (hazelcastInstance instanceof HazelcastInstanceImpl) {
+                return ((HazelcastInstanceImpl) hazelcastInstance).node.getNodeEngine();
+            }
             // Ugly hack due to lack in SPI
             //ACCESSIBILITY_HACK
             Field originalField = HazelcastInstanceProxy.class.getDeclaredField("original");
