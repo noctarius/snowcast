@@ -25,12 +25,12 @@ import com.hazelcast.util.ExceptionUtil;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 
-final class Hazelcast37ClientInvocator
+final class Hazelcast39ClientInvocator
         implements ClientInvocator {
 
     private final HazelcastClientInstanceImpl client;
 
-    Hazelcast37ClientInvocator(@Nonnull HazelcastClientInstanceImpl client) {
+    Hazelcast39ClientInvocator(@Nonnull HazelcastClientInstanceImpl client) {
         this.client = client;
     }
 
@@ -38,7 +38,7 @@ final class Hazelcast37ClientInvocator
     @Override
     public ICompletableFuture<ClientMessage> invoke(@Nonnegative int partitionId, @Nonnull ClientMessage request) {
         try {
-            ClientInvocation clientInvocation = new ClientInvocation(client, request, partitionId);
+            ClientInvocation clientInvocation = new ClientInvocation(client, request, "snowcast", partitionId);
             return clientInvocation.invoke();
 
         } catch (Exception e) {

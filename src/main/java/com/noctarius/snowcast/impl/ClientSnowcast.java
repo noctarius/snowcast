@@ -24,11 +24,11 @@ import com.noctarius.snowcast.Snowcast;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastSequencer;
 
+import java.lang.reflect.Field;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.lang.reflect.Field;
 
 import static com.noctarius.snowcast.impl.ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED;
 import static com.noctarius.snowcast.impl.ExceptionMessages.UNKNOWN_HAZELCAST_VERSION;
@@ -85,7 +85,7 @@ class ClientSnowcast
     @Nonnull
     private ClientInvocator buildClientInvocator(HazelcastClientInstanceImpl client) {
         if (InternalSequencerUtils.getHazelcastVersion() != SnowcastConstants.HazelcastVersion.Unknown) {
-            return new Hazelcast37ClientInvocator(client);
+            return new Hazelcast39ClientInvocator(client);
         }
         throw exception(UNKNOWN_HAZELCAST_VERSION);
     }
