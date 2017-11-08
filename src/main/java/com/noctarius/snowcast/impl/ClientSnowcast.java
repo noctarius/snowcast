@@ -73,6 +73,9 @@ class ClientSnowcast
 
     @Nonnull
     private HazelcastClientInstanceImpl getHazelcastClient(@Nonnull HazelcastInstance hazelcastInstance) {
+        if (hazelcastInstance instanceof HazelcastClientInstanceImpl) {
+            return (HazelcastClientInstanceImpl) hazelcastInstance;
+        }
         //ACCESSIBILITY_HACK
         return ExceptionUtils.execute(() -> {
             // Ugly hack due to lack in SPI
