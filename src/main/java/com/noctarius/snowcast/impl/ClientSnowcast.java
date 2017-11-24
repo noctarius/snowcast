@@ -24,15 +24,12 @@ import com.noctarius.snowcast.Snowcast;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastSequencer;
 
-import java.lang.reflect.Field;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
 import static com.noctarius.snowcast.impl.ExceptionMessages.RETRIEVE_CLIENT_ENGINE_FAILED;
-import static com.noctarius.snowcast.impl.ExceptionMessages.UNKNOWN_HAZELCAST_VERSION;
-import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
 import static com.noctarius.snowcast.impl.InternalSequencerUtils.printStartupMessage;
 import static com.noctarius.snowcast.impl.SnowcastConstants.DEFAULT_MAX_LOGICAL_NODES_13_BITS;
 
@@ -45,10 +42,9 @@ class ClientSnowcast
     ClientSnowcast(@Nonnull HazelcastInstance hazelcastInstance, @Nonnegative @Max(Short.MAX_VALUE) short backupCount) {
         this.backupCount = backupCount;
         HazelcastClientInstanceImpl client = getHazelcastClient(hazelcastInstance);
-        ClientInvocator clientInvocator = buildClientInvocator(client);
-        ClientCodec clientCodec = new ClientCodec(client, clientInvocator);
+        ClientCodec clientCodec = new ClientCodec(client);
         ProxyManager proxyManager = client.getProxyManager();
-        this.sequencerService = new ClientSequencerService(proxyManager, clientCodec);
+        this.sequencerService = new ClientSequencerService(client, proxyManager, clientCodec);
         printStartupMessage(true);
     }
 
@@ -62,7 +58,6 @@ class ClientSnowcast
     @Override
     public SnowcastSequencer createSequencer(@Nonnull String sequencerName, @Nonnull SnowcastEpoch epoch,
                                              @Min(128) @Max(8192) int maxLogicalNodeCount) {
-
         return sequencerService.createSequencer(sequencerName, epoch, maxLogicalNodeCount, backupCount);
     }
 
@@ -73,23 +68,14 @@ class ClientSnowcast
 
     @Nonnull
     private HazelcastClientInstanceImpl getHazelcastClient(@Nonnull HazelcastInstance hazelcastInstance) {
-        if (hazelcastInstance instanceof HazelcastClientInstanceImpl) {
-            return (HazelcastClientInstanceImpl) hazelcastInstance;
-        }
-        //ACCESSIBILITY_HACK
         return ExceptionUtils.execute(() -> {
-            // Ugly hack due to lack in SPI
-            Field clientField = HazelcastClientProxy.class.getDeclaredField("client");
-            clientField.setAccessible(true);
-            return (HazelcastClientInstanceImpl) clientField.get(hazelcastInstance);
+            if (hazelcastInstance instanceof HazelcastClientInstanceImpl) {
+                return (HazelcastClientInstanceImpl) hazelcastInstance;
+            }
+            if (hazelcastInstance instanceof HazelcastClientProxy) {
+                return ((HazelcastClientProxy) hazelcastInstance).client;
+            }
+            throw new InstantiationException();
         }, RETRIEVE_CLIENT_ENGINE_FAILED);
-    }
-
-    @Nonnull
-    private ClientInvocator buildClientInvocator(HazelcastClientInstanceImpl client) {
-        if (InternalSequencerUtils.getHazelcastVersion() != SnowcastConstants.HazelcastVersion.Unknown) {
-            return new Hazelcast39ClientInvocator(client);
-        }
-        throw exception(UNKNOWN_HAZELCAST_VERSION);
     }
 }

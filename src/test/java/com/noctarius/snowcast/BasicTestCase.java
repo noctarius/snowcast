@@ -19,6 +19,7 @@ package com.noctarius.snowcast;
 import com.hazelcast.config.Config;
 import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
 import org.junit.Test;
@@ -34,7 +35,12 @@ import static org.junit.Assert.*;
 
 public class BasicTestCase
         extends HazelcastTestSupport {
-
+    
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        GroupProperty.PHONE_HOME_ENABLED.setSystemProperty("false");
+    }
+    
     @Test
     public void test_simple_sequencer_initialization()
             throws Exception {

@@ -16,18 +16,19 @@
  */
 package com.noctarius.snowcast.impl;
 
+import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.spi.ProxyManager;
 import com.hazelcast.util.ConstructorFunction;
 import com.noctarius.snowcast.SnowcastEpoch;
 import com.noctarius.snowcast.SnowcastSequenceState;
 import com.noctarius.snowcast.SnowcastSequencer;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_SEQUENCER_TYPE;
 import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
@@ -43,12 +44,9 @@ class ClientSequencerService
 
     private final ConcurrentMap<String, SequencerProvision> provisions;
 
-    ClientSequencerService(@Nonnull ProxyManager proxyManager, @Nonnull ClientCodec clientCodec) {
-        if (InternalSequencerUtils.getHazelcastVersion() == SnowcastConstants.HazelcastVersion.V_3_9) {
-            this.sequencerConstructor = new ClientSequencerConstructorFunction39(proxyManager, this, clientCodec);
-        } else {
-            this.sequencerConstructor = new ClientSequencerConstructorFunction(proxyManager, this, clientCodec);
-        }
+    ClientSequencerService(@Nonnull HazelcastClientInstanceImpl client, @Nonnull ProxyManager proxyManager,
+                           @Nonnull ClientCodec clientCodec) {
+        this.sequencerConstructor = new ClientSequencerConstructorFunction(client, proxyManager, this, clientCodec);
         this.provisions = new ConcurrentHashMap<>();
         this.clientCodec = clientCodec;
     }

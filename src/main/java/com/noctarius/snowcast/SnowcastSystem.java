@@ -19,16 +19,14 @@ package com.noctarius.snowcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.instance.HazelcastInstanceImpl;
 import com.hazelcast.instance.HazelcastInstanceProxy;
-import com.hazelcast.nio.ClassLoaderUtil;
+import com.noctarius.snowcast.impl.ClientSnowcastFactory;
 import com.noctarius.snowcast.impl.NodeSnowcastFactory;
-import com.noctarius.snowcast.impl.SequencerService;
 
+import java.util.Map;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.ThreadSafe;
 import javax.validation.constraints.Max;
-import java.lang.reflect.Method;
-import java.util.Map;
 
 import static com.noctarius.snowcast.impl.ExceptionMessages.BACKUP_COUNT_TOO_HIGH;
 import static com.noctarius.snowcast.impl.ExceptionMessages.BACKUP_COUNT_TOO_LOW;
@@ -133,12 +131,7 @@ public final class SnowcastSystem {
 
             // Client setup
             if (snowcast == null) {
-                snowcast = execute(() -> {
-                    String className = SequencerService.class.getPackage().getName() + ".ClientSnowcastFactory";
-                    Class<?> clazz = ClassLoaderUtil.loadClass(null, className);
-                    Method snowcastMethod = clazz.getMethod("snowcast", HazelcastInstance.class, short.class);
-                    return (Snowcast) snowcastMethod.invoke(clazz, hazelcastInstance, (short) backupCount);
-                });
+                snowcast = execute(() -> ClientSnowcastFactory.snowcast(hazelcastInstance, (short) backupCount));
             }
 
             userContext.put(USER_CONTEXT_LOOKUP_NAME, snowcast);

@@ -121,7 +121,7 @@ In addition to our `com.noctarius.snowcast.Snowcast` factory, a custom epoch mus
 
 ```java
 Calendar calendar = GregorianCalendar.getInstance();
-calendar.set( 2014, Calendar.JANUARY, 1, 0, 0, 0 );
+calendar.set( 2017, Calendar.JANUARY, 1, 0, 0, 0 );
 SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
 ```
 
@@ -151,62 +151,13 @@ Destroying a sequencer is a cluster operation and will destroy all sequencers re
 
 ### Hazelcast Configuration
 
-snowcast 2.0 uses a custom service that is automatically registered with Hazelcast on startup. It supports Hazelcast 3.7.x and 3.8.x. To get started with snowcast simply provide the according JAR file in the classpath of the application. No additional step's necessary. For older snowcast versions see below.
-
-For snowcast 1.0; Hazelcast requires custom services to be configured upfront using either the Configuration API or by utilizing the, XML based, declarative configuration.
+snowcast uses a custom service that is automatically registered with Hazelcast on startup. Snowcast 2.0 supports Hazelcast 3.7.x and 3.8.x. snowcast 2.1 supports 3.9.x. To get started with snowcast simply provide the according JAR file in the classpath of the application. No additional step's necessary. For older snowcast versions see below.
 
 snowcast offers three different ways to register the snowcast service with Hazelcast by providing support for the two already named ones and additionally is equipped with a hack to lazily registers itself as a Hazelcast service on first acquisition. This way is not meant to be used in production, the reason will be shown in a bit.
 
-#### Using the Configuration API
- 
-As of snowcast 2.0 no manual configuration is required anymore. This chapter, however, stays for reference of snowcast 1.0. 
-
-The simplest way to configure snowcast is using the Hazelcast Configuration API. snowcast provides the user with a helper class to configure all necessary options.
-
-If no other configuration is necessary let the snowcast helper create the `com.hazelcast.config.Config` instance for you, using the same way as Hazelcast itself would do it, and retrieve a pre-configured `Config` ready to be used to create a Hazelcast instance.
-
-```java
-Config config = SnowcastNodeConfigurator.buildSnowcastAwareConfig();
-HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance( config );
-```
-
-If there is already a `Config` instance this can be passed in and configured to use snowcast.
-
-```java
-Config config = new Config();
-config = SnowcastNodeConfigurator.buildSnowcastAwareConfig( config );
-HazelcastInstance hazelcastInstance = Hazelcast.newHazelcastInstance( config );
-```
-
-#### Using the Declarative Configuration
-
-As of snowcast 2.0 no manual configuration is required anymore. This chapter, however, stays for reference of snowcast 1.0. 
-
-For people configuring Hazelcast using the XML based configuration only, snowcast also supports a configuration based on declarative configuration. As a disadvantage using the declarative configuration the internal classname of the service is bound to the configuration. Whenever the classname might change for any reason instantiating Hazelcast might fail for an non-obvious reason. Using the [Configuration API](#using-the-configuration-api) is recommended.
-
-```xml
-<hazelcast xsi:schemaLocation="http://www.hazelcast.com/schema/config hazelcast-config-3.4.xsd"
-           xmlns="http://www.hazelcast.com/schema/config"
-           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-
-  <services enable-defaults="true">
-    <service enabled="true">
-      <name>noctarius::SequencerService</name>
-      <class-name>com.noctarius.snowcast.impl.NodeSequencerService</class-name>
-    </service>
-  </services>
-</hazelcast>
-```
-
-That way the snowcast service is registered into Hazelcast.
-
-#### Lazy Configuration Hack (removed)
-
-The previously available "Lazy Configuration Hack" has been removed from snowcast 1.0.0.
-
 ### Hazelcast Client Configuration
 
-snowcast 2.0 snapshots currently support Hazelcast 3.7.x, 3.8.x. The underlying communication system is automatically registered.
+snowcast 2.0 snapshots currently support Hazelcast 3.7.x, 3.8.x. snowcast 2.1 supports Hazelcast 3.9.x. The underlying communication system is automatically registered.
 
 For older versions, snowcast 1.0 supports Hazelcast 3.4.x as well as Hazelcast 3.5.x and automatically registers a matching communication system.
 
@@ -229,7 +180,7 @@ snowcast is deployed as a Apache Maven artifact. All release candidates as well 
 <dependency>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>1.0.0</version>
+  <version>2.1.0</version>
 </dependency>
 ```
 
@@ -254,7 +205,7 @@ The Maven coordinates for the snowcast artifacts are:
 <dependency>
   <groupId>com.noctarius.snowcast</groupId>
   <artifactId>snowcast</artifactId>
-  <version>2.0.0-SNAPSHOT</version>
+  <version>2.1.0-SNAPSHOT</version>
 </dependency>
 ```
 
@@ -341,7 +292,7 @@ HazelcastInstance hazelcastClient = getHazelcastClient();
 Snowcast snowcast = SnowcastSystem.snowcast( hazelcastClient );
 
 Calendar calendar = GregorianCalendar.getInstance();
-calendar.set( 2014, Calendar.JANUARY, 1, 0, 0, 0 );
+calendar.set( 2017, Calendar.JANUARY, 1, 0, 0, 0 );
 SnowcastEpoch epoch = SnowcastEpoch.byCalendar( calendar );
 
 SnowcastSequencer sequencer = snowcast.createSequencer( "sequencerName", epoch );

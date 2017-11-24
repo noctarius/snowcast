@@ -18,12 +18,8 @@ package com.noctarius.snowcast.impl;
 
 import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
 import com.hazelcast.client.impl.protocol.ClientMessage;
-import com.hazelcast.client.impl.protocol.codec.SnowcastAttachLogicalNodeCodec;
-import com.hazelcast.client.impl.protocol.codec.SnowcastCreateSequencerDefinitionCodec;
-import com.hazelcast.client.impl.protocol.codec.SnowcastDestroySequencerDefinitionCodec;
-import com.hazelcast.client.impl.protocol.codec.SnowcastDetachLogicalNodeCodec;
-import com.hazelcast.client.impl.protocol.codec.SnowcastRegisterChannelCodec;
-import com.hazelcast.client.impl.protocol.codec.SnowcastRemoveChannelCodec;
+import com.hazelcast.client.impl.protocol.codec.*;
+import com.hazelcast.client.spi.impl.ClientInvocation;
 import com.hazelcast.core.Partition;
 import com.hazelcast.core.PartitionService;
 import com.noctarius.snowcast.SnowcastEpoch;
@@ -32,11 +28,11 @@ import javax.annotation.Nonnull;
 
 final class ClientCodec {
 
-    private final ClientInvocator clientInvocator;
+    private final HazelcastClientInstanceImpl client;
     private final PartitionService partitionService;
 
-    ClientCodec(HazelcastClientInstanceImpl client, ClientInvocator clientInvocator) {
-        this.clientInvocator = clientInvocator;
+    ClientCodec(HazelcastClientInstanceImpl client) {
+        this.client = client;
         this.partitionService = client.getPartitionService();
     }
 
@@ -106,7 +102,8 @@ final class ClientCodec {
     private ClientMessage invoke(@Nonnull String sequencerName, @Nonnull ClientMessage request) {
         return ExceptionUtils.execute(() -> {
             int partitionId = partitionId(sequencerName);
-            return clientInvocator.invoke(partitionId, request).get();
+            ClientInvocation clientInvocation = new ClientInvocation(client, request, "snowcast", partitionId);
+            return clientInvocation.invoke().get();
         });
     }
 

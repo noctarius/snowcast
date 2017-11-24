@@ -16,14 +16,15 @@
  */
 package com.noctarius.snowcast.impl;
 
-import com.hazelcast.client.spi.ClientProxy;
+import com.hazelcast.client.impl.HazelcastClientInstanceImpl;
+import com.hazelcast.client.impl.protocol.ClientMessage;
+import com.hazelcast.client.impl.protocol.codec.ClientCreateProxyCodec;
 import com.hazelcast.client.spi.ProxyManager;
+import com.hazelcast.client.spi.impl.ClientInvocation;
+import com.hazelcast.nio.Address;
 import com.hazelcast.util.ConstructorFunction;
 
 import javax.annotation.Nonnull;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Method;
 
 final class ClientSequencerConstructorFunction
         implements ConstructorFunction<SequencerDefinition, SequencerProvision> {
@@ -33,42 +34,38 @@ final class ClientSequencerConstructorFunction
     private final ClientCodec clientCodec;
     private final ProxyManager proxyManager;
     private final ClientSequencerService sequencerService;
-    private final MethodHandle proxyManagerInitialize;
+    private final HazelcastClientInstanceImpl client;
 
-    ClientSequencerConstructorFunction(@Nonnull ProxyManager proxyManager, @Nonnull ClientSequencerService sequencerService,
+    ClientSequencerConstructorFunction(@Nonnull HazelcastClientInstanceImpl client,
+                                       @Nonnull ProxyManager proxyManager,
+                                       @Nonnull ClientSequencerService sequencerService,
                                        @Nonnull ClientCodec clientCodec) {
-
+        this.client = client;
         this.clientCodec = clientCodec;
         this.proxyManager = proxyManager;
         this.sequencerService = sequencerService;
-        this.proxyManagerInitialize = getInitializeMethod();
     }
 
     @Nonnull
     @Override
     public SequencerProvision createNew(@Nonnull SequencerDefinition definition) {
         TRACER.trace("create new provision for definition %s", definition);
-        ClientSequencer sequencer = new ClientSequencer(sequencerService, definition, clientCodec);
-        initializeProxy(sequencer);
+        ClientSequencer sequencer = new ClientSequencer(sequencerService, definition, clientCodec, proxyManager.getContext());
+
+        Address initializationTarget = proxyManager.findNextAddressToSendCreateRequest();
+        if (initializationTarget == null) {
+            throw new RuntimeException("Not able to find a member to create proxy on!");
+        } else {
+            ClientMessage clientMessage = ClientCreateProxyCodec.encodeRequest(
+                    definition.getSequencerName(), sequencer.getServiceName(), initializationTarget);
+            ExceptionUtils.execute(() -> {
+                new ClientInvocation(client, clientMessage, sequencer.getServiceName(), initializationTarget)
+                        .invoke().get();
+                return null;
+            });
+            sequencer.onInitialize();
+        }
         sequencer.attachLogicalNode();
         return new SequencerProvision(definition, sequencer);
-    }
-
-    private void initializeProxy(@Nonnull ClientSequencer sequencer) {
-        //ACCESSIBILITY_HACK
-        ExceptionUtils.execute(() -> {
-            TRACER.trace("initialize sequencer proxy %s", sequencer);
-            return proxyManagerInitialize.invoke(proxyManager, sequencer);
-        });
-    }
-
-    @Nonnull
-    private MethodHandle getInitializeMethod() {
-        return ExceptionUtils.execute(() -> {
-            MethodHandles.Lookup lookup = MethodHandles.lookup();
-            Method method = ProxyManager.class.getDeclaredMethod("initialize", ClientProxy.class);
-            method.setAccessible(true);
-            return lookup.unreflect(method);
-        });
     }
 }
