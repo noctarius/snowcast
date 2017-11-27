@@ -25,6 +25,7 @@ import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.PartitionService;
 import com.hazelcast.nio.Address;
+import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.noctarius.snowcast.Snowcast;
@@ -44,6 +45,7 @@ public class ClientSequencerBackupTestCase
 
     static {
         System.setProperty("java.net.preferIPv4Stack", "true");
+        GroupProperty.PHONE_HOME_ENABLED.setSystemProperty("false");
     }
 
     private final Config config1 = new XmlConfigBuilder().build();

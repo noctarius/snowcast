@@ -19,6 +19,7 @@ package com.noctarius.snowcast.impl;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.core.PartitionService;
 import com.hazelcast.nio.Address;
+import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.test.AssertTask;
 import com.hazelcast.test.HazelcastTestSupport;
 import com.hazelcast.test.TestHazelcastInstanceFactory;
@@ -36,6 +37,11 @@ import static org.junit.Assert.assertEquals;
 public class SequencerBackupTestCase
         extends HazelcastTestSupport {
 
+    static {
+        System.setProperty("java.net.preferIPv4Stack", "true");
+        GroupProperty.PHONE_HOME_ENABLED.setSystemProperty("false");
+    }
+    
     @Test
     public void test_simple_backup_create_sequencer_definition_owner() {
         TestHazelcastInstanceFactory factory = new TestHazelcastInstanceFactory(2);

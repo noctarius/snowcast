@@ -23,6 +23,7 @@ import com.hazelcast.config.Config;
 import com.hazelcast.config.XmlConfigBuilder;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.spi.properties.GroupProperty;
 import com.hazelcast.test.HazelcastTestSupport;
 import org.junit.Test;
 
@@ -38,6 +39,7 @@ public class ClientBasicTestCase
 
     static {
         System.setProperty("java.net.preferIPv4Stack", "true");
+        GroupProperty.PHONE_HOME_ENABLED.setSystemProperty("false");
     }
 
     private final Config config = new XmlConfigBuilder().build();

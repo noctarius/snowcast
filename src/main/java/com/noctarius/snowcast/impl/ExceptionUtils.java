@@ -19,8 +19,11 @@ package com.noctarius.snowcast.impl;
 import com.noctarius.snowcast.SnowcastException;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static com.hazelcast.util.ExceptionUtil.rethrow;
 
 public class ExceptionUtils {
 
@@ -44,7 +47,13 @@ public class ExceptionUtils {
     public static <V> V execute(ThrowingCallable<V> callable) {
         try {
             return callable.call();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw rethrow(e);
         } catch (Throwable throwable) {
+            if (throwable instanceof ExecutionException) {
+                throwable = throwable.getCause();
+            }
             if (throwable instanceof SnowcastException) {
                 throw (SnowcastException) throwable;
             } else if (throwable instanceof Error) {

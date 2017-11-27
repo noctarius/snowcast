@@ -23,34 +23,15 @@ import com.noctarius.snowcast.SnowcastMaxLogicalNodeIdOutOfBoundsException;
 import com.noctarius.snowcast.SnowcastSequenceComparator;
 import com.noctarius.snowcast.SnowcastSequencer;
 
+import java.util.Comparator;
 import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.Comparator;
 
-import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_COUNT;
-import static com.noctarius.snowcast.impl.ExceptionMessages.ILLEGAL_MAX_LOGICAL_NODE_ID_BOUNDARY;
-import static com.noctarius.snowcast.impl.ExceptionMessages.NEXT_ID_LARGER_THAN_ALLOWED_MAX_COUNTER;
+import static com.noctarius.snowcast.impl.ExceptionMessages.*;
 import static com.noctarius.snowcast.impl.ExceptionUtils.exception;
-import static com.noctarius.snowcast.impl.SnowcastConstants.ID_TIMESTAMP_READ_MASK;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_1024;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_128;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_2048;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_256;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_4096;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_512;
-import static com.noctarius.snowcast.impl.SnowcastConstants.MAX_LOGICAL_NODE_COUNT_8192;
-import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_LOWER_BOUND;
-import static com.noctarius.snowcast.impl.SnowcastConstants.NODE_ID_UPPER_BOUND;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_1024;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_128;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_2048;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_256;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_4096;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_512;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_LOGICAL_NODE_ID_8192;
-import static com.noctarius.snowcast.impl.SnowcastConstants.SHIFT_TIMESTAMP;
+import static com.noctarius.snowcast.impl.SnowcastConstants.*;
 
 public final class InternalSequencerUtils {
 
@@ -162,10 +143,8 @@ public final class InternalSequencerUtils {
             return SnowcastConstants.HazelcastVersion.Unknown;
         }
 
-        if (buildInfo.getVersion().startsWith("3.7")) {
-            return SnowcastConstants.HazelcastVersion.V_3_7;
-        } else if (buildInfo.getVersion().startsWith("3.8")) {
-            return SnowcastConstants.HazelcastVersion.V_3_8;
+        if (buildInfo.getVersion().startsWith("3.9")) {
+            return SnowcastConstants.HazelcastVersion.V_3_9;
         }
         return SnowcastConstants.HazelcastVersion.Unknown;
     }

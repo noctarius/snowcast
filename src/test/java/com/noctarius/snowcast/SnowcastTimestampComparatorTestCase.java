@@ -19,9 +19,7 @@ package com.noctarius.snowcast;
 import com.noctarius.snowcast.impl.SnowcastConstants;
 import org.junit.Test;
 
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateBoundedMaxLogicalNodeCount;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.calculateLogicalNodeShifting;
-import static com.noctarius.snowcast.impl.InternalSequencerUtils.generateSequenceId;
+import static com.noctarius.snowcast.impl.InternalSequencerUtils.*;
 import static junit.framework.TestCase.assertEquals;
 
 public class SnowcastTimestampComparatorTestCase {

@@ -18,7 +18,6 @@ package com.noctarius.snowcast.impl.operations.clientcodec;
 
 import com.hazelcast.annotation.GenerateCodec;
 import com.hazelcast.annotation.Response;
-import com.hazelcast.annotation.Since;
 import com.hazelcast.client.impl.client.DistributedObjectInfo;
 import com.hazelcast.client.impl.protocol.constants.ResponseMessageConst;
 import com.hazelcast.core.Member;
@@ -27,9 +26,9 @@ import com.hazelcast.mapreduce.JobPartitionState;
 import com.hazelcast.nio.Address;
 import com.hazelcast.nio.serialization.Data;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 
 @GenerateCodec(id = 0, name = "response", ns = "")
 public interface ResponseMessageTemplate {
@@ -99,8 +98,8 @@ public interface ResponseMessageTemplate {
      */
     @Response(ResponseMessageConst.AUTHENTICATION)
     Object Authentication(byte status, @Nullable Address address, @Nullable String uuid, @Nullable String ownerUuid,
-                          byte serializationVersion, @Since(value = "1.3") String serverHazelcastVersion,
-                          @Since(value = "1.3") @Nullable List<Member> clientUnregisteredMembers);
+                          byte serializationVersion, String serverHazelcastVersion, 
+                          @Nullable List<Member> clientUnregisteredMembers);
 
     /**
      * @param partitions mappings from member address to list of partition id 's that member owns

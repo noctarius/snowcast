@@ -28,7 +28,6 @@ import javax.annotation.Nonnegative;
 import javax.annotation.Nonnull;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.lang.reflect.Field;
 
 import static com.noctarius.snowcast.impl.ExceptionMessages.RETRIEVE_NODE_ENGINE_FAILED;
 import static com.noctarius.snowcast.impl.ExceptionMessages.SERVICE_NOT_REGISTERED;
@@ -78,12 +77,13 @@ class NodeSnowcast
     @Nonnull
     private NodeEngine getNodeEngine(@Nonnull HazelcastInstance hazelcastInstance) {
         return ExceptionUtils.execute(() -> {
-            // Ugly hack due to lack in SPI
-            //ACCESSIBILITY_HACK
-            Field originalField = HazelcastInstanceProxy.class.getDeclaredField("original");
-            originalField.setAccessible(true);
-            HazelcastInstanceImpl impl = (HazelcastInstanceImpl) originalField.get(hazelcastInstance);
-            return impl.node.getNodeEngine();
+            if (hazelcastInstance instanceof HazelcastInstanceImpl) {
+                return ((HazelcastInstanceImpl) hazelcastInstance).node.getNodeEngine();
+            }
+            if (hazelcastInstance instanceof HazelcastInstanceProxy) {
+                return ((HazelcastInstanceProxy) hazelcastInstance).getOriginal().node.getNodeEngine();
+            }
+            throw new InstantiationException();
         }, RETRIEVE_NODE_ENGINE_FAILED);
     }
 }
