@@ -1,4 +1,5 @@
 # ![snowcast](https://raw.githubusercontent.com/noctarius/snowcast/master/snowcast_name.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fnoctarius%2Fsnowcast.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fnoctarius%2Fsnowcast?ref=badge_shield)
 
 **snowcast** is an auto-configuration, distributed, scalable ID generator on top of [Hazelcast](http://www.hazelcast.org).
 
@@ -358,3 +359,7 @@ As an important note, clients behave exactly as cluster nodes. Cluster communica
 snowcast is build using Jenkins for Continuous Integration. The project build is publically available for review. It contains Code and Test Coverage reports and many more information.
 
 Please find the Jenkins build here: [Jenkins build](https://noctarius.ci.cloudbees.com/job/snowcast/)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fnoctarius%2Fsnowcast.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fnoctarius%2Fsnowcast?ref=badge_large)
